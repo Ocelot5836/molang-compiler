@@ -11,9 +11,9 @@ import io.github.ocelot.molangcompiler.core.compiler.StringReader;
 import io.github.ocelot.molangcompiler.core.node.*;
 import io.github.ocelot.molangcompiler.core.object.MolangMath;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * <p>Compiles a {@link MolangExpression} from a string input.</p>
@@ -52,7 +52,7 @@ public class MolangCompiler
     private static final int CHECK_OPERATORS_FLAG = 16;
 
     private static final MolangEnvironment ENVIRONMENT = new CompileEnvironment();
-    private static final Set<Character> MATH_OPERATORS = Set.of('(', ')', '*', '/', '+', '-');
+    private static final List<Character> MATH_OPERATORS = Arrays.asList('(', ')', '*', '/', '+', '-');
 
     /**
      * Compiles a {@link MolangExpression} from the specified string input.

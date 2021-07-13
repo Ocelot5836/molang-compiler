@@ -15,7 +15,7 @@ public class MolangLazyNode implements MolangExpression
 
     public MolangLazyNode(Supplier<MolangExpression> parent)
     {
-        this.parent = new Supplier<>()
+        this.parent = new Supplier<MolangExpression>()
         {
             private MolangExpression object;
 
