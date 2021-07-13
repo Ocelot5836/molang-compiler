@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+group 'io.github.ocelot'
+version '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation 'com.google.guava:guava:30.1.1-jre'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact jar
+        }
+    }
+    repositories {
+        if (project.hasProperty("jacksonMavenUser") && project.hasProperty("jacksonMavenPass")) {
+            maven {
+                url "https://maven.jaackson.me"
+                credentials {
+                    username = project.properties.jacksonMavenUser
+                    password = project.properties.jacksonMavenPass
+                }
+            }
+        }
+    }
+}
