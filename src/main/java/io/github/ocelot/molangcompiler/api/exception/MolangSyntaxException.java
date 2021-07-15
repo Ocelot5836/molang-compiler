@@ -3,6 +3,8 @@
 
 package io.github.ocelot.molangcompiler.api.exception;
 
+import org.jetbrains.annotations.Nullable;
+
 /**
  * <p>Thrown when any exception occurs when parsing a MoLang expression.</p>
  * <p>Modified version of CommandSyntaxException from <a href=https://github.com/Mojang/brigadier/blob/master/src/main/java/com/mojang/brigadier/exceptions/CommandSyntaxException.java>Brigadier</a></p>
@@ -17,14 +19,16 @@ public class MolangSyntaxException extends MolangException
     private final String input;
     private final int cursor;
 
-    public MolangSyntaxException(String message) {
+    public MolangSyntaxException(String message)
+    {
         super(message);
         this.message = message;
         this.input = null;
         this.cursor = -1;
     }
 
-    public MolangSyntaxException(String message, String input, int cursor) {
+    public MolangSyntaxException(String message, String input, int cursor)
+    {
         super(message);
         this.message = message;
         this.input = input;
@@ -32,7 +36,8 @@ public class MolangSyntaxException extends MolangException
     }
 
     @Override
-    public String getMessage() {
+    public String getMessage()
+    {
         String message = this.message;
         String context = this.getContext();
         if (context != null)
@@ -40,11 +45,19 @@ public class MolangSyntaxException extends MolangException
         return message;
     }
 
-    public String getRawMessage() {
+    /**
+     * @return The raw message error
+     */
+    public String getRawMessage()
+    {
         return message;
     }
 
-    public String getContext() {
+    /**
+     * @return The additional context if there is any
+     */
+    public String getContext()
+    {
         if (this.input == null || this.cursor < 0)
             return null;
         StringBuilder builder = new StringBuilder();
@@ -59,11 +72,20 @@ public class MolangSyntaxException extends MolangException
         return builder.toString();
     }
 
-    public String getInput() {
+    /**
+     * @return The raw input data or <code>null</code> if no context was specified
+     */
+    @Nullable
+    public String getInput()
+    {
         return input;
     }
 
-    public int getCursor() {
+    /**
+     * @return The cursor position when the error occurs or <code>-1</code> if no context was specified
+     */
+    public int getCursor()
+    {
         return cursor;
     }
 }

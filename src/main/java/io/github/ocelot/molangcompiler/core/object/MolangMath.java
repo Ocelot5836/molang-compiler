@@ -2,20 +2,19 @@ package io.github.ocelot.molangcompiler.core.object;
 
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
-import io.github.ocelot.molangcompiler.api.object.MolangLibrary;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
-import io.github.ocelot.molangcompiler.core.node.MolangConstantNode;
+import io.github.ocelot.molangcompiler.api.object.MolangLibrary;
+import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Locale;
 import java.util.Random;
 import java.util.function.BiConsumer;
 
 /**
- * <p>A reference to all standard MoLang math functions.</p>
- *
  * @author Ocelot
- * @since 1.0.0
  */
+@ApiStatus.Internal
 public class MolangMath extends MolangLibrary
 {
     private static final Random RNG = new Random();
@@ -138,7 +137,7 @@ public class MolangMath extends MolangLibrary
                 Math.min(parameters.resolve(0), parameters.resolve(1))),
         MOD(2, parameters ->
                 parameters.resolve(0) % parameters.resolve(1)),
-        PI(new MolangConstantNode((float) Math.PI)),
+        PI(MolangExpression.of((float) Math.PI)),
         POW(2, parameters ->
                 (float) Math.pow(parameters.resolve(0), parameters.resolve(1))),
         RANDOM(2, parameters ->
@@ -204,11 +203,13 @@ public class MolangMath extends MolangLibrary
             return expression;
         }
 
+        @Nullable
         public MolangJavaFunction getOp()
         {
             return op;
         }
 
+        @Nullable
         public static MolangMath.MathFunction byName(String name)
         {
             for (MathFunction function : MathFunction.values())

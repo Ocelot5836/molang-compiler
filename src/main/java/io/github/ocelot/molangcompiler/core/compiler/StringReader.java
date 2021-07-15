@@ -3,9 +3,12 @@
 
 package io.github.ocelot.molangcompiler.core.compiler;
 
+import org.jetbrains.annotations.ApiStatus;
+
 /**
  * <p>Modified version of StringReader from <a href=https://github.com/Mojang/brigadier/blob/master/src/main/java/com/mojang/brigadier/StringReader.java>Brigadier</a></p>
  */
+@ApiStatus.Internal
 public class StringReader
 {
     private final String string;

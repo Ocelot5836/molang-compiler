@@ -5,10 +5,12 @@ import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.core.MolangJavaFunctionContext;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @author Ocelot
  */
+@ApiStatus.Internal
 public class MolangFunction implements MolangExpression
 {
     private final int params;

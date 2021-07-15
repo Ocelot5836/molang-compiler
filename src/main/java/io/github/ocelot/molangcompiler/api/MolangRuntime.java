@@ -4,9 +4,7 @@ import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariableProvider;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
-import io.github.ocelot.molangcompiler.core.node.MolangConstantNode;
-import io.github.ocelot.molangcompiler.core.node.MolangLazyNode;
-import io.github.ocelot.molangcompiler.core.object.ImmutableMolangObject;
+import io.github.ocelot.molangcompiler.api.object.ImmutableMolangObject;
 import io.github.ocelot.molangcompiler.core.object.MolangFunction;
 import io.github.ocelot.molangcompiler.core.object.MolangMath;
 import io.github.ocelot.molangcompiler.core.object.MolangVariableStorage;
@@ -152,7 +150,7 @@ public class MolangRuntime implements MolangEnvironment
          */
         public Builder setQuery(String name, float value)
         {
-            this.query.set(name, new MolangConstantNode(value));
+            this.query.set(name, MolangExpression.of(value));
             return this;
         }
 
@@ -164,7 +162,7 @@ public class MolangRuntime implements MolangEnvironment
          */
         public Builder setQuery(String name, Supplier<Float> value)
         {
-            this.query.set(name, new MolangLazyNode(() -> new MolangConstantNode(value.get())));
+            this.query.set(name, MolangExpression.of(value));
             return this;
         }
 
@@ -176,7 +174,7 @@ public class MolangRuntime implements MolangEnvironment
          */
         public Builder setGlobal(String name, float value)
         {
-            this.global.set(name, new MolangConstantNode(value));
+            this.global.set(name, MolangExpression.of(value));
             return this;
         }
 
@@ -188,7 +186,7 @@ public class MolangRuntime implements MolangEnvironment
          */
         public Builder setGlobal(String name, Supplier<Float> value)
         {
-            this.global.set(name, new MolangLazyNode(() -> new MolangConstantNode(value.get())));
+            this.global.set(name, MolangExpression.of(value));
             return this;
         }
 
@@ -200,7 +198,7 @@ public class MolangRuntime implements MolangEnvironment
          */
         public Builder setVariable(String name, float value)
         {
-            this.variable.set(name, new MolangConstantNode(value)); // Variables are assumed to be used later
+            this.variable.set(name, MolangExpression.of(value)); // Variables are assumed to be used later
             return this;
         }
 
@@ -216,7 +214,7 @@ public class MolangRuntime implements MolangEnvironment
                 @Override
                 public void add(String name, float value)
                 {
-                    variable.set(name, new MolangConstantNode(value));
+                    variable.set(name, MolangExpression.of(value));
                 }
 
                 @Override
@@ -224,7 +222,7 @@ public class MolangRuntime implements MolangEnvironment
                 {
                     variable.set(name, MolangExpression.ZERO);
                 }
-            }); // Variables are assumed to be used later
+            });
             return this;
         }
 

@@ -4,10 +4,12 @@ import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * @author Ocelot
  */
+@ApiStatus.Internal
 public class MolangJavaFunctionContext implements MolangJavaFunction.Context
 {
     private final MolangEnvironment environment;

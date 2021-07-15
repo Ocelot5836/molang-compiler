@@ -187,7 +187,7 @@ public class MolangCompiler
             reader.skipWhitespace();
             if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek()))
                 throw TRAILING_STATEMENT.createWithContext(reader);
-            return parseCondition(reader, new MolangConstantNode(Float.parseFloat(fullWord)), flags, allowMath);
+            return parseCondition(reader, MolangExpression.of(Float.parseFloat(fullWord)), flags, allowMath);
         }
 
         // methods and params require at least both parts
@@ -393,7 +393,7 @@ public class MolangCompiler
                         continue;
                     try
                     {
-                        parameters[i] = new MolangConstantNode(parameters[i].resolve(ENVIRONMENT));
+                        parameters[i] = MolangExpression.of(parameters[i].resolve(ENVIRONMENT));
                     }
                     catch (MolangException e)
                     {
@@ -407,7 +407,7 @@ public class MolangCompiler
                 {
                     try
                     {
-                        return new MolangConstantNode(function.getOp().resolve(new MolangJavaFunctionContext(ENVIRONMENT, parameters)));
+                        return MolangExpression.of(function.getOp().resolve(new MolangJavaFunctionContext(ENVIRONMENT, parameters)));
                     }
                     catch (MolangException e)
                     {
@@ -455,7 +455,7 @@ public class MolangCompiler
                 // Attempt to reduce if possible
                 try
                 {
-                    return new MolangConstantNode(x.resolve(ENVIRONMENT));
+                    return MolangExpression.of(x.resolve(ENVIRONMENT));
                 }
                 catch (MolangException e)
                 {
@@ -512,7 +512,7 @@ public class MolangCompiler
                 if (accept('+'))
                     return parseFactor(); // unary plus
                 if (accept('-'))
-                    return new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.MULTIPLY, parseFactor(), new MolangConstantNode(-1)); // unary minus
+                    return new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.MULTIPLY, parseFactor(), MolangExpression.of(-1)); // unary minus
 
                 if (accept('('))
                 {

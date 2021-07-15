@@ -4,12 +4,14 @@
 package io.github.ocelot.molangcompiler.core.compiler;
 
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.BiFunction;
 
 /**
  * <p>Modified version of Dynamic2CommandExceptionType from <a href=https://github.com/Mojang/brigadier/blob/master/src/main/java/com/mojang/brigadier/exceptions/Dynamic2CommandExceptionType.java>Brigadier</a></p>
  */
+@ApiStatus.Internal
 public class Dynamic2MolangExceptionType
 {
     private BiFunction<Object, Object, String> function;

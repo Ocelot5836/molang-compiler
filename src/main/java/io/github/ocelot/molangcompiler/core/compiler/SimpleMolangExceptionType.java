@@ -4,10 +4,12 @@
 package io.github.ocelot.molangcompiler.core.compiler;
 
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * <p>Modified version of SimpleCommandExceptionType from <a href=https://github.com/Mojang/brigadier/blob/master/src/main/java/com/mojang/brigadier/exceptions/SimpleCommandExceptionType.java>Brigadier</a></p>
  */
+@ApiStatus.Internal
 public class SimpleMolangExceptionType
 {
     private final String message;

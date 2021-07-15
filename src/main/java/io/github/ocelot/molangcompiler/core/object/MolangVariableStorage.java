@@ -2,10 +2,15 @@ package io.github.ocelot.molangcompiler.core.object;
 
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author Ocelot
+ */
+@ApiStatus.Internal
 public class MolangVariableStorage implements MolangObject
 {
     private final Map<String, MolangExpression> storage;
