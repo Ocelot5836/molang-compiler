@@ -3,7 +3,7 @@ package io.github.ocelot.molangcompiler.api;
 
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.core.node.MolangConstantNode;
-import io.github.ocelot.molangcompiler.core.node.MolangLazyNode;
+import io.github.ocelot.molangcompiler.core.node.MolangStaticNode;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -69,24 +69,24 @@ public interface MolangExpression
     }
 
     /**
-     * Creates a {@link MolangExpression} of the specified value that will be lazily loaded.
+     * Creates a {@link MolangExpression} of the specified value that will be computed after every call.
      *
      * @param value The value to represent as an expression
      * @return A new expression with that value
      */
     static MolangExpression of(Supplier<Float> value)
     {
-        return new MolangLazyNode(() -> new MolangConstantNode(value.get()));
+        return new MolangStaticNode(value);
     }
 
     /**
-     * Creates a {@link MolangExpression} of the specified value that will be lazily loaded.
+     * Creates a {@link MolangExpression} of the specified value that will be computed after every call.
      *
      * @param value The value to represent as an expression
      * @return A new expression with that value
      */
     static MolangExpression of(BooleanSupplier value)
     {
-        return new MolangLazyNode(() -> new MolangConstantNode(value.getAsBoolean() ? 1.0F : 0.0F));
+        return new MolangStaticNode(() -> value.getAsBoolean() ? 1.0F : 0.0F);
     }
 }
