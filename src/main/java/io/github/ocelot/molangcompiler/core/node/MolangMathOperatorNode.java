@@ -31,7 +31,7 @@ public class MolangMathOperatorNode implements MolangExpression
     @Override
     public String toString()
     {
-        return this.a + " " + this.operation.sign + " " + this.b;
+        return "(" + this.a + " " + this.operation.sign + " " + this.b + ")";
     }
 
     public enum MathOperation
