@@ -16,7 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * <p>Compiles a {@link MolangExpression} from a string input.</p>
+ * Compiles a {@link MolangExpression} from a string input.
  *
  * @author Ocelot
  * @since 1.0.0
@@ -31,23 +31,23 @@ public class MolangCompiler
     private static final Dynamic2MolangExceptionType TOO_MANY_PARAMETERS = new Dynamic2MolangExceptionType((obj, obj2) -> "Too many parameters. Expected at most " + obj + ", got " + obj2);
 
     /**
-     * Whether or not to reduce math to constant values if possible. Eg. <code>4 * 4 + 2</code> would become <code>18</code>. This should almost always be on.
+     * Whether to reduce math to constant values if possible. E.g. <code>4 * 4 + 2</code> would become <code>18</code>. This should almost always be on.
      */
     public static final int REDUCE_FLAG = 1;
     /**
-     * Whether or not to check for 'this' keyword.
+     * Whether to check for 'this' keyword.
      */
     private static final int CHECK_THIS_FLAG = 2;
     /**
-     * Whether or not to check for variables.
+     * Whether to check for variables.
      */
     private static final int CHECK_VARIABLE_FLAG = 4;
     /**
-     * Whether or not to check for methods.
+     * Whether to check for methods.
      */
     private static final int CHECK_METHOD_FLAG = 8;
     /**
-     * Whether or not to check for math operations.
+     * Whether to check for math operations.
      */
     private static final int CHECK_OPERATORS_FLAG = 16;
 

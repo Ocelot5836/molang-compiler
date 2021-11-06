@@ -4,7 +4,7 @@ import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
 
 /**
- * <p>An environment for MoLang execution.</p>
+ * A MoLang execution environment.
  *
  * @author Ocelot
  * @since 1.0.0
@@ -50,7 +50,7 @@ public interface MolangEnvironment
      * Checks to see if a parameter is loaded under the specified index.
      *
      * @param parameter The parameter to check
-     * @return Whether or not a parameter is present
+     * @return Whether a parameter is present
      */
     boolean hasParameter(int parameter) throws MolangException;
 }

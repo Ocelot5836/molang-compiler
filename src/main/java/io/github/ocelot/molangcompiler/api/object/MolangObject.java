@@ -3,7 +3,7 @@ package io.github.ocelot.molangcompiler.api.object;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 
 /**
- * <p>An object that can be referenced in MoLang.</p>
+ * An object that can be referenced in MoLang.
  *
  * @author Ocelot
  * @since 1.0.0

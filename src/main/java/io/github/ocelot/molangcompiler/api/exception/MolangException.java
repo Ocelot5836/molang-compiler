@@ -1,7 +1,7 @@
 package io.github.ocelot.molangcompiler.api.exception;
 
 /**
- * <p>An exception that can be thrown by MoLang.</p>
+ * An exception that can be thrown by MoLang.
  *
  * @author Ocelot
  * @since 1.0.0

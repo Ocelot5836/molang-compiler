@@ -1,7 +1,7 @@
 package io.github.ocelot.molangcompiler.api.bridge;
 
 /**
- * <p>Provides variables for Molang expressions. Variables are immutable values from Java code used as constants in MoLang.</p>
+ * Provides variables for Molang expressions. Variables are immutable values from Java code used as constants in MoLang.
  *
  * @author Ocelot
  * @since 1.0.0

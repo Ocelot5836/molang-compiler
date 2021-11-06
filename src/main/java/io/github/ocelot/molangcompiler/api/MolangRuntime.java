@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /**
- * <p>The runtime for MoLang to create and access data from.</p>
+ * The runtime for MoLang to create and access data from.
  *
  * @author Ocelot
  * @since 1.0.0
@@ -124,7 +124,7 @@ public class MolangRuntime implements MolangEnvironment
     }
 
     /**
-     * <p>Constructs a new {@link MolangRuntime} with preset parameters.</p>
+     * Constructs a new {@link MolangRuntime} with preset parameters.
      *
      * @author Ocelot
      * @since 1.0.0

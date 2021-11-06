@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
- * <p>A template for a function-providing library in MoLang.</p>
+ * A template for a function-providing library in MoLang.
  *
  * @author Ocelot
  * @since 1.0.0

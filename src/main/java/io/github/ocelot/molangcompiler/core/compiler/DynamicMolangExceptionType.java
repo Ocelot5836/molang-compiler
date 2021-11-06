@@ -9,7 +9,7 @@ import org.jetbrains.annotations.ApiStatus;
 import java.util.function.Function;
 
 /**
- * <p>Modified version of DynamicCommandExceptionType from <a href=https://github.com/Mojang/brigadier/blob/master/src/main/java/com/mojang/brigadier/exceptions/DynamicCommandExceptionType.java>Brigadier</a></p>
+ * Modified version of DynamicCommandExceptionType from <a href=https://github.com/Mojang/brigadier/blob/master/src/main/java/com/mojang/brigadier/exceptions/DynamicCommandExceptionType.java>Brigadier</a>
  */
 @ApiStatus.Internal
 public class DynamicMolangExceptionType

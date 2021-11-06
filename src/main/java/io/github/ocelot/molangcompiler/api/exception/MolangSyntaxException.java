@@ -6,8 +6,9 @@ package io.github.ocelot.molangcompiler.api.exception;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * <p>Thrown when any exception occurs when parsing a MoLang expression.</p>
- * <p>Modified version of CommandSyntaxException from <a href=https://github.com/Mojang/brigadier/blob/master/src/main/java/com/mojang/brigadier/exceptions/CommandSyntaxException.java>Brigadier</a></p>
+ * Thrown when any exception occurs when parsing a MoLang expression.
+ *
+ * <p> Modified version of CommandSyntaxException from <a href=https://github.com/Mojang/brigadier/blob/master/src/main/java/com/mojang/brigadier/exceptions/CommandSyntaxException.java>Brigadier</a>
  *
  * @since 1.0.0
  */

@@ -4,7 +4,7 @@ import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 
 /**
- * <p>Executes java code from MoLang expressions.</p>
+ * Executes java code from MoLang expressions.
  *
  * @author Ocelot
  * @since 1.0.0

@@ -3,7 +3,7 @@ package io.github.ocelot.molangcompiler.api.object;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 
 /**
- * <p>A {@link MolangObject} that cannot have any values modified.</p>
+ * A {@link MolangObject} that cannot have any values modified.
  *
  * @author Ocelot
  * @since 1.0.0

@@ -9,9 +9,10 @@ import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
 
 /**
- * <p>A math expression that can be reduced using a {@link MolangRuntime}.</p>
+ * A math expression that can be reduced using a {@link MolangEnvironment}.
  *
  * @author Ocelot
+ * @see MolangEnvironment
  * @since 1.0.0
  */
 public interface MolangExpression
