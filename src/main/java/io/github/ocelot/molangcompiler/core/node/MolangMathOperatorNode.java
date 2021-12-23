@@ -5,6 +5,8 @@ import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Objects;
+
 /**
  * @author Ocelot
  */
@@ -32,6 +34,21 @@ public class MolangMathOperatorNode implements MolangExpression
     public String toString()
     {
         return "(" + this.a + " " + this.operation.sign + " " + this.b + ")";
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MolangMathOperatorNode that = (MolangMathOperatorNode) o;
+        return this.operation == that.operation && this.a.equals(that.a) && this.b.equals(that.b);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(this.operation, this.a, this.b);
     }
 
     public enum MathOperation

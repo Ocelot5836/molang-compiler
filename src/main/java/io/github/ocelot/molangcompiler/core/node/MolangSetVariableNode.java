@@ -5,6 +5,8 @@ import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Objects;
+
 /**
  * @author Ocelot
  */
@@ -34,5 +36,20 @@ public class MolangSetVariableNode implements MolangExpression
     public String toString()
     {
         return this.object + "." + this.name + " = " + this.expression;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MolangSetVariableNode that = (MolangSetVariableNode) o;
+        return this.object.equals(that.object) && this.name.equals(that.name) && this.expression.equals(that.expression);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(this.object, this.name, this.expression);
     }
 }

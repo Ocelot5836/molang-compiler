@@ -5,6 +5,8 @@ import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Arrays;
+
 /**
  * @author Ocelot
  */
@@ -42,5 +44,20 @@ public class MolangCompoundNode implements MolangExpression
             builder.append(';');
         }
         return builder.toString();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MolangCompoundNode that = (MolangCompoundNode) o;
+        return Arrays.equals(this.expressions, that.expressions);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Arrays.hashCode(this.expressions);
     }
 }

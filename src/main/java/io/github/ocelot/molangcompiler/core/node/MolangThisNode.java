@@ -22,4 +22,10 @@ public class MolangThisNode implements MolangExpression
     {
         return "this";
     }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        return obj instanceof MolangThisNode;
+    }
 }

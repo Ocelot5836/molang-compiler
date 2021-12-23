@@ -6,6 +6,9 @@ import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 /**
  * @author Ocelot
  */
@@ -60,5 +63,22 @@ public class MolangInvokeFunctionNode implements MolangExpression
                 builder.append(", ");
         }
         return builder.append(')').toString();
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MolangInvokeFunctionNode that = (MolangInvokeFunctionNode) o;
+        return this.object.equals(that.object) && this.name.equals(that.name) && Arrays.equals(this.parameters, that.parameters);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = Objects.hash(this.object, this.name);
+        result = 31 * result + Arrays.hashCode(this.parameters);
+        return result;
     }
 }

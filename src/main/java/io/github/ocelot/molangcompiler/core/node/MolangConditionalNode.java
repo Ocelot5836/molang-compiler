@@ -5,6 +5,8 @@ import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Objects;
+
 /**
  * @author Ocelot
  */
@@ -32,5 +34,20 @@ public class MolangConditionalNode implements MolangExpression
     public String toString()
     {
         return this.condition + " ? " + this.first + " : " + this.branch;
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MolangConditionalNode that = (MolangConditionalNode) o;
+        return this.condition.equals(that.condition) && this.first.equals(that.first) && this.branch.equals(that.branch);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(this.condition, this.first, this.branch);
     }
 }

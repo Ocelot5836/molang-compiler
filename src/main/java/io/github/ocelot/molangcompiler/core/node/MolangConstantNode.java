@@ -4,6 +4,8 @@ import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Objects;
+
 /**
  * @author Ocelot
  */
@@ -27,5 +29,20 @@ public class MolangConstantNode implements MolangExpression
     public String toString()
     {
         return Float.toString(this.value);
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MolangConstantNode that = (MolangConstantNode) o;
+        return Float.compare(that.value, this.value) == 0;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(this.value);
     }
 }

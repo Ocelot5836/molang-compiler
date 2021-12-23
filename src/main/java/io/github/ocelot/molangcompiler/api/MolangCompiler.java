@@ -254,12 +254,13 @@ public class MolangCompiler
                     return new MolangSetVariableNode(currentKeyword[0], currentKeyword[1], expression);
                 }
             }
-            if (checkFlag(flags, REDUCE_FLAG) && "math".equalsIgnoreCase(currentKeyword[0])) // Attempt to reduce math constants
+            if ("math".equalsIgnoreCase(currentKeyword[0])) // Attempt to reduce math constants
             {
                 MolangMath.MathFunction function = MolangMath.MathFunction.byName(currentKeyword[1]);
                 if (function == null || function.getOp() != null)
                     throw INVALID_KEYWORD.create(currentKeyword[1]);
-                return function.getExpression();
+                if (checkFlag(flags, REDUCE_FLAG))
+                    return function.getExpression();
             }
             return parseCondition(reader, new MolangGetVariableNode(currentKeyword[0], currentKeyword[1]), flags, allowMath);
         }

@@ -4,6 +4,7 @@ import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
@@ -29,5 +30,20 @@ public class MolangStaticNode implements MolangExpression
     public String toString()
     {
         return Float.toString(this.value.get());
+    }
+
+    @Override
+    public boolean equals(Object o)
+    {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MolangStaticNode that = (MolangStaticNode) o;
+        return this.value.get().equals(that.value.get());
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(this.value.get());
     }
 }

@@ -22,36 +22,41 @@ public class MolangVariableStorage implements MolangObject
         this.allowMethods = allowMethods;
     }
 
+    protected Map<String, MolangExpression> getStorage()
+    {
+        return storage;
+    }
+
     @Override
     public void set(String name, MolangExpression value)
     {
-        if (value == MolangExpression.ZERO)
+        if (value.equals(MolangExpression.ZERO))
         {
-            this.storage.remove(name);
+            this.getStorage().remove(name);
             return;
         }
         if (!this.allowMethods && value instanceof MolangFunction)
             throw new IllegalStateException("Cannot set functions on objects that do not allow functions");
-        this.storage.put(name, value);
+        this.getStorage().put(name, value);
     }
 
     @Override
     public MolangExpression get(String name)
     {
-        return this.storage.getOrDefault(name, MolangExpression.ZERO);
+        return this.getStorage().getOrDefault(name, MolangExpression.ZERO);
     }
 
     @Override
     public boolean has(String name)
     {
-        return this.storage.containsKey(name);
+        return this.getStorage().containsKey(name);
     }
 
     @Override
     public String toString()
     {
         StringBuilder builder = new StringBuilder("MoLang Object\n");
-        for (Map.Entry<String, MolangExpression> entry : this.storage.entrySet())
+        for (Map.Entry<String, MolangExpression> entry : this.getStorage().entrySet())
         {
             builder.append('\t').append(entry.getKey());
             if (entry.getValue() instanceof MolangFunction)
