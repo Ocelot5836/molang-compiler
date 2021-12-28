@@ -82,6 +82,7 @@ public class MolangRuntime implements MolangEnvironment
      *
      * @param name   The name of the library to load
      * @param object The object to use under that name
+     * @since 1.1.0
      */
     public void loadAlias(String name, MolangObject object)
     {
