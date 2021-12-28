@@ -3,10 +3,14 @@ import io.github.ocelot.molangcompiler.api.MolangCompiler;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.MolangRuntime;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 public class MolangTest
 {
-    public static void main(String[] args) throws MolangException
+    @Test
+    void testSpeed() throws MolangException
     {
         Stopwatch compileTime = Stopwatch.createStarted();
         MolangExpression expression =
@@ -26,13 +30,31 @@ public class MolangTest
                 .setQuery("life_time", 0)
                 .create(0);
 
+
         Stopwatch runTime = Stopwatch.createStarted();
         float result = expression.resolve(runtime);
         runTime.stop();
 
+        Assertions.assertEquals(result, 3);
+
         System.out.println("\n" + runtime.dump());
-        System.out.println("Final expression: '" + expression + "', " + expression.getClass());
-        System.out.println("Took " + compileTime + " to compile");
-        System.out.println("Took " + runTime + " to execute. Result: " + result);
+        System.out.println("Took " + compileTime + " to compile, " + runTime + " to execute");
+    }
+
+    @Test
+    void testScopes() throws MolangException
+    {
+        MolangExpression expression = MolangCompiler.compile("""
+                        temp.a = 4;
+                        {
+                        temp.b = 16;
+                        }
+                        temp.b = temp.c * 4;
+                        return temp.b;
+                """);
+
+        MolangRuntime runtime = MolangRuntime.runtime().create(0.0F);
+
+        System.out.println(expression + "\n==RESULT==\n" + expression.resolve(runtime));
     }
 }

@@ -7,6 +7,7 @@ import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import io.github.ocelot.molangcompiler.api.object.ImmutableMolangObject;
 import io.github.ocelot.molangcompiler.core.object.MolangFunction;
 import io.github.ocelot.molangcompiler.core.object.MolangMath;
+import io.github.ocelot.molangcompiler.core.object.MolangVariableStack;
 import io.github.ocelot.molangcompiler.core.object.MolangVariableStorage;
 
 import java.util.Comparator;
@@ -31,7 +32,7 @@ public class MolangRuntime implements MolangEnvironment
     {
         this.thisValue = thisValue;
         this.objects = new HashMap<>();
-        MolangObject temp = new MolangVariableStorage(false);
+        MolangObject temp = new MolangVariableStack(false);
         this.objects.put("context", query); // This is static accesses
         this.objects.put("query", query); // This is static accesses
         this.objects.put("math", new MolangMath()); // The MoLang math "library"
