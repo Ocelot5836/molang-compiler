@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
  */
 public class MolangSyntaxException extends MolangException
 {
-    public static final int CONTEXT_AMOUNT = 10;
+    public static final int CONTEXT_AMOUNT = 64;
 
     private final String message;
     private final String input;

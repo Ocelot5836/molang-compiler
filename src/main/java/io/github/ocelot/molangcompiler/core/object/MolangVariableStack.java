@@ -1,7 +1,6 @@
 package io.github.ocelot.molangcompiler.core.object;
 
 import io.github.ocelot.molangcompiler.api.MolangExpression;
-import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.HashMap;

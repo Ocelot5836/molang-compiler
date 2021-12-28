@@ -3,17 +3,14 @@ package io.github.ocelot.molangcompiler.api;
 import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariableProvider;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
-import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import io.github.ocelot.molangcompiler.api.object.ImmutableMolangObject;
+import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import io.github.ocelot.molangcompiler.core.object.MolangFunction;
 import io.github.ocelot.molangcompiler.core.object.MolangMath;
 import io.github.ocelot.molangcompiler.core.object.MolangVariableStack;
 import io.github.ocelot.molangcompiler.core.object.MolangVariableStorage;
 
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 /**
@@ -26,12 +23,14 @@ public class MolangRuntime implements MolangEnvironment
 {
     private final float thisValue;
     private final Map<String, MolangObject> objects;
+    private final Set<String> aliases;
     private final Map<Integer, MolangExpression> parameters;
 
     private MolangRuntime(float thisValue, MolangObject query, MolangObject global, MolangObject variable)
     {
         this.thisValue = thisValue;
         this.objects = new HashMap<>();
+        this.aliases = new HashSet<>();
         MolangObject temp = new MolangVariableStack(false);
         this.objects.put("context", query); // This is static accesses
         this.objects.put("query", query); // This is static accesses
@@ -39,10 +38,10 @@ public class MolangRuntime implements MolangEnvironment
         this.objects.put("global", global); // This is parameter access
         this.objects.put("temp", temp); // This is specifically for expression variables
         this.objects.put("variable", variable); // This can be accessed by Java code
-        this.objects.put("c", query); // Alias
-        this.objects.put("q", query); // Alias
-        this.objects.put("t", temp); // Alias
-        this.objects.put("v", variable); // Alias
+        this.loadAlias("c", query); // Alias
+        this.loadAlias("q", query); // Alias
+        this.loadAlias("t", temp); // Alias
+        this.loadAlias("v", variable); // Alias
         this.parameters = new HashMap<>();
     }
 
@@ -55,7 +54,8 @@ public class MolangRuntime implements MolangEnvironment
         builder.append("==Start Objects==\n");
         for (Map.Entry<String, MolangObject> entry : this.objects.entrySet())
         {
-            builder.append(entry.getKey()).append('=').append(entry.getValue()).append('\n');
+            if (!this.aliases.contains(entry.getKey()))
+                builder.append(entry.getKey()).append('=').append(entry.getValue()).append('\n');
         }
         builder.deleteCharAt(builder.length() - 2);
         builder.append("==End Objects==\n\n");
@@ -75,6 +75,18 @@ public class MolangRuntime implements MolangEnvironment
     public void loadLibrary(String name, MolangObject object)
     {
         this.objects.put(name.toLowerCase(Locale.ROOT), object);
+    }
+
+    /**
+     * Loads an alias for a library under the specified name.
+     *
+     * @param name   The name of the library to load
+     * @param object The object to use under that name
+     */
+    public void loadAlias(String name, MolangObject object)
+    {
+        this.objects.put(name.toLowerCase(Locale.ROOT), object);
+        this.aliases.add(name);
     }
 
     @Override

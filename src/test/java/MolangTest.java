@@ -4,7 +4,6 @@ import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.MolangRuntime;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 public class MolangTest
@@ -29,16 +28,13 @@ public class MolangTest
                 .setQuery("anim_time", 90)
                 .setQuery("life_time", 0)
                 .create(0);
-
-
         Stopwatch runTime = Stopwatch.createStarted();
         float result = expression.resolve(runtime);
         runTime.stop();
 
-        Assertions.assertEquals(result, 3);
-
-        System.out.println("\n" + runtime.dump());
         System.out.println("Took " + compileTime + " to compile, " + runTime + " to execute");
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(3, result);
     }
 
     @Test
@@ -46,15 +42,37 @@ public class MolangTest
     {
         MolangExpression expression = MolangCompiler.compile("""
                         temp.a = 4;
+                        temp.b = 4;
                         {
-                        temp.b = 16;
+                        temp.c = 1;
                         }
-                        temp.b = temp.c * 4;
-                        return temp.b;
+                        temp.d = 5;
+                        return temp.d * temp.b;
                 """);
 
         MolangRuntime runtime = MolangRuntime.runtime().create(0.0F);
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(20, result);
+    }
 
-        System.out.println(expression + "\n==RESULT==\n" + expression.resolve(runtime));
+    @Test
+    void testReturnScopes() throws MolangException
+    {
+        MolangExpression expression = MolangCompiler.compile("""
+                        temp.a = 4;
+                        temp.b = 2;
+                        temp.c = {
+                        return 4;
+                        };
+                        return {
+                        return {return temp.a * temp.b;};
+                        };
+                """);
+
+        MolangRuntime runtime = MolangRuntime.runtime().create(0.0F);
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(8, result);
     }
 }

@@ -64,6 +64,11 @@ public class StringReader
         this.cursor++;
     }
 
+    public void skip(int amount)
+    {
+        this.cursor += amount;
+    }
+
     public void skipWhitespace()
     {
         while (this.canRead() && Character.isWhitespace(this.peek()))

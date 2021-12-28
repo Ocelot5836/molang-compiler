@@ -10,8 +10,8 @@ import io.github.ocelot.molangcompiler.core.compiler.SimpleMolangExceptionType;
 import io.github.ocelot.molangcompiler.core.compiler.StringReader;
 import io.github.ocelot.molangcompiler.core.node.*;
 import io.github.ocelot.molangcompiler.core.object.MolangMath;
-import io.github.ocelot.molangcompiler.core.object.MolangVariableStack;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -84,6 +84,97 @@ public class MolangCompiler
         if (input.isEmpty())
             throw UNEXPECTED_TOKEN.create();
 
+        // Set initial flags
+        if (input.contains("."))
+        {
+            flags |= CHECK_VARIABLE_FLAG;
+            if (input.contains("("))
+                flags |= CHECK_METHOD_FLAG | CHECK_OPERATORS_FLAG;
+        }
+        if (input.contains("this"))
+            flags |= CHECK_THIS_FLAG;
+        if (!checkFlag(flags, CHECK_OPERATORS_FLAG))
+        {
+            for (char operator : MATH_OPERATORS)
+            {
+                if (input.indexOf(operator) != -1)
+                {
+                    flags |= CHECK_OPERATORS_FLAG;
+                    break;
+                }
+            }
+        }
+
+        return parseGroup(input, flags, true);
+    }
+
+    private static MolangExpression parseGroup(String input, int flags, boolean strictSyntax) throws MolangSyntaxException
+    {
+        List<MolangExpression> expressions = new ArrayList<>();
+        StringReader reader = new StringReader(input);
+        reader.skipWhitespace();
+        if (!reader.canRead())
+            throw UNEXPECTED_TOKEN.create();
+
+        if ((strictSyntax || !input.contains("return")) && input.chars().filter(c -> c == ';').count() <= 1)
+            return parseExpression(new StringReader(input.replaceAll(";", "")), flags, true, true);
+
+        int start = 0;
+        int scopeStart = 0;
+        int scope = 0;
+        boolean startScope = false;
+        while (reader.canRead())
+        {
+            if (reader.peek() == '{')
+            {
+                if (scopeStart == reader.getCursor())
+                    startScope = true;
+                scope++;
+                flags |= CHECK_SCOPE_FLAG;
+            }
+            else if (reader.peek() == '}')
+            {
+                scope--;
+                if (scope < 0)
+                    throw TRAILING_STATEMENT.createWithContext(reader);
+                if (scope == 0 && startScope)
+                {
+                    startScope = false;
+                    reader.skip();
+                    expressions.add(parseExpression(new StringReader(input.substring(start, reader.getCursor())), flags, false, true));
+                    start = reader.getCursor();
+                }
+            }
+            else if (scope == 0 && reader.peek() == ';')
+            {
+                expressions.add(parseExpression(new StringReader(input.substring(start, reader.getCursor())), flags, false, true));
+                start = reader.getCursor() + 1;
+                reader.skip();
+                reader.skipWhitespace();
+                scopeStart = reader.getCursor();
+                continue;
+            }
+
+            reader.skip();
+            reader.skipWhitespace();
+        }
+
+        if (expressions.isEmpty())
+        {
+            if (strictSyntax)
+                throw UNEXPECTED_TOKEN.createWithContext(reader);
+            return parseExpression(new StringReader(input.replaceAll(";", "")), flags, false, true);
+        }
+
+        return expressions.size() == 1 ? expressions.get(0) : new MolangCompoundNode(expressions.toArray(new MolangExpression[0]));
+    }
+
+    /*
+    * public static MolangExpression compile(String input, int flags) throws MolangSyntaxException
+    {
+        if (input.isEmpty())
+            throw UNEXPECTED_TOKEN.create();
+
         String[] lines = splitInput(input);
         if (lines.length == 1)
         {
@@ -130,69 +221,44 @@ public class MolangCompiler
         MolangExpression[] expressions = new MolangExpression[lines.length];
         for (int i = 0; i < lines.length; i++)
         {
-            expressions[i] = parseInput(new StringReader(lines[i]), flags, lines.length == 1, i < lines.length - 1);
+            StringReader reader = new StringReader(lines[i]);
+            reader.skipWhitespace();
+
+            // Set initial flags
+            if (reader.getString().contains("."))
+            {
+                flags |= CHECK_VARIABLE_FLAG;
+                if (reader.getString().contains("("))
+                    flags |= CHECK_METHOD_FLAG | CHECK_OPERATORS_FLAG;
+            }
+            if (reader.getString().contains("this"))
+                flags |= CHECK_THIS_FLAG;
+            if (!checkFlag(flags, CHECK_OPERATORS_FLAG))
+            {
+                for (char operator : MATH_OPERATORS)
+                {
+                    if (reader.getString().indexOf(operator) != -1)
+                    {
+                        flags |= CHECK_OPERATORS_FLAG;
+                        break;
+                    }
+                }
+            }
+
+            expressions[i] = parseInput(reader, flags, lines.length == 1, i == lines.length - 1);
         }
 
         return expressions.length == 1 ? expressions[0] : new MolangCompoundNode(expressions);
     }
+    */
 
-    private static String[] splitInput(String input)
-    {
-        return Arrays.stream(input.replaceAll("\n", "").replaceAll("}", "};").split("(?!;\s*});")).filter(s -> !s.trim().isEmpty()).toArray(String[]::new);
-    }
-
-    private static MolangExpression parseInput(StringReader reader, int flags, boolean simple, boolean allowReturn) throws MolangSyntaxException
-    {
-        reader.skipWhitespace();
-
-        // Set initial flags
-        int additionalFlags = 0;
-        if (reader.getString().contains("."))
-        {
-            additionalFlags |= CHECK_VARIABLE_FLAG;
-            if (reader.getString().contains("("))
-                additionalFlags |= CHECK_METHOD_FLAG | CHECK_OPERATORS_FLAG;
-        }
-        if (reader.getString().contains("this"))
-            additionalFlags |= CHECK_THIS_FLAG;
-        if (!checkFlag(additionalFlags, CHECK_OPERATORS_FLAG))
-        {
-            for (char operator : MATH_OPERATORS)
-            {
-                if (reader.getString().indexOf(operator) != -1)
-                {
-                    additionalFlags |= CHECK_OPERATORS_FLAG;
-                    break;
-                }
-            }
-        }
-
-        // Check for return
-        if (reader.getRemaining().startsWith("return"))
-        {
-            if (allowReturn)
-            {
-                reader.setCursor(reader.getString().indexOf("return") + 6);
-                throw UNEXPECTED_TOKEN.createWithContext(reader);
-            }
-            for (int j = 0; j < 7; j++)
-                reader.skip();
-            MolangExpression expression = parseExpression(reader, flags | additionalFlags, false, true);
-            if (reader.canRead())
-                throw TRAILING_STATEMENT.createWithContext(reader);
-            return expression;
-        }
-        else
-        {
-            return parseExpression(new StringReader(reader.getString()), flags | additionalFlags, simple, true);
-        }
-    }
+//    private static String[] splitInput(String input)
+//    {
+//        return Arrays.stream(input.replaceAll("\n", "").replaceAll("}", "};").split("(?!;\s*});")).filter(s -> !s.trim().isEmpty()).toArray(String[]::new);
+//    }
 
     private static MolangExpression parseExpression(StringReader reader, int flags, boolean simple, boolean allowMath) throws MolangSyntaxException
     {
-        if (!reader.canRead())
-            throw UNEXPECTED_TOKEN.createWithContext(reader);
-
         reader.skipWhitespace(); // Skip potential spaces or tabs before '=', '*', etc
         if (!reader.canRead())
             throw UNEXPECTED_TOKEN.createWithContext(reader);
@@ -202,13 +268,39 @@ public class MolangCompiler
         {
             reader.skip();
             int start = reader.getCursor();
+            int scope = 1;
             while (reader.canRead())
             {
-                if (reader.peek() == '}')
-                    return new MolangScopeNode(parseExpression(new StringReader(reader.getString().substring(start, reader.getCursor()).replaceAll(";", "")), flags, false, true));
+                if (reader.peek() == '{')
+                {
+                    scope++;
+                }
+                else if (reader.peek() == '}')
+                {
+                    scope--;
+                    if (scope < 0)
+                        break;
+                    if (scope == 0)
+                    {
+                        reader.skip();
+                        return new MolangScopeNode(parseGroup(reader.getString().substring(start, reader.getCursor() - 1), flags, false));
+                    }
+                }
                 reader.skip();
             }
             throw TRAILING_STATEMENT.createWithContext(reader);
+        }
+
+        // Check for return
+        if (reader.getRemaining().startsWith("return"))
+        {
+            reader.skip(6);
+            if (simple)
+                throw UNEXPECTED_TOKEN.createWithContext(reader);
+            MolangExpression expression = parseExpression(reader, flags, true, allowMath);
+            if (reader.canRead())
+                throw TRAILING_STATEMENT.createWithContext(reader);
+            return expression;
         }
 
         // Check for math. This will not happen if reading from math because operators are removed
@@ -235,6 +327,15 @@ public class MolangCompiler
             return parseCondition(reader, new MolangThisNode(), flags, allowMath);
         }
 
+        // Check for 'true' keyword
+        if ("true".equals(fullWord) || "false".equals(fullWord))
+        {
+            reader.skipWhitespace();
+            if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek()))
+                throw TRAILING_STATEMENT.createWithContext(reader);
+            return parseCondition(reader, MolangExpression.of("true".equals(fullWord)), flags, allowMath);
+        }
+
         // Check for number
         if (isNumber(fullWord))
         {
@@ -255,8 +356,8 @@ public class MolangCompiler
         // Check for methods
         if (checkFlag(flags, CHECK_METHOD_FLAG) && reader.canRead() && reader.peek() == '(')
         {
-            reader.skip();
             int start = reader.getCursor();
+            reader.skip();
             MolangExpression[] parameters = null;
             int parentheses = 0;
             while (reader.canRead() && start != -1)
@@ -271,7 +372,7 @@ public class MolangCompiler
                         reader.skip();
                         continue;
                     }
-                    if (reader.getCursor() == start + 1)
+                    if (reader.getCursor() == start)
                     {
                         parameters = new MolangExpression[0];
                     }
@@ -654,8 +755,6 @@ public class MolangCompiler
 
     private static class CompileEnvironment implements MolangEnvironment
     {
-        private final MolangObject temp = new MolangVariableStack(false);
-
         @Override
         public void loadParameter(int index, MolangExpression expression) throws MolangException
         {
@@ -677,8 +776,6 @@ public class MolangCompiler
         @Override
         public MolangObject get(String name) throws MolangException
         {
-            if ("temp".equals(name) || "t".equals(name))
-                return this.temp;
             throw new MolangException("Invalid Call");
         }
 

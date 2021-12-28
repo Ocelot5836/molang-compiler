@@ -2,8 +2,8 @@ package io.github.ocelot.molangcompiler.core.node;
 
 import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
-import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;

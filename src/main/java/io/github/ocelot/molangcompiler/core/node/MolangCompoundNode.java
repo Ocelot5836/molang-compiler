@@ -41,6 +41,7 @@ public class MolangCompoundNode implements MolangExpression
             if (i >= this.expressions.length - 1)
                 builder.append("return ");
             builder.append(this.expressions[i]);
+            builder.append(';');
             if (i < this.expressions.length - 1)
                 builder.append('\n');
         }
