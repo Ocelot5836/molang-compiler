@@ -181,6 +181,19 @@ public class MolangRuntime implements MolangEnvironment
         }
 
         /**
+         * Sets a global immutable function.
+         *
+         * @param name     The name of the function
+         * @param params   The number of parameters to accept
+         * @param function The function to execute
+         */
+        public Builder setQuery(String name, int params, MolangJavaFunction function)
+        {
+            this.query.set(params < 0 ? name : (name + "$" + params), new MolangFunction(params, function));
+            return this;
+        }
+
+        /**
          * Sets a global immutable value.
          *
          * @param name  The name of the value
@@ -201,6 +214,19 @@ public class MolangRuntime implements MolangEnvironment
         public Builder setGlobal(String name, Supplier<Float> value)
         {
             this.global.set(name, MolangExpression.of(value));
+            return this;
+        }
+
+        /**
+         * Sets a global immutable function.
+         *
+         * @param name     The name of the function
+         * @param params   The number of parameters to accept
+         * @param function The function to execute
+         */
+        public Builder setGlobal(String name, int params, MolangJavaFunction function)
+        {
+            this.global.set(params < 0 ? name : (name + "$" + params), new MolangFunction(params, function));
             return this;
         }
 
@@ -226,43 +252,41 @@ public class MolangRuntime implements MolangEnvironment
             provider.addMolangVariables(new MolangVariableProvider.Context()
             {
                 @Override
-                public void add(String name, float value)
+                public void addVariable(String name, float value)
                 {
-                    variable.set(name, MolangExpression.of(value));
+                    setVariable(name, value);
                 }
 
                 @Override
-                public void remove(String name)
+                public void addQuery(String name, float value)
+                {
+                    setQuery(name, value);
+                }
+
+                @Override
+                public void addQuery(String name, Supplier<Float> value)
+                {
+                    setQuery(name, value);
+                }
+
+                @Override
+                public void addQuery(String name, int params, MolangJavaFunction function)
+                {
+                    setQuery(name, params, function);
+                }
+
+                @Override
+                public void removeVariable(String name)
                 {
                     variable.set(name, MolangExpression.ZERO);
                 }
+
+                @Override
+                public void removeQuery(String name)
+                {
+                    query.set(name, MolangExpression.ZERO);
+                }
             });
-            return this;
-        }
-
-        /**
-         * Sets a global immutable function.
-         *
-         * @param name     The name of the function
-         * @param params   The number of parameters to accept
-         * @param function The function to execute
-         */
-        public Builder setQuery(String name, int params, MolangJavaFunction function)
-        {
-            this.query.set(params < 0 ? name : (name + "$" + params), new MolangFunction(params, function));
-            return this;
-        }
-
-        /**
-         * Sets a global immutable function.
-         *
-         * @param name     The name of the function
-         * @param params   The number of parameters to accept
-         * @param function The function to execute
-         */
-        public Builder setGlobal(String name, int params, MolangJavaFunction function)
-        {
-            this.global.set(params < 0 ? name : (name + "$" + params), new MolangFunction(params, function));
             return this;
         }
 
