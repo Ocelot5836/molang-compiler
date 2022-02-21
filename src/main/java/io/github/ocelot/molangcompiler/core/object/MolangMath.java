@@ -49,10 +49,10 @@ public class MolangMath extends MolangLibrary
         CLAMP(3, parameters ->
         {
             float value = parameters.resolve(0);
-            float min = parameters.resolve(0);
+            float min = parameters.resolve(1);
             if (value <= min)
                 return min;
-            return Math.min(value, parameters.resolve(0));
+            return Math.min(value, parameters.resolve(2));
         }),
         COS(1, parameters ->
                 (float) Math.cos(parameters.resolve(0) * Math.PI / 180.0F)),
