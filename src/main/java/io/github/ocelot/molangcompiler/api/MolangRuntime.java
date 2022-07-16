@@ -59,7 +59,7 @@ public class MolangRuntime implements MolangEnvironment
         }
         builder.deleteCharAt(builder.length() - 2);
         builder.append("==End Objects==\n\n");
-        builder.append("==Parameters==\n");
+        builder.append("==Start Parameters==\n");
         this.parameters.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getKey)).forEach(entry -> builder.append("\tParameter ").append(entry.getKey()).append('=').append(entry.getValue()).append('\n'));
         builder.append("==End Parameters==\n\n");
         builder.append("==End MoLang Runtime Dump==");

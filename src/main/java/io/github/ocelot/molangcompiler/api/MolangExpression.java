@@ -1,6 +1,5 @@
 package io.github.ocelot.molangcompiler.api;
 
-
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.core.node.MolangConstantNode;
 import io.github.ocelot.molangcompiler.core.node.MolangStaticNode;

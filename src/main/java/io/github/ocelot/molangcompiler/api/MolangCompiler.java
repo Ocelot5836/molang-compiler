@@ -34,27 +34,27 @@ public class MolangCompiler
     /**
      * Whether to reduce math to constant values if possible. E.g. <code>4 * 4 + 2</code> would become <code>18</code>. This should almost always be on.
      */
-    public static final int REDUCE_FLAG = 1;
+    public static final int REDUCE_FLAG = 0b00000001;
     /**
      * Whether to check for 'this' keyword.
      */
-    private static final int CHECK_THIS_FLAG = 2;
+    private static final int CHECK_THIS_FLAG = 0b00000010;
     /**
      * Whether to check for variables.
      */
-    private static final int CHECK_VARIABLE_FLAG = 4;
+    private static final int CHECK_VARIABLE_FLAG = 0b00000100;
     /**
      * Whether to check for methods.
      */
-    private static final int CHECK_METHOD_FLAG = 8;
+    private static final int CHECK_METHOD_FLAG = 0b00001000;
     /**
      * Whether to check for math operations.
      */
-    private static final int CHECK_OPERATORS_FLAG = 16;
+    private static final int CHECK_OPERATORS_FLAG = 0b00010000;
     /**
      * Whether to check for scopes. Eg {}.
      */
-    private static final int CHECK_SCOPE_FLAG = 32;
+    private static final int CHECK_SCOPE_FLAG = 0b00100000;
 
     private static final MolangEnvironment ENVIRONMENT = new CompileEnvironment();
     private static final List<Character> MATH_OPERATORS = Arrays.asList('(', ')', '*', '/', '+', '-');
@@ -72,7 +72,7 @@ public class MolangCompiler
     }
 
     /**
-     * Compiles a {@link MolangExpression} from the specified string input.
+     * Compiles a {@link MolangExpression} from the specified string input. Use {@link #compile(String)} for the best general settings.
      *
      * @param input The data to compile
      * @param flags Additional flags to use when compiling
