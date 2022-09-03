@@ -30,7 +30,7 @@ public interface MolangObject
      * Checks to see if there is a value with the specified name.
      *
      * @param name The name of the value to check
-     * @return Whether or not a value exists with that name
+     * @return Whether a value exists with that name
      */
     boolean has(String name);
 }

@@ -23,7 +23,7 @@ public interface MolangVariableProvider
     // TODO remove deprecated features in 2.0.0
 
     /**
-     * <p>Context for MoLang variable modification.</p>
+     * Context for MoLang variable modification.
      *
      * @author Ocelot
      * @since 1.0.0

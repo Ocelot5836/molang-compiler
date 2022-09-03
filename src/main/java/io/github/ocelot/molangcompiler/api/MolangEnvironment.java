@@ -32,7 +32,7 @@ public interface MolangEnvironment
     /**
      * Retrieves a {@link MolangObject} by the specified domain name.
      *
-     * @param name The name to fetch by, case insensitive
+     * @param name The name to fetch by, case-insensitive
      * @return The object with the name
      * @throws MolangException If the object does not exist
      */

@@ -22,7 +22,7 @@ public interface MolangJavaFunction
     float resolve(Context context) throws MolangException;
 
     /**
-     * <p>Provides parameters for MoLang Java functions.</p>
+     * Provides parameters for MoLang Java functions.
      *
      * @author Ocelot
      * @since 1.0.0

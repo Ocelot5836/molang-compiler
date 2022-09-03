@@ -28,7 +28,7 @@ public interface MolangExpression
     float resolve(MolangEnvironment environment) throws MolangException;
 
     /**
-     * Resolves the float value of this runtime. Catches any exception thrown and returns <code>0.0F</code>.
+     * Resolves the float value of this runtime. Catches any exception thrown and returns <code>0.0</code>.
      *
      * @param environment The environment to execute in
      * @return The resulting value
