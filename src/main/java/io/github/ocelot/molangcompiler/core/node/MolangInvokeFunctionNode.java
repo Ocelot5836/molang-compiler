@@ -13,35 +13,28 @@ import java.util.Objects;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangInvokeFunctionNode implements MolangExpression
-{
+public class MolangInvokeFunctionNode implements MolangExpression {
+
     private final String object;
     private final String name;
     private final MolangExpression[] parameters;
 
-    public MolangInvokeFunctionNode(String object, String name, MolangExpression... parameters)
-    {
+    public MolangInvokeFunctionNode(String object, String name, MolangExpression... parameters) {
         this.object = object;
         this.name = name;
         this.parameters = parameters;
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException
-    {
+    public float resolve(MolangEnvironment environment) throws MolangException {
         MolangObject object = environment.get(this.object);
         MolangExpression function;
 
-        if (object.has(this.name + "$" + this.parameters.length))
-        {
+        if (object.has(this.name + "$" + this.parameters.length)) {
             function = object.get(this.name + "$" + this.parameters.length);
-        }
-        else if (object.has(this.name))
-        {
+        } else if (object.has(this.name)) {
             function = object.get(this.name);
-        }
-        else
-        {
+        } else {
             throw new IllegalStateException("Unknown function: " + this.object + "." + this.name + "() with " + this.parameters.length + " parameters");
         }
 
@@ -53,11 +46,9 @@ public class MolangInvokeFunctionNode implements MolangExpression
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder builder = new StringBuilder(this.object).append('.').append(this.name).append('(');
-        for (int i = 0; i < this.parameters.length; i++)
-        {
+        for (int i = 0; i < this.parameters.length; i++) {
             builder.append(this.parameters[i].toString());
             if (i < this.parameters.length - 1)
                 builder.append(", ");
@@ -66,8 +57,7 @@ public class MolangInvokeFunctionNode implements MolangExpression
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MolangInvokeFunctionNode that = (MolangInvokeFunctionNode) o;
@@ -75,8 +65,7 @@ public class MolangInvokeFunctionNode implements MolangExpression
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         int result = Objects.hash(this.object, this.name);
         result = 31 * result + Arrays.hashCode(this.parameters);
         return result;

@@ -15,25 +15,22 @@ import java.util.function.BiConsumer;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangMath extends MolangLibrary
-{
+public class MolangMath extends MolangLibrary {
+
     private static final Random RNG = new Random();
 
     @Override
-    protected void populate(BiConsumer<String, MolangExpression> consumer)
-    {
+    protected void populate(BiConsumer<String, MolangExpression> consumer) {
         for (MathFunction function : MathFunction.values())
             consumer.accept(function.functionName, function.expression);
     }
 
     @Override
-    protected String getName()
-    {
+    protected String getName() {
         return "MoLang Math";
     }
 
-    public enum MathFunction
-    {
+    public enum MathFunction {
         ABS(1, parameters ->
                 Math.abs(parameters.resolve(0))),
         ACOS(1, parameters ->
@@ -72,7 +69,7 @@ public class MolangMath extends MolangLibrary
                 sum += min + RNG.nextFloat() * (max - min);
             return sum;
         }),
-        DIE_ROLL_INTEGER(3,false, parameters ->
+        DIE_ROLL_INTEGER(3, false, parameters ->
         {
             int count = (int) parameters.resolve(0);
             if (count <= 0)
@@ -178,13 +175,11 @@ public class MolangMath extends MolangLibrary
         private final MolangJavaFunction op;
         private final boolean canOptimize;
 
-        MathFunction(int parameters, MolangJavaFunction op)
-        {
+        MathFunction(int parameters, MolangJavaFunction op) {
             this(parameters, true, op);
         }
 
-        MathFunction(int parameters, boolean canOptimize, MolangJavaFunction op)
-        {
+        MathFunction(int parameters, boolean canOptimize, MolangJavaFunction op) {
             this.parameters = parameters;
             this.functionName = this.name().toLowerCase(Locale.ROOT) + "$" + parameters;
             this.expression = new MolangFunction(parameters, op);
@@ -192,8 +187,7 @@ public class MolangMath extends MolangLibrary
             this.canOptimize = canOptimize;
         }
 
-        MathFunction(MolangExpression value)
-        {
+        MathFunction(MolangExpression value) {
             this.parameters = 0;
             this.functionName = this.name().toLowerCase(Locale.ROOT);
             this.expression = value;
@@ -201,19 +195,16 @@ public class MolangMath extends MolangLibrary
             this.canOptimize = true;
         }
 
-        public int getParameters()
-        {
+        public int getParameters() {
             return parameters;
         }
 
-        public MolangExpression getExpression()
-        {
+        public MolangExpression getExpression() {
             return expression;
         }
 
         @Nullable
-        public MolangJavaFunction getOp()
-        {
+        public MolangJavaFunction getOp() {
             return op;
         }
 
@@ -222,8 +213,7 @@ public class MolangMath extends MolangLibrary
         }
 
         @Nullable
-        public static MolangMath.MathFunction byName(String name)
-        {
+        public static MolangMath.MathFunction byName(String name) {
             for (MathFunction function : MathFunction.values())
                 if (function.functionName.equals(name))
                     return function;

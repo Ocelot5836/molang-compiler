@@ -11,8 +11,8 @@ import java.util.function.Supplier;
  * @since 1.0.0
  */
 @FunctionalInterface
-public interface MolangVariableProvider
-{
+public interface MolangVariableProvider {
+
     /**
      * Modifies all variables to the provided context.
      *
@@ -28,34 +28,7 @@ public interface MolangVariableProvider
      * @author Ocelot
      * @since 1.0.0
      */
-    interface Context
-    {
-        /**
-         * Adds a value to the variable struct.
-         *
-         * @param name  The name of the variable to set
-         * @param value The value to set under that name
-         * @deprecated Use {@link #addVariable(String, float)} instead
-         */
-        @Deprecated
-        @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
-        default void add(String name, float value)
-        {
-            this.addVariable(name, value);
-        }
-
-        /**
-         * Removes a variable with the specified name.
-         *
-         * @param name The name of the variable to remove
-         * @deprecated Use {@link #removeVariable(String)} instead
-         */
-        @Deprecated
-        @ApiStatus.ScheduledForRemoval(inVersion = "2.0.0")
-        default void remove(String name)
-        {
-            this.removeVariable(name);
-        }
+    interface Context {
 
         /**
          * Adds a value to the variable struct.
@@ -63,7 +36,7 @@ public interface MolangVariableProvider
          * @param name  The name of the variable to set
          * @param value The value to set under that name
          */
-        void addVariable(String name, float value);
+        void addVariable(String name, MolangVariable value);
 
         /**
          * Sets a global immutable value.

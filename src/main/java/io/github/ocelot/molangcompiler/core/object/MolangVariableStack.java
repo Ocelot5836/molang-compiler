@@ -11,30 +11,26 @@ import java.util.Stack;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangVariableStack extends MolangVariableStorage
-{
+public class MolangVariableStack extends MolangVariableStorage {
+
     private final Stack<Map<String, MolangExpression>> stack;
 
-    public MolangVariableStack(boolean allowMethods)
-    {
+    public MolangVariableStack(boolean allowMethods) {
         super(allowMethods);
         this.stack = new Stack<>();
         this.stack.push(new HashMap<>());
     }
 
     @Override
-    protected Map<String, MolangExpression> getStorage()
-    {
+    protected Map<String, MolangExpression> getStorage() {
         return this.stack.peek();
     }
 
-    public void push()
-    {
+    public void push() {
         this.stack.push(new HashMap<>(this.stack.peek()));
     }
 
-    public void pop()
-    {
+    public void pop() {
         if (this.stack.size() > 1)
             this.stack.pop();
     }

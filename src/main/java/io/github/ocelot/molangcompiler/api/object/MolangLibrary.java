@@ -13,12 +13,11 @@ import java.util.function.BiConsumer;
  * @author Ocelot
  * @since 1.0.0
  */
-public abstract class MolangLibrary implements MolangObject
-{
+public abstract class MolangLibrary implements MolangObject {
+
     private final Map<String, MolangExpression> functions;
 
-    public MolangLibrary()
-    {
+    public MolangLibrary() {
         this.functions = new HashMap<>();
         this.populate(this.functions::put);
     }
@@ -36,29 +35,24 @@ public abstract class MolangLibrary implements MolangObject
     protected abstract String getName();
 
     @Override
-    public void set(String name, MolangExpression value)
-    {
+    public void set(String name, MolangExpression value) {
         throw new UnsupportedOperationException("Cannot set values on a library");
     }
 
     @Override
-    public MolangExpression get(String name)
-    {
+    public MolangExpression get(String name) {
         return this.functions.getOrDefault(name, MolangExpression.ZERO);
     }
 
     @Override
-    public boolean has(String name)
-    {
+    public boolean has(String name) {
         return this.functions.containsKey(name);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder builder = new StringBuilder(this.getName()).append('\n');
-        for (Map.Entry<String, MolangExpression> entry : this.functions.entrySet())
-        {
+        for (Map.Entry<String, MolangExpression> entry : this.functions.entrySet()) {
             builder.append('\t').append(entry.getKey());
             if (entry.getValue() instanceof MolangFunction)
                 builder.append("()");

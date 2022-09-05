@@ -11,32 +11,28 @@ import java.util.Objects;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangGetVariableNode implements MolangExpression
-{
+public class MolangGetVariableNode implements MolangExpression {
+
     private final String object;
     private final String name;
 
-    public MolangGetVariableNode(String object, String name)
-    {
+    public MolangGetVariableNode(String object, String name) {
         this.object = object;
         this.name = name;
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException
-    {
+    public float resolve(MolangEnvironment environment) throws MolangException {
         return environment.get(this.object).get(this.name).resolve(environment);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return this.object + "." + this.name;
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MolangGetVariableNode that = (MolangGetVariableNode) o;
@@ -44,8 +40,7 @@ public class MolangGetVariableNode implements MolangExpression
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(this.object, this.name);
     }
 }

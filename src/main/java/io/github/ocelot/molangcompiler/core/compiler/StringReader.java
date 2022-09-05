@@ -9,70 +9,57 @@ import org.jetbrains.annotations.ApiStatus;
  * Modified version of StringReader from <a href=https://github.com/Mojang/brigadier/blob/master/src/main/java/com/mojang/brigadier/StringReader.java>Brigadier</a>
  */
 @ApiStatus.Internal
-public class StringReader
-{
+public class StringReader {
+
     private final String string;
     private int cursor;
 
-    public StringReader(String string)
-    {
+    public StringReader(String string) {
         this.string = string;
     }
 
-    public String getString()
-    {
+    public String getString() {
         return string;
     }
 
-    public void setCursor(final int cursor)
-    {
+    public void setCursor(final int cursor) {
         this.cursor = cursor;
     }
 
-    public int getCursor()
-    {
+    public int getCursor() {
         return cursor;
     }
 
-    public String getRead()
-    {
+    public String getRead() {
         return this.string.substring(0, this.cursor);
     }
 
-    public String getRemaining()
-    {
+    public String getRemaining() {
         return this.string.substring(this.cursor);
     }
 
-    public boolean canRead(final int length)
-    {
+    public boolean canRead(final int length) {
         return this.cursor + length <= this.string.length();
     }
 
-    public boolean canRead()
-    {
+    public boolean canRead() {
         return canRead(1);
     }
 
-    public char peek()
-    {
+    public char peek() {
         return this.string.charAt(this.cursor);
     }
 
-    public void skip()
-    {
+    public void skip() {
         this.cursor++;
     }
 
-    public void skip(int amount)
-    {
+    public void skip(int amount) {
         this.cursor += amount;
     }
 
-    public void skipWhitespace()
-    {
-        while (this.canRead() && Character.isWhitespace(this.peek()))
-        {
+    public void skipWhitespace() {
+        while (this.canRead() && Character.isWhitespace(this.peek())) {
             this.skip();
         }
     }

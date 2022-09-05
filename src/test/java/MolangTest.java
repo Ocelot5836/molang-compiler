@@ -2,15 +2,15 @@ import com.google.common.base.Stopwatch;
 import io.github.ocelot.molangcompiler.api.MolangCompiler;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.MolangRuntime;
+import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class MolangTest
-{
+public class MolangTest {
+
     @Test
-    void testSpeed() throws MolangException
-    {
+    void testSpeed() throws MolangException {
         Stopwatch compileTime = Stopwatch.createStarted();
         MolangExpression expression =
 //                MolangCompiler.compile("2");
@@ -27,7 +27,7 @@ public class MolangTest
         MolangRuntime runtime = MolangRuntime.runtime()
                 .setQuery("anim_time", 90)
                 .setQuery("life_time", 0)
-                .create(0);
+                .create();
         Stopwatch runTime = Stopwatch.createStarted();
         float result = expression.resolve(runtime);
         runTime.stop();
@@ -38,8 +38,7 @@ public class MolangTest
     }
 
     @Test
-    void testScopes() throws MolangException
-    {
+    void testScopes() throws MolangException {
         MolangExpression expression = MolangCompiler.compile("""
                         temp.a = 4;
                         temp.b = 4;
@@ -50,15 +49,14 @@ public class MolangTest
                         return temp.d * temp.b;
                 """);
 
-        MolangRuntime runtime = MolangRuntime.runtime().create(0.0F);
+        MolangRuntime runtime = MolangRuntime.runtime().create();
         float result = expression.resolve(runtime);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(20, result);
     }
 
     @Test
-    void testReturnScopes() throws MolangException
-    {
+    void testReturnScopes() throws MolangException {
         MolangExpression expression = MolangCompiler.compile("""
                         temp.a = 4;
                         temp.b = 2;
@@ -70,9 +68,48 @@ public class MolangTest
                         };
                 """);
 
-        MolangRuntime runtime = MolangRuntime.runtime().create(0.0F);
+        MolangRuntime runtime = MolangRuntime.runtime().create();
         float result = expression.resolve(runtime);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(8, result);
+    }
+
+    @Test
+    void testRandom() throws MolangException {
+        MolangExpression expression = MolangCompiler.compile("math.die_roll(1, 0, 1)");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+    }
+
+    MolangVariable testVariable = MolangVariable.create(7);
+
+    @Test
+    void testGetVariable() throws MolangException {
+        MolangExpression expression = MolangCompiler.compile("""
+                t.a = 14;
+                return v.test + t.a;
+                """);
+
+        MolangRuntime runtime = MolangRuntime.runtime()
+                .setVariable("test", this.testVariable).create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(21, result);
+    }
+
+    @Test
+    void testSetVariable() throws MolangException {
+        MolangExpression expression = MolangCompiler.compile("""
+                v.test = 2;
+                """);
+
+        MolangRuntime runtime = MolangRuntime.runtime()
+                .setVariable("test", this.testVariable).create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(2, result);
+        Assertions.assertEquals(2, this.testVariable.getValue());
     }
 }

@@ -1,6 +1,7 @@
 package io.github.ocelot.molangcompiler.api;
 
 import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
+import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariableProvider;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.object.ImmutableMolangObject;
@@ -19,16 +20,15 @@ import java.util.function.Supplier;
  * @author Ocelot
  * @since 1.0.0
  */
-public class MolangRuntime implements MolangEnvironment
-{
-    private final float thisValue;
+public class MolangRuntime implements MolangEnvironment {
+
+    private float thisValue;
     private final Map<String, MolangObject> objects;
     private final Set<String> aliases;
     private final Map<Integer, MolangExpression> parameters;
 
-    private MolangRuntime(float thisValue, MolangObject query, MolangObject global, MolangObject variable)
-    {
-        this.thisValue = thisValue;
+    private MolangRuntime(MolangObject query, MolangObject global, MolangObject variable) {
+        this.thisValue = 0.0F;
         this.objects = new HashMap<>();
         this.aliases = new HashSet<>();
         MolangObject temp = new MolangVariableStack(false);
@@ -48,12 +48,10 @@ public class MolangRuntime implements MolangEnvironment
     /**
      * @return A dump of all objects stored in the runtime
      */
-    public String dump()
-    {
+    public String dump() {
         StringBuilder builder = new StringBuilder("==Start MoLang Runtime Dump==\n\n");
         builder.append("==Start Objects==\n");
-        for (Map.Entry<String, MolangObject> entry : this.objects.entrySet())
-        {
+        for (Map.Entry<String, MolangObject> entry : this.objects.entrySet()) {
             if (!this.aliases.contains(entry.getKey()))
                 builder.append(entry.getKey()).append('=').append(entry.getValue()).append('\n');
         }
@@ -72,8 +70,7 @@ public class MolangRuntime implements MolangEnvironment
      * @param name   The name of the library to load
      * @param object The object to use under that name
      */
-    public void loadLibrary(String name, MolangObject object)
-    {
+    public void loadLibrary(String name, MolangObject object) {
         this.objects.put(name.toLowerCase(Locale.ROOT), object);
     }
 
@@ -84,33 +81,28 @@ public class MolangRuntime implements MolangEnvironment
      * @param object The object to use under that name
      * @since 1.1.0
      */
-    public void loadAlias(String name, MolangObject object)
-    {
+    public void loadAlias(String name, MolangObject object) {
         this.objects.put(name.toLowerCase(Locale.ROOT), object);
         this.aliases.add(name);
     }
 
     @Override
-    public void loadParameter(int index, MolangExpression expression)
-    {
+    public void loadParameter(int index, MolangExpression expression) {
         this.parameters.put(index, expression);
     }
 
     @Override
-    public void clearParameters()
-    {
+    public void clearParameters() {
         this.parameters.clear();
     }
 
     @Override
-    public float getThis()
-    {
+    public float getThis() {
         return this.thisValue;
     }
 
     @Override
-    public MolangObject get(String name) throws MolangException
-    {
+    public MolangObject get(String name) throws MolangException {
         name = name.toLowerCase(Locale.ROOT);
         if (!this.objects.containsKey(name))
             throw new MolangException("Unknown MoLang object: " + name);
@@ -118,22 +110,28 @@ public class MolangRuntime implements MolangEnvironment
     }
 
     @Override
-    public MolangExpression getParameter(int parameter)
-    {
+    public MolangExpression getParameter(int parameter) {
         return this.parameters.getOrDefault(parameter, MolangExpression.ZERO);
     }
 
     @Override
-    public boolean hasParameter(int parameter)
-    {
+    public boolean hasParameter(int parameter) {
         return this.parameters.containsKey(parameter);
+    }
+
+    /**
+     * Sets the value of "this."
+     *
+     * @param thisValue The new value
+     */
+    public void setThisValue(float thisValue) {
+        this.thisValue = thisValue;
     }
 
     /**
      * @return A new runtime builder.
      */
-    public static Builder runtime()
-    {
+    public static Builder runtime() {
         return new Builder();
     }
 
@@ -143,14 +141,13 @@ public class MolangRuntime implements MolangEnvironment
      * @author Ocelot
      * @since 1.0.0
      */
-    public static class Builder
-    {
+    public static class Builder {
+
         private final MolangObject query;
         private final MolangObject global;
         private final MolangObject variable;
 
-        public Builder()
-        {
+        public Builder() {
             this.query = new MolangVariableStorage(true);
             this.global = new MolangVariableStorage(true);
             this.variable = new MolangVariableStorage(false);
@@ -162,8 +159,7 @@ public class MolangRuntime implements MolangEnvironment
          * @param name  The name of the value
          * @param value The resulting number
          */
-        public Builder setQuery(String name, float value)
-        {
+        public Builder setQuery(String name, float value) {
             this.query.set(name, MolangExpression.of(value));
             return this;
         }
@@ -174,8 +170,7 @@ public class MolangRuntime implements MolangEnvironment
          * @param name  The name of the value
          * @param value The resulting number
          */
-        public Builder setQuery(String name, Supplier<Float> value)
-        {
+        public Builder setQuery(String name, Supplier<Float> value) {
             this.query.set(name, MolangExpression.of(value));
             return this;
         }
@@ -187,8 +182,7 @@ public class MolangRuntime implements MolangEnvironment
          * @param params   The number of parameters to accept
          * @param function The function to execute
          */
-        public Builder setQuery(String name, int params, MolangJavaFunction function)
-        {
+        public Builder setQuery(String name, int params, MolangJavaFunction function) {
             this.query.set(params < 0 ? name : (name + "$" + params), new MolangFunction(params, function));
             return this;
         }
@@ -199,8 +193,7 @@ public class MolangRuntime implements MolangEnvironment
          * @param name  The name of the value
          * @param value The resulting number
          */
-        public Builder setGlobal(String name, float value)
-        {
+        public Builder setGlobal(String name, float value) {
             this.global.set(name, MolangExpression.of(value));
             return this;
         }
@@ -211,8 +204,7 @@ public class MolangRuntime implements MolangEnvironment
          * @param name  The name of the value
          * @param value The resulting number
          */
-        public Builder setGlobal(String name, Supplier<Float> value)
-        {
+        public Builder setGlobal(String name, Supplier<Float> value) {
             this.global.set(name, MolangExpression.of(value));
             return this;
         }
@@ -224,8 +216,7 @@ public class MolangRuntime implements MolangEnvironment
          * @param params   The number of parameters to accept
          * @param function The function to execute
          */
-        public Builder setGlobal(String name, int params, MolangJavaFunction function)
-        {
+        public Builder setGlobal(String name, int params, MolangJavaFunction function) {
             this.global.set(params < 0 ? name : (name + "$" + params), new MolangFunction(params, function));
             return this;
         }
@@ -236,8 +227,7 @@ public class MolangRuntime implements MolangEnvironment
          * @param name  The name of the value
          * @param value The resulting number
          */
-        public Builder setVariable(String name, float value)
-        {
+        public Builder setVariable(String name, MolangVariable value) {
             this.variable.set(name, MolangExpression.of(value)); // Variables are assumed to be used later
             return this;
         }
@@ -247,47 +237,46 @@ public class MolangRuntime implements MolangEnvironment
          *
          * @param provider The provider to add variables for
          */
-        public Builder setVariables(MolangVariableProvider provider)
-        {
-            provider.addMolangVariables(new MolangVariableProvider.Context()
-            {
+        public Builder setVariables(MolangVariableProvider provider) {
+            provider.addMolangVariables(new MolangVariableProvider.Context() {
                 @Override
-                public void addVariable(String name, float value)
-                {
+                public void addVariable(String name, MolangVariable value) {
                     setVariable(name, value);
                 }
 
                 @Override
-                public void addQuery(String name, float value)
-                {
+                public void addQuery(String name, float value) {
                     setQuery(name, value);
                 }
 
                 @Override
-                public void addQuery(String name, Supplier<Float> value)
-                {
+                public void addQuery(String name, Supplier<Float> value) {
                     setQuery(name, value);
                 }
 
                 @Override
-                public void addQuery(String name, int params, MolangJavaFunction function)
-                {
+                public void addQuery(String name, int params, MolangJavaFunction function) {
                     setQuery(name, params, function);
                 }
 
                 @Override
-                public void removeVariable(String name)
-                {
+                public void removeVariable(String name) {
                     variable.set(name, MolangExpression.ZERO);
                 }
 
                 @Override
-                public void removeQuery(String name)
-                {
+                public void removeQuery(String name) {
                     query.set(name, MolangExpression.ZERO);
                 }
             });
             return this;
+        }
+
+        /**
+         * @return A new runtime with <code>0</code> as the value for <code>this</code>.
+         */
+        public MolangRuntime create() {
+            return new MolangRuntime(new ImmutableMolangObject(this.query), new ImmutableMolangObject(this.global), this.variable);
         }
 
         /**
@@ -296,32 +285,30 @@ public class MolangRuntime implements MolangEnvironment
          * @param thisValue The value to load for the context
          * @return A new runtime
          */
-        public MolangRuntime create(float thisValue)
-        {
-            return new MolangRuntime(thisValue, new ImmutableMolangObject(this.query), new ImmutableMolangObject(this.global), this.variable);
+        public MolangRuntime create(float thisValue) {
+            MolangRuntime runtime = this.create();
+            runtime.setThisValue(thisValue);
+            return runtime;
         }
 
         /**
          * @return The query variable object
          */
-        public MolangObject getQuery()
-        {
+        public MolangObject getQuery() {
             return query;
         }
 
         /**
          * @return The global variable object
          */
-        public MolangObject getGlobal()
-        {
+        public MolangObject getGlobal() {
             return global;
         }
 
         /**
          * @return The variable object
          */
-        public MolangObject getVariable()
-        {
+        public MolangObject getVariable() {
             return variable;
         }
     }

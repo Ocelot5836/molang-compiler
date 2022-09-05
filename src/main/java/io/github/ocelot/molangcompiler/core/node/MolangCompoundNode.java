@@ -11,20 +11,17 @@ import java.util.Arrays;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangCompoundNode implements MolangExpression
-{
+public class MolangCompoundNode implements MolangExpression {
+
     private final MolangExpression[] expressions;
 
-    public MolangCompoundNode(MolangExpression... expressions)
-    {
+    public MolangCompoundNode(MolangExpression... expressions) {
         this.expressions = expressions;
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException
-    {
-        for (int i = 0; i < this.expressions.length; i++)
-        {
+    public float resolve(MolangEnvironment environment) throws MolangException {
+        for (int i = 0; i < this.expressions.length; i++) {
             float result = this.expressions[i].resolve(environment);
             if (i >= this.expressions.length - 1) // The last expression is expected to have the `return`
                 return result;
@@ -33,11 +30,9 @@ public class MolangCompoundNode implements MolangExpression
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < this.expressions.length; i++)
-        {
+        for (int i = 0; i < this.expressions.length; i++) {
             if (i >= this.expressions.length - 1)
                 builder.append("return ");
             builder.append(this.expressions[i]);
@@ -49,8 +44,7 @@ public class MolangCompoundNode implements MolangExpression
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MolangCompoundNode that = (MolangCompoundNode) o;
@@ -58,8 +52,7 @@ public class MolangCompoundNode implements MolangExpression
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Arrays.hashCode(this.expressions);
     }
 }

@@ -11,34 +11,30 @@ import java.util.Objects;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangConditionalNode implements MolangExpression
-{
+public class MolangConditionalNode implements MolangExpression {
+
     private final MolangExpression condition;
     private final MolangExpression first;
     private final MolangExpression branch;
 
-    public MolangConditionalNode(MolangExpression condition, MolangExpression first, MolangExpression branch)
-    {
+    public MolangConditionalNode(MolangExpression condition, MolangExpression first, MolangExpression branch) {
         this.condition = condition;
         this.first = first;
         this.branch = branch;
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException
-    {
+    public float resolve(MolangEnvironment environment) throws MolangException {
         return (this.condition.resolve(environment) != 0 ? this.first : this.branch).resolve(environment);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return this.condition + " ? " + this.first + " : " + this.branch;
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MolangConditionalNode that = (MolangConditionalNode) o;
@@ -46,8 +42,7 @@ public class MolangConditionalNode implements MolangExpression
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(this.condition, this.first, this.branch);
     }
 }

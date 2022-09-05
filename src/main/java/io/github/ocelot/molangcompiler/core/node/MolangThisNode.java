@@ -9,23 +9,20 @@ import org.jetbrains.annotations.ApiStatus;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangThisNode implements MolangExpression
-{
+public class MolangThisNode implements MolangExpression {
+
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException
-    {
+    public float resolve(MolangEnvironment environment) throws MolangException {
         return environment.getThis();
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "this";
     }
 
     @Override
-    public boolean equals(Object obj)
-    {
+    public boolean equals(Object obj) {
         return obj instanceof MolangThisNode;
     }
 }

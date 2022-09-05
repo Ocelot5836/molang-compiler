@@ -10,8 +10,8 @@ import io.github.ocelot.molangcompiler.api.exception.MolangException;
  * @since 1.0.0
  */
 @FunctionalInterface
-public interface MolangJavaFunction
-{
+public interface MolangJavaFunction {
+
     /**
      * Resolves a float from a set of parameters.
      *
@@ -27,8 +27,8 @@ public interface MolangJavaFunction
      * @author Ocelot
      * @since 1.0.0
      */
-    interface Context
-    {
+    interface Context {
+
         /**
          * Retrieves a value for the specified parameter
          *

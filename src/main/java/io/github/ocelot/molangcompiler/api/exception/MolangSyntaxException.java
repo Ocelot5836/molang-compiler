@@ -12,24 +12,22 @@ import org.jetbrains.annotations.Nullable;
  *
  * @since 1.0.0
  */
-public class MolangSyntaxException extends MolangException
-{
+public class MolangSyntaxException extends MolangException {
+
     public static final int CONTEXT_AMOUNT = 64;
 
     private final String message;
     private final String input;
     private final int cursor;
 
-    public MolangSyntaxException(String message)
-    {
+    public MolangSyntaxException(String message) {
         super(message);
         this.message = message;
         this.input = null;
         this.cursor = -1;
     }
 
-    public MolangSyntaxException(String message, String input, int cursor)
-    {
+    public MolangSyntaxException(String message, String input, int cursor) {
         super(message);
         this.message = message;
         this.input = input;
@@ -37,8 +35,7 @@ public class MolangSyntaxException extends MolangException
     }
 
     @Override
-    public String getMessage()
-    {
+    public String getMessage() {
         String message = this.message;
         String context = this.getContext();
         if (context != null)
@@ -49,16 +46,14 @@ public class MolangSyntaxException extends MolangException
     /**
      * @return The raw message error
      */
-    public String getRawMessage()
-    {
+    public String getRawMessage() {
         return message;
     }
 
     /**
      * @return The additional context if there is any
      */
-    public String getContext()
-    {
+    public String getContext() {
         if (this.input == null || this.cursor < 0)
             return null;
         StringBuilder builder = new StringBuilder();
@@ -77,16 +72,14 @@ public class MolangSyntaxException extends MolangException
      * @return The raw input data or <code>null</code> if no context was specified
      */
     @Nullable
-    public String getInput()
-    {
+    public String getInput() {
         return input;
     }
 
     /**
      * @return The cursor position when the error occurs or <code>-1</code> if no context was specified
      */
-    public int getCursor()
-    {
+    public int getCursor() {
         return cursor;
     }
 }

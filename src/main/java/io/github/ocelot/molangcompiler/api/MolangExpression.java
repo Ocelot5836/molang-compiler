@@ -1,7 +1,9 @@
 package io.github.ocelot.molangcompiler.api;
 
+import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.core.node.MolangConstantNode;
+import io.github.ocelot.molangcompiler.core.node.MolangLazyNode;
 import io.github.ocelot.molangcompiler.core.node.MolangStaticNode;
 
 import java.util.function.BooleanSupplier;
@@ -14,8 +16,8 @@ import java.util.function.Supplier;
  * @see MolangEnvironment
  * @since 1.0.0
  */
-public interface MolangExpression
-{
+public interface MolangExpression {
+
     MolangExpression ZERO = of(0);
 
     /**
@@ -33,14 +35,10 @@ public interface MolangExpression
      * @param environment The environment to execute in
      * @return The resulting value
      */
-    default float safeResolve(MolangEnvironment environment)
-    {
-        try
-        {
+    default float safeResolve(MolangEnvironment environment) {
+        try {
             return this.resolve(environment);
-        }
-        catch (MolangException e)
-        {
+        } catch (MolangException e) {
             e.printStackTrace();
             return 0.0F;
         }
@@ -52,8 +50,7 @@ public interface MolangExpression
      * @param value The value to represent as an expression
      * @return A new expression with that value
      */
-    static MolangExpression of(float value)
-    {
+    static MolangExpression of(float value) {
         return new MolangConstantNode(value);
     }
 
@@ -63,8 +60,7 @@ public interface MolangExpression
      * @param value The value to represent as an expression
      * @return A new expression with that value
      */
-    static MolangExpression of(boolean value)
-    {
+    static MolangExpression of(boolean value) {
         return new MolangConstantNode(value ? 1.0F : 0.0F);
     }
 
@@ -74,9 +70,8 @@ public interface MolangExpression
      * @param value The value to represent as an expression
      * @return A new expression with that value
      */
-    static MolangExpression of(Supplier<Float> value)
-    {
-        return new MolangStaticNode(value);
+    static MolangExpression of(Supplier<Float> value) {
+        return new MolangLazyNode(value);
     }
 
     /**
@@ -85,8 +80,18 @@ public interface MolangExpression
      * @param value The value to represent as an expression
      * @return A new expression with that value
      */
-    static MolangExpression of(BooleanSupplier value)
-    {
-        return new MolangStaticNode(() -> value.getAsBoolean() ? 1.0F : 0.0F);
+    static MolangExpression of(BooleanSupplier value) {
+        return new MolangLazyNode(() -> value.getAsBoolean() ? 1.0F : 0.0F);
+    }
+
+    /**
+     * Creates a {@link MolangExpression} that access a Java variable.
+     *
+     * @param value The value to represent as an expression
+     * @return A new expression with that value
+     * @since 2.0.0
+     */
+    static MolangExpression of(MolangVariable value) {
+        return new MolangStaticNode(value);
     }
 }

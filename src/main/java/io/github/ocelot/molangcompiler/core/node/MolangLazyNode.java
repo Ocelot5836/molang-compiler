@@ -5,39 +5,45 @@ import io.github.ocelot.molangcompiler.api.MolangExpression;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangConstantNode implements MolangExpression {
+public class MolangLazyNode implements MolangExpression {
 
-    private final float value;
+    private final Supplier<Float> value;
+    private Float result = null;
 
-    public MolangConstantNode(float value) {
-        this.value = value;
+    public MolangLazyNode(Supplier<Float> value) {
+        this.value = () -> {
+            if (this.result == null)
+                this.result = value.get();
+            return this.result;
+        };
     }
 
     @Override
     public float resolve(MolangEnvironment environment) {
-        return value;
+        return this.value.get();
     }
 
     @Override
     public String toString() {
-        return Float.toString(this.value);
+        return Float.toString(this.value.get());
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MolangConstantNode that = (MolangConstantNode) o;
-        return Float.compare(that.value, this.value) == 0;
+        MolangLazyNode that = (MolangLazyNode) o;
+        return this.value.get().equals(that.value.get());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.value);
+        return Objects.hash(this.value.get());
     }
 }

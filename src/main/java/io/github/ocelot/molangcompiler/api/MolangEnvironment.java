@@ -9,8 +9,8 @@ import io.github.ocelot.molangcompiler.api.object.MolangObject;
  * @author Ocelot
  * @since 1.0.0
  */
-public interface MolangEnvironment
-{
+public interface MolangEnvironment {
+
     /**
      * Loads a parameter into the specified slot.
      *

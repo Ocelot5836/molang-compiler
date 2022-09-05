@@ -2,7 +2,9 @@ package io.github.ocelot.molangcompiler.core.node;
 
 import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
+import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
@@ -11,36 +13,41 @@ import java.util.Objects;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangSetVariableNode implements MolangExpression
-{
+public class MolangSetVariableNode implements MolangExpression {
+
     private final String object;
     private final String name;
     private final MolangExpression expression;
 
-    public MolangSetVariableNode(String object, String name, MolangExpression expression)
-    {
+    public MolangSetVariableNode(String object, String name, MolangExpression expression) {
         this.object = object;
         this.name = name;
         this.expression = expression;
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException
-    {
+    public float resolve(MolangEnvironment environment) throws MolangException {
         // This evaluates the value before setting it
-        environment.get(this.object).set(this.name, new MolangConstantNode(this.expression.resolve(environment)));
+        float value = this.expression.resolve(environment);
+
+        MolangObject object = environment.get(this.object);
+        MolangExpression old = object.get(this.name);
+        if (old instanceof MolangVariable) {
+            ((MolangVariable) old).setValue(value);
+        } else {
+            object.set(this.name, new MolangConstantNode(value));
+        }
+
         return this.expression.resolve(environment);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return this.object + "." + this.name + " = " + this.expression;
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MolangSetVariableNode that = (MolangSetVariableNode) o;
@@ -48,8 +55,7 @@ public class MolangSetVariableNode implements MolangExpression
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(this.object, this.name, this.expression);
     }
 }

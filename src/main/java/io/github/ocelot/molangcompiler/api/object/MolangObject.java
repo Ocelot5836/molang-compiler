@@ -8,8 +8,8 @@ import io.github.ocelot.molangcompiler.api.MolangExpression;
  * @author Ocelot
  * @since 1.0.0
  */
-public interface MolangObject
-{
+public interface MolangObject {
+
     /**
      * Sets a value with the specified name.
      *

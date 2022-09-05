@@ -13,18 +13,16 @@ import java.util.Objects;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangScopeNode implements MolangExpression
-{
+public class MolangScopeNode implements MolangExpression {
+
     private final MolangExpression expression;
 
-    public MolangScopeNode(MolangExpression expression)
-    {
+    public MolangScopeNode(MolangExpression expression) {
         this.expression = expression;
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException
-    {
+    public float resolve(MolangEnvironment environment) throws MolangException {
         MolangObject object = environment.get("temp");
         if (object instanceof MolangVariableStack)
             ((MolangVariableStack) object).push();
@@ -36,14 +34,12 @@ public class MolangScopeNode implements MolangExpression
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         return "{\n" + this.expression + "\n}";
     }
 
     @Override
-    public boolean equals(Object o)
-    {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MolangScopeNode that = (MolangScopeNode) o;
@@ -51,8 +47,7 @@ public class MolangScopeNode implements MolangExpression
     }
 
     @Override
-    public int hashCode()
-    {
+    public int hashCode() {
         return Objects.hash(this.expression);
     }
 }

@@ -11,27 +11,23 @@ import java.util.Map;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangVariableStorage implements MolangObject
-{
+public class MolangVariableStorage implements MolangObject {
+
     private final Map<String, MolangExpression> storage;
     private final boolean allowMethods;
 
-    public MolangVariableStorage(boolean allowMethods)
-    {
+    public MolangVariableStorage(boolean allowMethods) {
         this.storage = new HashMap<>();
         this.allowMethods = allowMethods;
     }
 
-    protected Map<String, MolangExpression> getStorage()
-    {
+    protected Map<String, MolangExpression> getStorage() {
         return storage;
     }
 
     @Override
-    public void set(String name, MolangExpression value)
-    {
-        if (value.equals(MolangExpression.ZERO))
-        {
+    public void set(String name, MolangExpression value) {
+        if (value.equals(MolangExpression.ZERO)) {
             this.getStorage().remove(name);
             return;
         }
@@ -41,30 +37,23 @@ public class MolangVariableStorage implements MolangObject
     }
 
     @Override
-    public MolangExpression get(String name)
-    {
+    public MolangExpression get(String name) {
         return this.getStorage().getOrDefault(name, MolangExpression.ZERO);
     }
 
     @Override
-    public boolean has(String name)
-    {
+    public boolean has(String name) {
         return this.getStorage().containsKey(name);
     }
 
     @Override
-    public String toString()
-    {
+    public String toString() {
         StringBuilder builder = new StringBuilder("MoLang Object\n");
-        for (Map.Entry<String, MolangExpression> entry : this.getStorage().entrySet())
-        {
+        for (Map.Entry<String, MolangExpression> entry : this.getStorage().entrySet()) {
             builder.append('\t').append(entry.getKey());
-            if (entry.getValue() instanceof MolangFunction)
-            {
+            if (entry.getValue() instanceof MolangFunction) {
                 builder.append("()");
-            }
-            else
-            {
+            } else {
                 builder.append('=').append(entry.getValue());
             }
             builder.append('\n');
