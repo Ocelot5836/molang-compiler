@@ -451,7 +451,7 @@ public class MolangCompiler
                     throw TOO_MANY_PARAMETERS.create(function.getParameters(), parameters.length);
             }
 
-            if (checkFlag(flags, REDUCE_FLAG))
+            if (checkFlag(flags, REDUCE_FLAG) && function.canOptimize())
             {
                 // Math functions are constant so these can be compiled down to raw numbers if all parameters are constants
                 boolean reduceFunction = true;

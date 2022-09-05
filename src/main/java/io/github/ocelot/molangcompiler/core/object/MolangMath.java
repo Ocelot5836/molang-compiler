@@ -56,7 +56,7 @@ public class MolangMath extends MolangLibrary
         }),
         COS(1, parameters ->
                 (float) Math.cos(parameters.resolve(0) * Math.PI / 180.0F)),
-        DIE_ROLL(3, parameters ->
+        DIE_ROLL(3, false, parameters ->
         {
             int count = (int) parameters.resolve(0);
             if (count <= 0)
@@ -72,7 +72,7 @@ public class MolangMath extends MolangLibrary
                 sum += min + RNG.nextFloat() * (max - min);
             return sum;
         }),
-        DIE_ROLL_INTEGER(3, parameters ->
+        DIE_ROLL_INTEGER(3,false, parameters ->
         {
             int count = (int) parameters.resolve(0);
             if (count <= 0)
@@ -140,7 +140,7 @@ public class MolangMath extends MolangLibrary
         PI(MolangExpression.of((float) Math.PI)),
         POW(2, parameters ->
                 (float) Math.pow(parameters.resolve(0), parameters.resolve(1))),
-        RANDOM(2, parameters ->
+        RANDOM(2, false, parameters ->
         {
             float min = parameters.resolve(0);
             float max = parameters.resolve(1);
@@ -148,7 +148,7 @@ public class MolangMath extends MolangLibrary
                 throw new MolangException("Invalid random range: " + min + " to " + max);
             return min + RNG.nextFloat() * (max - min);
         }),
-        RANDOM_INTEGER(2, parameters ->
+        RANDOM_INTEGER(2, false, parameters ->
         {
             int min = (int) parameters.resolve(0);
             int max = (int) parameters.resolve(1);
@@ -176,13 +176,20 @@ public class MolangMath extends MolangLibrary
         private final String functionName;
         private final MolangExpression expression;
         private final MolangJavaFunction op;
+        private final boolean canOptimize;
 
         MathFunction(int parameters, MolangJavaFunction op)
+        {
+            this(parameters, true, op);
+        }
+
+        MathFunction(int parameters, boolean canOptimize, MolangJavaFunction op)
         {
             this.parameters = parameters;
             this.functionName = this.name().toLowerCase(Locale.ROOT) + "$" + parameters;
             this.expression = new MolangFunction(parameters, op);
             this.op = op;
+            this.canOptimize = canOptimize;
         }
 
         MathFunction(MolangExpression value)
@@ -191,6 +198,7 @@ public class MolangMath extends MolangLibrary
             this.functionName = this.name().toLowerCase(Locale.ROOT);
             this.expression = value;
             this.op = null;
+            this.canOptimize = true;
         }
 
         public int getParameters()
@@ -207,6 +215,10 @@ public class MolangMath extends MolangLibrary
         public MolangJavaFunction getOp()
         {
             return op;
+        }
+
+        public boolean canOptimize() {
+            return canOptimize;
         }
 
         @Nullable
