@@ -1,7 +1,5 @@
 package io.github.ocelot.molangcompiler.api.bridge;
 
-import org.jetbrains.annotations.ApiStatus;
-
 import java.util.function.Supplier;
 
 /**
@@ -19,8 +17,6 @@ public interface MolangVariableProvider {
      * @param context The variable modification context
      */
     void addMolangVariables(Context context);
-
-    // TODO remove deprecated features in 2.0.0
 
     /**
      * Context for MoLang variable modification.
