@@ -21,6 +21,11 @@ public class MolangVariableStorage implements MolangObject {
         this.allowMethods = allowMethods;
     }
 
+    public MolangVariableStorage(MolangVariableStorage copy) {
+        this.storage = new HashMap<>(copy.storage);
+        this.allowMethods = copy.allowMethods;
+    }
+
     protected Map<String, MolangExpression> getStorage() {
         return storage;
     }

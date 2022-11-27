@@ -136,6 +136,15 @@ public class MolangRuntime implements MolangEnvironment {
     }
 
     /**
+     * Variables will be shared between the two runtimes, but new options added to the copy will not be reflected in the original.
+     *
+     * @return A new runtime builder copied from the specified builder.
+     */
+    public static Builder runtime(MolangRuntime.Builder copy) {
+        return new Builder(copy);
+    }
+
+    /**
      * Constructs a new {@link MolangRuntime} with preset parameters.
      *
      * @author Ocelot
@@ -143,14 +152,33 @@ public class MolangRuntime implements MolangEnvironment {
      */
     public static class Builder {
 
-        private final MolangObject query;
-        private final MolangObject global;
-        private final MolangObject variable;
+        private final MolangVariableStorage query;
+        private final MolangVariableStorage global;
+        private final MolangVariableStorage variable;
+        private final Map<String, MolangObject> libraries;
 
         public Builder() {
             this.query = new MolangVariableStorage(true);
             this.global = new MolangVariableStorage(true);
             this.variable = new MolangVariableStorage(false);
+            this.libraries = new HashMap<>();
+        }
+
+        public Builder(Builder copy) {
+            this.query = new MolangVariableStorage(copy.query);
+            this.global = new MolangVariableStorage(copy.global);
+            this.variable = new MolangVariableStorage(copy.variable);
+            this.libraries = new HashMap<>(copy.libraries);
+        }
+
+        /**
+         * Loads the specified object under the provided namespace. Ex. <code>libraryname.method()</code>
+         *
+         * @param name   The namespace of the library
+         * @param object The library to load
+         */
+        public void loadLibrary(String name, MolangObject object) {
+            this.libraries.put(name, object);
         }
 
         /**
