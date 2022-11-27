@@ -238,18 +238,18 @@ public class MolangCompiler {
                         throw TRAILING_STATEMENT.createWithContext(reader);
                     reader.skipWhitespace();
 
-                    MolangExpression first = parseExpression(new StringReader(fullWord), flags, true, false);
-                    MolangExpression second = parseExpression(new StringReader(reader.getRead().substring(start)), flags, true, false);
+                    MolangExpression first = parseExpression(new StringReader(fullWord), flags, true, true);
+                    MolangExpression second = parseExpression(new StringReader(reader.getRead().substring(start)), flags, true, true);
                     if (checkFlag(flags, REDUCE_FLAG) && first instanceof MolangConstantNode && second instanceof MolangConstantNode) {
                         try {
-                            return parseCondition(reader, MolangExpression.of(mode.resolve(first, second, ENVIRONMENT)), flags, allowMath);
+                            return parseCondition(reader, MolangExpression.of(mode.resolve(first, second, ENVIRONMENT)), flags, true);
                         } catch (MolangException e) {
                             // This should literally never happen
                             e.printStackTrace();
                         }
                     }
 
-                    return parseCondition(reader, new MolangCompareNode(first, second, mode), flags, allowMath);
+                    return parseCondition(reader, new MolangCompareNode(first, second, mode), flags, true);
                 }
             }
             throw TRAILING_STATEMENT.createWithContext(reader);
@@ -478,7 +478,7 @@ public class MolangCompiler {
 
             MolangExpression parse() throws MolangSyntaxException {
                 reader.skipWhitespace();
-                MolangExpression x = parseExpression();
+                MolangExpression x = parseExpression(0);
                 reader.skipWhitespace();
                 if (reader.canRead())
                     throw TRAILING_STATEMENT.createWithContext(reader);
@@ -498,41 +498,41 @@ public class MolangCompiler {
                 return x;
             }
 
-            MolangExpression parseExpression() throws MolangSyntaxException {
-                MolangExpression x = parseTerm();
+            MolangExpression parseExpression(int extra) throws MolangSyntaxException {
+                MolangExpression x = parseTerm(extra);
                 while (true) {
                     if (accept('+')) {
-                        x = new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.ADD, x, parseTerm()); // addition
+                        x = new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.ADD, x, parseTerm(extra)); // addition
                     } else if (accept('-')) {
-                        x = new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.SUBTRACT, x, parseTerm()); // subtraction
+                        x = new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.SUBTRACT, x, parseTerm(extra)); // subtraction
                     } else {
                         return x;
                     }
                 }
             }
 
-            MolangExpression parseTerm() throws MolangSyntaxException {
-                MolangExpression x = parseFactor();
+            MolangExpression parseTerm(int extra) throws MolangSyntaxException {
+                MolangExpression x = parseFactor(extra);
                 while (true) {
                     boolean accept = accept('*');
                     if (accept) {
-                        x = new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.MULTIPLY, x, parseFactor()); // multiplication
+                        x = new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.MULTIPLY, x, parseFactor(extra)); // multiplication
                     } else if (accept('/')) {
-                        x = new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.DIVIDE, x, parseFactor()); // division
+                        x = new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.DIVIDE, x, parseFactor(extra)); // division
                     } else {
                         return x;
                     }
                 }
             }
 
-            MolangExpression parseFactor() throws MolangSyntaxException {
+            MolangExpression parseFactor(int extra) throws MolangSyntaxException {
                 if (accept('+'))
-                    return parseFactor(); // unary plus
+                    return parseFactor(extra); // unary plus
                 if (accept('-'))
-                    return new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.MULTIPLY, parseFactor(), MolangExpression.of(-1)); // unary minus
+                    return new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.MULTIPLY, parseFactor(extra), MolangExpression.of(-1)); // unary minus
 
                 if (accept('(')) {
-                    MolangExpression expression = parseExpression();
+                    MolangExpression expression = parseExpression(extra + 1);
                     accept(')');
                     return expression;
                 }
@@ -541,15 +541,36 @@ public class MolangCompiler {
                 int start = reader.getCursor();
                 int parentheses = 0;
                 boolean hasMethod = hasMethod(reader);
-                while (reader.canRead() && (Character.isWhitespace(reader.peek()) || !MATH_OPERATORS.contains(reader.peek()) || hasMethod)) {
+                boolean hasCompare = false;
+                while (reader.canRead() && (hasMethod || hasCompare || Character.isWhitespace(reader.peek()) || (hasCompare = isCompareChar(reader.peek())) || !MATH_OPERATORS.contains(reader.peek()))) {
+                    if (reader.peek() == '=') {
+                        char before = reader.peekBefore(1);
+                        if (before == '>' || before == '<')
+                            continue;
+                        reader.skip();
+                        if (reader.canRead() && ((reader.peek() == '=') ^ (before == '=')))
+                            continue;
+                        throw UNEXPECTED_TOKEN.createWithContext(reader);
+                    }
                     if (reader.peek() == '(') {
                         parentheses++;
                     }
-                    if (reader.peek() == ')' && hasMethod) {
+                    if (reader.peek() == ')') {
                         parentheses--;
-                        if (parentheses == 0) {
-                            reader.skip();
-                            break;
+                        if (parentheses <= 0) {
+                            if (parentheses == 0)
+                                reader.skip();
+                            if (extra > 0 && reader.canRead(extra)) {
+                                StringReader parenthesisReader = new StringReader(reader.getRemaining());
+                                while (extra > 1 && parenthesisReader.peek() == ')') {
+                                    extra--;
+                                    parenthesisReader.skip();
+                                }
+                                if (extra == 1)
+                                    break;
+                            } else if (hasMethod) {
+                                break;
+                            }
                         }
                     }
                     reader.skip();
@@ -558,7 +579,7 @@ public class MolangCompiler {
                 MolangExpression expression = MolangCompiler.parseExpression(new StringReader(reader.getRead().substring(start)), flags, true, false);
                 if (!checkFlag(flags, REDUCE_FLAG))
                     return expression;
-                if (this.canReduce && (expression instanceof MolangSetVariableNode || expression instanceof MolangInvokeFunctionNode || expression instanceof MolangGetVariableNode || expression instanceof MolangThisNode))
+                if (this.canReduce && (expression instanceof MolangSetVariableNode || expression instanceof MolangInvokeFunctionNode || expression instanceof MolangCompareNode || expression instanceof MolangConditionalNode || expression instanceof MolangGetVariableNode || expression instanceof MolangThisNode))
                     this.canReduce = false;
                 return expression;
             }

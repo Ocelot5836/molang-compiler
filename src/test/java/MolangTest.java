@@ -141,4 +141,24 @@ public class MolangTest {
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(0.5, result);
     }
+
+    @Test
+    void testNegativeCondition() throws MolangException {
+        MolangExpression expression = MolangCompiler.compile("+variable.particle_random_3>0.2 ? -10 : -4");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(-4, result);
+    }
+
+    @Test
+    void testWeird() throws MolangException {
+        MolangExpression expression = MolangCompiler.compile("((((-7))*((((((((variable.particle_random_3>(0.2) * (((4))) ? (-10) : -4))))))))))");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(28, result);
+    }
 }

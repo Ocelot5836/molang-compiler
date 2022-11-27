@@ -46,6 +46,10 @@ public class StringReader {
         return canRead(1);
     }
 
+    public char peekBefore(int i) {
+        return this.string.charAt(this.cursor - i);
+    }
+
     public char peek() {
         return this.string.charAt(this.cursor);
     }
