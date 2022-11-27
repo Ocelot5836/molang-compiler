@@ -112,4 +112,33 @@ public class MolangTest {
         Assertions.assertEquals(2, result);
         Assertions.assertEquals(2, this.testVariable.getValue());
     }
+
+    @Test
+    void testMultiple() throws MolangException {
+        MolangExpression expression = MolangCompiler.compile("v.b = 2;v.a = 3;v.ab = v.b;v.c = 1;");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+    }
+
+    @Test
+    void testCondition() throws MolangException {
+        MolangExpression expression = MolangCompiler.compile("1 > 2 ? 10 : 20", 0);
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(20, result);
+    }
+
+    @Test
+    void testComplexCondition() throws MolangException {
+        MolangExpression expression = MolangCompiler.compile("math.clamp(0.5 + variable.particle_random_4/7 + (variable.particle_random_3>0.2 ? 0.4 : 0), 0, 1)");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(0.5, result);
+    }
 }

@@ -52,9 +52,13 @@ public class MolangCompiler {
      */
     private static final int CHECK_OPERATORS_FLAG = 0b00010000;
     /**
+     * Whether to check for comparisons.
+     */
+    private static final int CHECK_COMPARE_FLAG = 0b00100000;
+    /**
      * Whether to check for scopes. Eg {}.
      */
-    private static final int CHECK_SCOPE_FLAG = 0b00100000;
+    private static final int CHECK_SCOPE_FLAG = 0b01000000;
 
     private static final MolangEnvironment ENVIRONMENT = new CompileEnvironment();
     private static final List<Character> MATH_OPERATORS = Arrays.asList('(', ')', '*', '/', '+', '-');
@@ -90,6 +94,8 @@ public class MolangCompiler {
         }
         if (input.contains("this"))
             flags |= CHECK_THIS_FLAG;
+        if (input.contains(">") || input.contains("<") || input.contains("=="))
+            flags |= CHECK_COMPARE_FLAG;
         if (!checkFlag(flags, CHECK_OPERATORS_FLAG)) {
             for (char operator : MATH_OPERATORS) {
                 if (input.indexOf(operator) != -1) {
@@ -193,7 +199,7 @@ public class MolangCompiler {
         }
 
         // Check for math. This will not happen if reading from math because operators are removed
-        if (checkFlag(flags, CHECK_OPERATORS_FLAG) && !reader.getRemaining().contains("=") && !reader.getRemaining().contains("?") && !reader.getRemaining().contains(":") && allowMath) {
+        if (checkFlag(flags, CHECK_OPERATORS_FLAG) && !reader.getRemaining().contains("=") && allowMath) {
             for (char operator : MATH_OPERATORS) {
                 if (reader.getRemaining().chars().anyMatch(a -> a == operator)) {
                     return compute(reader, flags);
@@ -203,18 +209,54 @@ public class MolangCompiler {
 
         String[] currentKeyword = parseKeyword(reader, simple); // This handles 'abc.def' etc
         String fullWord = currentKeyword[0] + (currentKeyword.length > 1 ? "." + currentKeyword[1] : "");
+        reader.skipWhitespace(); // Skip space after the word
 
         // Check for 'this' keyword
         if (checkFlag(flags, CHECK_THIS_FLAG) && "this".equals(fullWord)) {
-            reader.skipWhitespace();
             if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek()))
                 throw TRAILING_STATEMENT.createWithContext(reader);
             return parseCondition(reader, new MolangThisNode(), flags, allowMath);
         }
 
+        // Check for comparisons
+        if (checkFlag(flags, CHECK_COMPARE_FLAG) && reader.canRead() && isCompareChar(reader.peek())) {
+            int start = reader.getCursor();
+            while (reader.canRead() && isCompareChar(reader.peek())) {
+                reader.skip();
+            }
+
+            String operator = reader.getRead().substring(start);
+            reader.skipWhitespace();
+            for (MolangCompareNode.CompareMode mode : MolangCompareNode.CompareMode.values()) {
+                if (mode.getSign().equals(operator)) {
+                    start = reader.getCursor();
+                    while (reader.canRead() && reader.peek() != '?') {
+                        reader.skip();
+                    }
+
+                    if (!reader.canRead()) // Failed to find the end of the condition
+                        throw TRAILING_STATEMENT.createWithContext(reader);
+                    reader.skipWhitespace();
+
+                    MolangExpression first = parseExpression(new StringReader(fullWord), flags, true, false);
+                    MolangExpression second = parseExpression(new StringReader(reader.getRead().substring(start)), flags, true, false);
+                    if (checkFlag(flags, REDUCE_FLAG) && first instanceof MolangConstantNode && second instanceof MolangConstantNode) {
+                        try {
+                            return parseCondition(reader, MolangExpression.of(mode.resolve(first, second, ENVIRONMENT)), flags, allowMath);
+                        } catch (MolangException e) {
+                            // This should literally never happen
+                            e.printStackTrace();
+                        }
+                    }
+
+                    return parseCondition(reader, new MolangCompareNode(first, second, mode), flags, allowMath);
+                }
+            }
+            throw TRAILING_STATEMENT.createWithContext(reader);
+        }
+
         // Check for 'true' keyword
         if ("true".equals(fullWord) || "false".equals(fullWord)) {
-            reader.skipWhitespace();
             if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek()))
                 throw TRAILING_STATEMENT.createWithContext(reader);
             return parseCondition(reader, MolangExpression.of("true".equals(fullWord)), flags, allowMath);
@@ -222,14 +264,13 @@ public class MolangCompiler {
 
         // Check for number
         if (isNumber(fullWord)) {
-            reader.skipWhitespace();
             if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek()))
                 throw TRAILING_STATEMENT.createWithContext(reader);
             return parseCondition(reader, MolangExpression.of(Float.parseFloat(fullWord)), flags, allowMath);
         }
 
         // methods and params require at least both parts
-        if (currentKeyword.length <= 1 || currentKeyword[0].isEmpty())
+        if (currentKeyword.length == 1 || currentKeyword[0].isEmpty())
             throw UNEXPECTED_TOKEN.createWithContext(reader);
 
         // objects are not allowed to start with numbers
@@ -254,7 +295,7 @@ public class MolangCompiler {
                     if (reader.getCursor() == start) {
                         parameters = new MolangExpression[0];
                     } else {
-                        String[] parameterStrings = reader.getRead().substring(start).split(",");
+                        String[] parameterStrings = reader.getRead().substring(start + 1).split(",");
                         parameters = new MolangExpression[parameterStrings.length];
                         for (int i = 0; i < parameterStrings.length; i++) {
                             parameters[i] = parseExpression(new StringReader(parameterStrings[i]), flags, true, true);
@@ -293,7 +334,7 @@ public class MolangCompiler {
         throw TRAILING_STATEMENT.createWithContext(reader);
     }
 
-    private static MolangExpression parseCondition(StringReader reader, MolangExpression expression, int flags, boolean allowMath) throws MolangSyntaxException {
+    private static MolangExpression parseCondition(StringReader reader, MolangExpression conditionExpression, int flags, boolean allowMath) throws MolangSyntaxException {
         if (reader.canRead() && reader.peek() == '?') {
             reader.skip();
             reader.skipWhitespace();
@@ -311,10 +352,10 @@ public class MolangCompiler {
             reader.skip();
 
             MolangExpression branch = parseExpression(reader, flags, true, allowMath);
-            MolangExpression condition = new MolangConditionalNode(expression, first, branch);
-            if (checkFlag(flags, REDUCE_FLAG) && expression instanceof MolangConstantNode) {
+            MolangExpression condition = new MolangConditionalNode(conditionExpression, first, branch);
+            if (checkFlag(flags, REDUCE_FLAG) && conditionExpression instanceof MolangConstantNode) {
                 try {
-                    return expression.resolve(ENVIRONMENT) != 0.0 ? first : branch;
+                    return conditionExpression.resolve(ENVIRONMENT) != 0.0 ? first : branch;
                 } catch (MolangException e) {
                     // This should literally never happen
                     e.printStackTrace();
@@ -322,7 +363,7 @@ public class MolangCompiler {
             }
             return condition;
         }
-        return expression;
+        return conditionExpression;
     }
 
     private static String[] parseKeyword(StringReader reader, boolean simple) throws MolangSyntaxException {
@@ -533,6 +574,10 @@ public class MolangCompiler {
                 || c >= 'A' && c <= 'Z'
                 || c >= 'a' && c <= 'z'
                 || c == '_' || c == '.';
+    }
+
+    private static boolean isCompareChar(final char c) {
+        return c == '>' || c == '<' || c == '=';
     }
 
     private static boolean isNumber(String input) {
