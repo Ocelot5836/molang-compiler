@@ -26,7 +26,7 @@ public class MolangInvokeFunctionNode implements MolangExpression {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangException {
         MolangObject object = environment.get(this.object);
         MolangExpression function;
 

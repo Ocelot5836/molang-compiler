@@ -24,7 +24,7 @@ public class MolangMathOperatorNode implements MolangExpression {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangException {
         return this.operation.op.apply(this.a, this.b, environment);
     }
 
@@ -48,13 +48,7 @@ public class MolangMathOperatorNode implements MolangExpression {
 
     public enum MathOperation {
         MULTIPLY('*', (a, b, environment) -> a.resolve(environment) * b.resolve(environment)),
-        DIVIDE('/', (a, b, environment) ->
-        {
-            float second = b.resolve(environment);
-            if (second == 0) // This is to prevent a divide by zero exception
-                return 0;
-            return a.resolve(environment) / second;
-        }),
+        DIVIDE('/', (a, b, environment) -> a.resolve(environment) / b.resolve(environment)),
         ADD('+', (a, b, environment) -> a.resolve(environment) + b.resolve(environment)),
         SUBTRACT('-', (a, b, environment) -> a.resolve(environment) - b.resolve(environment));
 

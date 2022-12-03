@@ -53,4 +53,34 @@ public interface MolangEnvironment {
      * @return Whether a parameter is present
      */
     boolean hasParameter(int parameter) throws MolangException;
+
+    /**
+     * Resolves the float value of the specified expression in this environment.
+     * <p>This allows environments to fine-tune how expressions are evaluated.
+     *
+     * @param expression The expression to evaluate
+     * @return The resulting value
+     * @throws MolangException If any error occurs when resolving the value
+     * @since 2.0.0
+     */
+    default float resolve(MolangExpression expression) throws MolangException {
+        return expression.get(this);
+    }
+
+    /**
+     * Resolves the float value of the specified expression in this environment. Catches any exception thrown and returns <code>0.0</code>.
+     * <p>This allows environments to fine-tune how expressions are evaluated.
+     *
+     * @param expression The expression to evaluate
+     * @return The resulting value
+     * @since 2.0.0
+     */
+    default float safeResolve(MolangExpression expression) {
+        try {
+            return this.resolve(expression);
+        } catch (MolangException e) {
+            e.printStackTrace();
+            return 0.0F;
+        }
+    }
 }

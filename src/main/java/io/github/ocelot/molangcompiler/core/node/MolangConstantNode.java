@@ -19,7 +19,7 @@ public class MolangConstantNode implements MolangExpression {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) {
+    public float get(MolangEnvironment environment) {
         return value;
     }
 

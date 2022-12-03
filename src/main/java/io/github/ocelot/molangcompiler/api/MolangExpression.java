@@ -5,6 +5,7 @@ import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.core.node.MolangConstantNode;
 import io.github.ocelot.molangcompiler.core.node.MolangLazyNode;
 import io.github.ocelot.molangcompiler.core.node.MolangStaticNode;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.BooleanSupplier;
 import java.util.function.Supplier;
@@ -21,27 +22,34 @@ public interface MolangExpression {
     MolangExpression ZERO = of(0);
 
     /**
-     * Resolves the float value of this runtime.
+     * Resolves the float value of this expression.
      *
      * @param environment The environment to execute in
      * @return The resulting value
      * @throws MolangException If any error occurs when resolving the value
      */
-    float resolve(MolangEnvironment environment) throws MolangException;
+    @ApiStatus.OverrideOnly
+    float get(MolangEnvironment environment) throws MolangException;
 
     /**
-     * Resolves the float value of this runtime. Catches any exception thrown and returns <code>0.0</code>.
+     * Resolves the float value of this expression.
+     *
+     * @param environment The environment to execute in
+     * @return The resulting value
+     * @throws MolangException If any error occurs when resolving the value
+     */
+    default float resolve(MolangEnvironment environment) throws MolangException {
+        return environment.resolve(this);
+    }
+
+    /**
+     * Resolves the float value of this expression. Catches any exception thrown and returns <code>0.0</code>.
      *
      * @param environment The environment to execute in
      * @return The resulting value
      */
     default float safeResolve(MolangEnvironment environment) {
-        try {
-            return this.resolve(environment);
-        } catch (MolangException e) {
-            e.printStackTrace();
-            return 0.0F;
-        }
+        return environment.safeResolve(this);
     }
 
     /**

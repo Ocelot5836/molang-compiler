@@ -24,7 +24,7 @@ public class MolangConditionalNode implements MolangExpression {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangException {
         return (this.condition.resolve(environment) != 0 ? this.first : this.branch).resolve(environment);
     }
 

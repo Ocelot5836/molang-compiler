@@ -22,7 +22,7 @@ public class MolangScopeNode implements MolangExpression {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangException {
         MolangObject object = environment.get("temp");
         if (object instanceof MolangVariableStack)
             ((MolangVariableStack) object).push();

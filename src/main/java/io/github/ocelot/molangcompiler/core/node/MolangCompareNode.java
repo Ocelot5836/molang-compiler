@@ -24,7 +24,7 @@ public class MolangCompareNode implements MolangExpression {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangException {
         return this.mode.resolve(this.first, this.second, environment);
     }
 

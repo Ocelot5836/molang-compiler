@@ -20,7 +20,7 @@ public class MolangStaticNode implements MolangExpression, MolangVariable {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) {
+    public float get(MolangEnvironment environment) {
         return this.value.getValue();
     }
 

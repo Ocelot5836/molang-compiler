@@ -25,7 +25,7 @@ public class MolangLazyNode implements MolangExpression {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) {
+    public float get(MolangEnvironment environment) {
         return this.value.get();
     }
 

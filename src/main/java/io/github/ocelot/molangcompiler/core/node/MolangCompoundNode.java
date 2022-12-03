@@ -20,7 +20,7 @@ public class MolangCompoundNode implements MolangExpression {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangException {
         for (int i = 0; i < this.expressions.length; i++) {
             float result = this.expressions[i].resolve(environment);
             if (i >= this.expressions.length - 1) // The last expression is expected to have the `return`

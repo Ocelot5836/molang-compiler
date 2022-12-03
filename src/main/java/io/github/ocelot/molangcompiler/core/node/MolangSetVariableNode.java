@@ -26,7 +26,7 @@ public class MolangSetVariableNode implements MolangExpression {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangException {
         // This evaluates the value before setting it
         float value = this.expression.resolve(environment);
 

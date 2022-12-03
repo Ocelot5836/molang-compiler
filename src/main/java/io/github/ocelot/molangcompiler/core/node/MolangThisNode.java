@@ -12,7 +12,7 @@ import org.jetbrains.annotations.ApiStatus;
 public class MolangThisNode implements MolangExpression {
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangException {
         return environment.getThis();
     }
 

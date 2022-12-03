@@ -22,7 +22,7 @@ public class MolangGetVariableNode implements MolangExpression {
     }
 
     @Override
-    public float resolve(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangException {
         return environment.get(this.object).get(this.name).resolve(environment);
     }
 
