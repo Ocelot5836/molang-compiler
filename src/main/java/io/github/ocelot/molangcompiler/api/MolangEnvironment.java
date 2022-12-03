@@ -12,6 +12,24 @@ import io.github.ocelot.molangcompiler.api.object.MolangObject;
 public interface MolangEnvironment {
 
     /**
+     * Loads a library under the specified name.
+     *
+     * @param name   The name of the library to load
+     * @param object The object to use under that name
+     * @since 2.0.0
+     */
+    void loadLibrary(String name, MolangObject object);
+
+    /**
+     * Loads an alias for a library under the specified name.
+     *
+     * @param name   The name of the library to load
+     * @param object The object to use under that name
+     * @since 2.0.0
+     */
+    void loadAlias(String name, MolangObject object);
+
+    /**
      * Loads a parameter into the specified slot.
      *
      * @param index      The parameter slot to load into
@@ -53,6 +71,14 @@ public interface MolangEnvironment {
      * @return Whether a parameter is present
      */
     boolean hasParameter(int parameter) throws MolangException;
+
+    /**
+     * Sets the value of "this."
+     *
+     * @param thisValue The new value
+     * @since 2.0.0
+     */
+    void setThisValue(float thisValue);
 
     /**
      * Resolves the float value of the specified expression in this environment.

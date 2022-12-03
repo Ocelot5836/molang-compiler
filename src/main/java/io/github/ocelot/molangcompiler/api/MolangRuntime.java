@@ -64,23 +64,12 @@ public class MolangRuntime implements MolangEnvironment {
         return builder.toString();
     }
 
-    /**
-     * Loads a library under the specified name.
-     *
-     * @param name   The name of the library to load
-     * @param object The object to use under that name
-     */
+    @Override
     public void loadLibrary(String name, MolangObject object) {
         this.objects.put(name.toLowerCase(Locale.ROOT), object);
     }
 
-    /**
-     * Loads an alias for a library under the specified name.
-     *
-     * @param name   The name of the library to load
-     * @param object The object to use under that name
-     * @since 1.1.0
-     */
+    @Override
     public void loadAlias(String name, MolangObject object) {
         this.objects.put(name.toLowerCase(Locale.ROOT), object);
         this.aliases.add(name);
@@ -119,11 +108,7 @@ public class MolangRuntime implements MolangEnvironment {
         return this.parameters.containsKey(parameter);
     }
 
-    /**
-     * Sets the value of "this."
-     *
-     * @param thisValue The new value
-     */
+    @Override
     public void setThisValue(float thisValue) {
         this.thisValue = thisValue;
     }
