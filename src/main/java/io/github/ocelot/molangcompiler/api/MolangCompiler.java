@@ -631,6 +631,14 @@ public class MolangCompiler {
     private static class CompileEnvironment implements MolangEnvironment {
 
         @Override
+        public void loadLibrary(String name, MolangObject object) {
+        }
+
+        @Override
+        public void loadAlias(String name, MolangObject object) {
+        }
+
+        @Override
         public void loadParameter(int index, MolangExpression expression) throws MolangException {
             throw new MolangException("Invalid Call");
         }
@@ -658,6 +666,10 @@ public class MolangCompiler {
         @Override
         public boolean hasParameter(int parameter) throws MolangException {
             throw new MolangException("Invalid Call");
+        }
+
+        @Override
+        public void setThisValue(float thisValue) {
         }
     }
 }
