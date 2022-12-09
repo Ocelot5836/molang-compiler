@@ -24,6 +24,35 @@ public interface MolangVariable {
     void setValue(float value);
 
     /**
+     * Makes read-only copy of this variable.
+     *
+     * @return A new variable that reflects the value of the provided, but cannot be changed
+     * @since 2.0.0
+     */
+    default MolangVariable immutable() {
+        return new MolangVariable() {
+            @Override
+            public float getValue() {
+                return MolangVariable.this.getValue();
+            }
+
+            @Override
+            public void setValue(float value) {
+            }
+
+            @Override
+            public MolangVariable immutable() {
+                return this;
+            }
+
+            @Override
+            public String toString() {
+                return "ImmutableMolangVariable[value=" + this.getValue() + "]";
+            }
+        };
+    }
+
+    /**
      * Helper for creating a MoLang variable.
      *
      * @param getter The getter for the value
@@ -40,6 +69,11 @@ public interface MolangVariable {
             @Override
             public void setValue(float value) {
                 setter.accept(value);
+            }
+
+            @Override
+            public String toString() {
+                return "DynamicMolangVariable[value=" + this.getValue() + "]";
             }
         };
     }
@@ -70,6 +104,11 @@ public interface MolangVariable {
             @Override
             public void setValue(float v) {
                 value[0] = v;
+            }
+
+            @Override
+            public String toString() {
+                return "MolangVariable[value=" + this.getValue() + "]";
             }
         };
     }

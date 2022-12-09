@@ -172,4 +172,26 @@ public class MolangTest {
         System.out.println("builder2");
         System.out.println(builder2.create().dump());
     }
+
+    @Test
+    void testContainer() throws MolangException {
+        MolangExpression expression = MolangCompiler.compile("v.screen_aspect_ratio > v.aspect_ratio ? q.screen.width : q.screen.height * v.aspect_ratio");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+    }
+
+    @Test
+    void testImmutable() throws MolangException {
+        MolangVariable test = MolangVariable.create(1);
+        MolangVariable testImmutable = test.immutable();
+
+        MolangExpression expression = MolangCompiler.compile("v.test=2");
+
+        MolangRuntime runtime = MolangRuntime.runtime().setVariable("test", testImmutable).create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(1, test.getValue());
+    }
 }
