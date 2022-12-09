@@ -172,6 +172,17 @@ public class MolangRuntime implements MolangEnvironment {
          * @param name  The name of the value
          * @param value The resulting number
          */
+        public Builder setQuery(String name, MolangExpression value) {
+            this.query.set(name, value);
+            return this;
+        }
+
+        /**
+         * Sets a global immutable value.
+         *
+         * @param name  The name of the value
+         * @param value The resulting number
+         */
         public Builder setQuery(String name, float value) {
             this.query.set(name, MolangExpression.of(value));
             return this;
@@ -197,6 +208,17 @@ public class MolangRuntime implements MolangEnvironment {
          */
         public Builder setQuery(String name, int params, MolangJavaFunction function) {
             this.query.set(params < 0 ? name : (name + "$" + params), new MolangFunction(params, function));
+            return this;
+        }
+
+        /**
+         * Sets a global immutable value.
+         *
+         * @param name  The name of the value
+         * @param value The resulting number
+         */
+        public Builder setGlobal(String name, MolangExpression value) {
+            this.global.set(name, value);
             return this;
         }
 
