@@ -31,7 +31,9 @@ public class MolangSetVariableNode implements MolangExpression {
         float value = this.expression.resolve(environment);
 
         MolangObject object = environment.get(this.object);
-        if (object.get(this.name) instanceof MolangVariable variable) {
+        MolangExpression old = object.get(this.name);
+        if (old instanceof MolangVariable) {
+            MolangVariable variable = (MolangVariable) old;
             variable.setValue(value);
             return variable.getValue(); // Return the new value of the variable
         } else {
