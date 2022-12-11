@@ -1,5 +1,7 @@
 package io.github.ocelot.molangcompiler.api.bridge;
 
+import io.github.ocelot.molangcompiler.api.MolangExpression;
+
 import java.util.function.Supplier;
 
 /**
@@ -33,6 +35,14 @@ public interface MolangVariableProvider {
          * @param value The value to set under that name
          */
         void addVariable(String name, MolangVariable value);
+
+        /**
+         * Sets a global immutable value.
+         *
+         * @param name  The name of the value
+         * @param value The resulting expression
+         */
+        void addQuery(String name, MolangExpression value);
 
         /**
          * Sets a global immutable value.

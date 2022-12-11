@@ -280,6 +280,11 @@ public class MolangRuntime implements MolangEnvironment {
                 }
 
                 @Override
+                public void addQuery(String name, MolangExpression value) {
+                    setQuery(name, value);
+                }
+
+                @Override
                 public void addQuery(String name, float value) {
                     setQuery(name, value);
                 }
