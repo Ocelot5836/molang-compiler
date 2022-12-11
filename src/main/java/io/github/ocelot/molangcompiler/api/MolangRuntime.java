@@ -195,7 +195,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setQuery(String name, Supplier<Float> value) {
-            this.query.set(name, MolangExpression.of(value));
+            this.query.set(name, MolangExpression.lazy(value));
             return this;
         }
 
@@ -240,7 +240,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setGlobal(String name, Supplier<Float> value) {
-            this.global.set(name, MolangExpression.of(value));
+            this.global.set(name, MolangExpression.lazy(value));
             return this;
         }
 

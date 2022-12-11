@@ -3,6 +3,7 @@ package io.github.ocelot.molangcompiler.api;
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.core.node.MolangConstantNode;
+import io.github.ocelot.molangcompiler.core.node.MolangDynamicNode;
 import io.github.ocelot.molangcompiler.core.node.MolangLazyNode;
 import io.github.ocelot.molangcompiler.core.node.MolangStaticNode;
 import org.jetbrains.annotations.ApiStatus;
@@ -79,6 +80,16 @@ public interface MolangExpression {
      * @return A new expression with that value
      */
     static MolangExpression of(Supplier<Float> value) {
+        return new MolangDynamicNode(value);
+    }
+
+    /**
+     * Creates a {@link MolangExpression} of the specified value that will be computed once and cached after.
+     *
+     * @param value The value to represent as an expression
+     * @return A new expression with that value
+     */
+    static MolangExpression lazy(Supplier<Float> value) {
         return new MolangLazyNode(value);
     }
 
@@ -89,6 +100,16 @@ public interface MolangExpression {
      * @return A new expression with that value
      */
     static MolangExpression of(BooleanSupplier value) {
+        return new MolangDynamicNode(() -> value.getAsBoolean() ? 1.0F : 0.0F);
+    }
+
+    /**
+     * Creates a {@link MolangExpression} of the specified value that will be computed once and cached after.
+     *
+     * @param value The value to represent as an expression
+     * @return A new expression with that value
+     */
+    static MolangExpression lazy(BooleanSupplier value) {
         return new MolangLazyNode(() -> value.getAsBoolean() ? 1.0F : 0.0F);
     }
 
