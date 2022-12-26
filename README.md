@@ -27,7 +27,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.molang-compiler:molang-compiler:version"
+    implementation "com.github.MoonflowerTeam:molang-compiler:version"
     shade "com.github.MoonflowerTeam:molang-compiler:version"
 }
 
