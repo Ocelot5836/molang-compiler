@@ -27,8 +27,8 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.Ocelot5836:molang-compiler:version"
-    shade "com.github.Ocelot5836:molang-compiler:version"
+    implementation "com.github.molang-compiler:molang-compiler:version"
+    shade "com.github.MoonflowerTeam:molang-compiler:version"
 }
 
 shadowJar {
