@@ -27,11 +27,12 @@ public class MolangRuntime implements MolangEnvironment {
     private final Set<String> aliases;
     private final Map<Integer, MolangExpression> parameters;
 
-    private MolangRuntime(MolangObject query, MolangObject global, MolangObject variable) {
+    private MolangRuntime(MolangObject query, MolangObject global, MolangObject variable, Map<String, MolangObject> libraries) {
         this.thisValue = 0.0F;
         this.objects = new HashMap<>();
         this.aliases = new HashSet<>();
         MolangObject temp = new MolangVariableStack(false);
+        this.objects.putAll(libraries);
         this.objects.put("context", query); // This is static accesses
         this.objects.put("query", query); // This is static accesses
         this.objects.put("math", new MolangMath()); // The MoLang math "library"
@@ -162,8 +163,9 @@ public class MolangRuntime implements MolangEnvironment {
          * @param name   The namespace of the library
          * @param object The library to load
          */
-        public void loadLibrary(String name, MolangObject object) {
+        public Builder loadLibrary(String name, MolangObject object) {
             this.libraries.put(name, object);
+            return this;
         }
 
         /**
@@ -316,7 +318,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @return A new runtime with <code>0</code> as the value for <code>this</code>.
          */
         public MolangRuntime create() {
-            return new MolangRuntime(new ImmutableMolangObject(this.query), new ImmutableMolangObject(this.global), this.variable);
+            return new MolangRuntime(new ImmutableMolangObject(this.query), new ImmutableMolangObject(this.global), this.variable, this.libraries);
         }
 
         /**
