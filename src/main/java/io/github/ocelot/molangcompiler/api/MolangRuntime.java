@@ -270,6 +270,17 @@ public class MolangRuntime implements MolangEnvironment {
         }
 
         /**
+         * Sets a global mutable value.
+         *
+         * @param name  The name of the value
+         * @param value The resulting number
+         */
+        public Builder setVariable(String name, MolangExpression value) {
+            this.variable.set(name, value); // Variables are assumed to be used later
+            return this;
+        }
+
+        /**
          * Adds all variables for the specified provider.
          *
          * @param provider The provider to add variables for
