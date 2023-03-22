@@ -1,4 +1,4 @@
-[![Release](https://jitpack.io/v/Ocelot5836/molang-compiler.svg)](https://jitpack.io/#Ocelot5836/molang-compiler)
+[![Release](https://jitpack.io/v/MoonflowerTeam/molang-compiler.svg)](https://jitpack.io/#MoonflowerTeam/molang-compiler)
 
 # Molang Compiler
 
@@ -6,8 +6,8 @@ High Speed MoLang compiler and executor designed with per-frame execution in min
 
 # How to add to your workspace
 
-There are two main ways to use this in your application. If you are writing a Minecraft Mod with Forge,
-install [this](https://github.com/Ocelot5836/ModelAnima) mod which already has the library shadowed. If you do not want
+There are two main ways to use this in your application. If you are writing a Minecraft Mod with Forge or Fabric,
+install [Pollen](https://github.com/MoonflowerTeam/pollen) which already has the library shadowed. If you do not want
 to add another library to your mod, you can just manually shadow this library into your mod.
 
 ```gradle
@@ -37,7 +37,7 @@ shadowJar {
 }
 ```
 
-This is only required in a Forge Gradle workspace
+This is only required in a modded workspace
 
 ```gradle
 reobf {
