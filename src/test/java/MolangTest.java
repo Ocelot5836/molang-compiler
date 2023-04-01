@@ -38,6 +38,16 @@ public class MolangTest {
     }
 
     @Test
+    void testSimplify() throws MolangException {
+        MolangExpression expression = MolangCompiler.compile("math.pi*2+(3/2+53)*((7)/5)");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = expression.resolve(runtime);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(82.58318328857422, result);
+    }
+
+    @Test
     void testScopes() throws MolangException {
         MolangExpression expression = MolangCompiler.compile("""
                         temp.a = 4;
