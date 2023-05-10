@@ -639,7 +639,7 @@ public class MolangCompiler {
         }
 
         @Override
-        public void loadParameter(int index, MolangExpression expression) throws MolangException {
+        public void loadParameter(MolangExpression expression) throws MolangException {
             throw new MolangException("Invalid Call");
         }
 
@@ -666,6 +666,11 @@ public class MolangCompiler {
         @Override
         public boolean hasParameter(int parameter) throws MolangException {
             throw new MolangException("Invalid Call");
+        }
+
+        @Override
+        public int getParameters() {
+            return 0;
         }
 
         @Override

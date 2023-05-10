@@ -25,7 +25,7 @@ public class MolangRuntime implements MolangEnvironment {
     private float thisValue;
     private final Map<String, MolangObject> objects;
     private final Set<String> aliases;
-    private final Map<Integer, MolangExpression> parameters;
+    private final List<MolangExpression> parameters;
 
     private MolangRuntime(MolangObject query, MolangObject global, MolangObject variable, Map<String, MolangObject> libraries) {
         this.thisValue = 0.0F;
@@ -43,7 +43,7 @@ public class MolangRuntime implements MolangEnvironment {
         this.loadAlias("q", query); // Alias
         this.loadAlias("t", temp); // Alias
         this.loadAlias("v", variable); // Alias
-        this.parameters = new HashMap<>();
+        this.parameters = new ArrayList<>(8);
     }
 
     /**
@@ -59,7 +59,9 @@ public class MolangRuntime implements MolangEnvironment {
         builder.deleteCharAt(builder.length() - 2);
         builder.append("==End Objects==\n\n");
         builder.append("==Start Parameters==\n");
-        this.parameters.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getKey)).forEach(entry -> builder.append("\tParameter ").append(entry.getKey()).append('=').append(entry.getValue()).append('\n'));
+        for (int i = 0; i < this.parameters.size(); i++) {
+            builder.append("\tParameter ").append(i).append('=').append(this.parameters.get(i)).append('\n');
+        }
         builder.append("==End Parameters==\n\n");
         builder.append("==End MoLang Runtime Dump==");
         return builder.toString();
@@ -77,8 +79,8 @@ public class MolangRuntime implements MolangEnvironment {
     }
 
     @Override
-    public void loadParameter(int index, MolangExpression expression) {
-        this.parameters.put(index, expression);
+    public void loadParameter(MolangExpression expression) {
+        this.parameters.add(expression);
     }
 
     @Override
@@ -101,12 +103,15 @@ public class MolangRuntime implements MolangEnvironment {
 
     @Override
     public MolangExpression getParameter(int parameter) {
-        return this.parameters.getOrDefault(parameter, MolangExpression.ZERO);
+        if (parameter >= 0 && parameter < this.parameters.size()) {
+            return this.parameters.get(parameter);
+        }
+        return MolangExpression.ZERO;
     }
 
     @Override
     public boolean hasParameter(int parameter) {
-        return this.parameters.containsKey(parameter);
+        return parameter >= 0 && parameter < this.parameters.size();
     }
 
     @Override
@@ -186,7 +191,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setQuery(String name, float value) {
-            this.query.set(name, MolangExpression.of(value));
+            this.query.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.of(value));
             return this;
         }
 
@@ -197,7 +202,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setQuery(String name, Supplier<Float> value) {
-            this.query.set(name, MolangExpression.lazy(value));
+            this.query.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.lazy(value));
             return this;
         }
 
@@ -231,7 +236,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setGlobal(String name, float value) {
-            this.global.set(name, MolangExpression.of(value));
+            this.global.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.of(value));
             return this;
         }
 
@@ -242,7 +247,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setGlobal(String name, Supplier<Float> value) {
-            this.global.set(name, MolangExpression.lazy(value));
+            this.global.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.lazy(value));
             return this;
         }
 
@@ -265,7 +270,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setVariable(String name, MolangVariable value) {
-            this.variable.set(name, MolangExpression.of(value)); // Variables are assumed to be used later
+            this.variable.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.of(value)); // Variables are assumed to be used later
             return this;
         }
 
@@ -314,12 +319,12 @@ public class MolangRuntime implements MolangEnvironment {
 
                 @Override
                 public void removeVariable(String name) {
-                    variable.set(name, MolangExpression.ZERO);
+                    variable.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.ZERO);
                 }
 
                 @Override
                 public void removeQuery(String name) {
-                    query.set(name, MolangExpression.ZERO);
+                    query.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.ZERO);
                 }
             });
             return this;

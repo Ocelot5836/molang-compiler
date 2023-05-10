@@ -38,8 +38,9 @@ public class MolangInvokeFunctionNode implements MolangExpression {
             throw new IllegalStateException("Unknown function: " + this.object + "." + this.name + "() with " + this.parameters.length + " parameters");
         }
 
-        for (int i = 0; i < this.parameters.length; i++)
-            environment.loadParameter(i, this.parameters[i]);
+        for (MolangExpression parameter : this.parameters) {
+            environment.loadParameter(parameter);
+        }
         float result = function.resolve(environment);
         environment.clearParameters();
         return result;
@@ -50,16 +51,21 @@ public class MolangInvokeFunctionNode implements MolangExpression {
         StringBuilder builder = new StringBuilder(this.object).append('.').append(this.name).append('(');
         for (int i = 0; i < this.parameters.length; i++) {
             builder.append(this.parameters[i].toString());
-            if (i < this.parameters.length - 1)
+            if (i < this.parameters.length - 1) {
                 builder.append(", ");
+            }
         }
         return builder.append(')').toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MolangInvokeFunctionNode that = (MolangInvokeFunctionNode) o;
         return this.object.equals(that.object) && this.name.equals(that.name) && Arrays.equals(this.parameters, that.parameters);
     }

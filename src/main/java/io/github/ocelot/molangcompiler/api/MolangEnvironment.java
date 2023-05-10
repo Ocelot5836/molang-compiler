@@ -2,6 +2,7 @@ package io.github.ocelot.molangcompiler.api;
 
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * A MoLang execution environment.
@@ -34,8 +35,21 @@ public interface MolangEnvironment {
      *
      * @param index      The parameter slot to load into
      * @param expression The expression to use as a parameter
+     * @deprecated Use {@link #loadParameter(MolangExpression)}. The index parameter is not necessary
      */
-    void loadParameter(int index, MolangExpression expression) throws MolangException;
+    @ApiStatus.ScheduledForRemoval(inVersion = "3.0.0") // TODO remove in 3.0.0
+    @Deprecated
+    default void loadParameter(int index, MolangExpression expression) throws MolangException {
+        this.loadParameter(expression);
+    }
+
+    /**
+     * Loads a parameter into the next parameter slot.
+     *
+     * @param expression The expression to use as a parameter
+     * @since 2.2.0
+     */
+    void loadParameter(MolangExpression expression) throws MolangException;
 
     /**
      * Clears all stored parameters.
@@ -73,7 +87,13 @@ public interface MolangEnvironment {
     boolean hasParameter(int parameter) throws MolangException;
 
     /**
-     * Sets the value of "this."
+     * @return The number of parameters loaded
+     * @since 2.2.0
+     */
+    int getParameters();
+
+    /**
+     * Sets the value of "this".
      *
      * @param thisValue The new value
      * @since 2.0.0
@@ -81,7 +101,7 @@ public interface MolangEnvironment {
     void setThisValue(float thisValue);
 
     /**
-     * Resolves the float value of the specified expression in this environment.
+     * <p>Resolves the float value of the specified expression in this environment.</p>
      * <p>This allows environments to fine-tune how expressions are evaluated.
      *
      * @param expression The expression to evaluate
