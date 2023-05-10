@@ -210,7 +210,7 @@ public class MolangRuntime implements MolangEnvironment {
          * Sets a global immutable function.
          *
          * @param name     The name of the function
-         * @param params   The number of parameters to accept
+         * @param params   The number of parameters to accept or <code>-1</code> to accept any number
          * @param function The function to execute
          */
         public Builder setQuery(String name, int params, MolangJavaFunction function) {
