@@ -83,19 +83,23 @@ public class MolangCompiler {
      * @throws MolangSyntaxException If any error occurs
      */
     public static MolangExpression compile(String input, int flags) throws MolangSyntaxException {
-        if (input.isEmpty())
+        if (input.isEmpty()) {
             throw UNEXPECTED_TOKEN.create();
+        }
 
         // Set initial flags
         if (input.contains(".")) {
             flags |= CHECK_VARIABLE_FLAG;
-            if (input.contains("("))
+            if (input.contains("(")) {
                 flags |= CHECK_METHOD_FLAG | CHECK_OPERATORS_FLAG;
+            }
         }
-        if (input.contains("this"))
+        if (input.contains("this")) {
             flags |= CHECK_THIS_FLAG;
-        if (input.contains(">") || input.contains("<") || input.contains("=="))
+        }
+        if (input.contains(">") || input.contains("<") || input.contains("==")) {
             flags |= CHECK_COMPARE_FLAG;
+        }
         if (!checkFlag(flags, CHECK_OPERATORS_FLAG)) {
             for (char operator : MATH_OPERATORS) {
                 if (input.indexOf(operator) != -1) {
@@ -112,11 +116,13 @@ public class MolangCompiler {
         List<MolangExpression> expressions = new ArrayList<>();
         StringReader reader = new StringReader(input);
         reader.skipWhitespace();
-        if (!reader.canRead())
+        if (!reader.canRead()) {
             throw UNEXPECTED_TOKEN.create();
+        }
 
-        if ((strictSyntax || !input.contains("return")) && input.chars().filter(c -> c == ';').count() <= 1)
+        if ((strictSyntax || !input.contains("return")) && input.chars().filter(c -> c == ';').count() <= 1) {
             return parseExpression(new StringReader(input.replaceAll(";", "")), flags, true, true);
+        }
 
         int start = 0;
         int scopeStart = 0;
@@ -124,14 +130,16 @@ public class MolangCompiler {
         boolean startScope = false;
         while (reader.canRead()) {
             if (reader.peek() == '{') {
-                if (scopeStart == reader.getCursor())
+                if (scopeStart == reader.getCursor()) {
                     startScope = true;
+                }
                 scope++;
                 flags |= CHECK_SCOPE_FLAG;
             } else if (reader.peek() == '}') {
                 scope--;
-                if (scope < 0)
+                if (scope < 0) {
                     throw TRAILING_STATEMENT.createWithContext(reader);
+                }
                 if (scope == 0 && startScope) {
                     startScope = false;
                     reader.skip();
@@ -152,8 +160,9 @@ public class MolangCompiler {
         }
 
         if (expressions.isEmpty()) {
-            if (strictSyntax)
+            if (strictSyntax) {
                 throw UNEXPECTED_TOKEN.createWithContext(reader);
+            }
             return parseExpression(new StringReader(input.replaceAll(";", "")), flags, false, true);
         }
 
@@ -162,8 +171,9 @@ public class MolangCompiler {
 
     private static MolangExpression parseExpression(StringReader reader, int flags, boolean simple, boolean allowMath) throws MolangSyntaxException {
         reader.skipWhitespace(); // Skip potential spaces or tabs before '=', '*', etc
-        if (!reader.canRead())
+        if (!reader.canRead()) {
             throw UNEXPECTED_TOKEN.createWithContext(reader);
+        }
 
         // Check for scope
         if (checkFlag(flags, CHECK_SCOPE_FLAG) && reader.peek() == '{') {
@@ -175,8 +185,9 @@ public class MolangCompiler {
                     scope++;
                 } else if (reader.peek() == '}') {
                     scope--;
-                    if (scope < 0)
+                    if (scope < 0) {
                         break;
+                    }
                     if (scope == 0) {
                         reader.skip();
                         return new MolangScopeNode(parseGroup(reader.getString().substring(start, reader.getCursor() - 1), flags, false));
@@ -190,11 +201,13 @@ public class MolangCompiler {
         // Check for return
         if (reader.getRemaining().startsWith("return")) {
             reader.skip(6);
-            if (simple)
+            if (simple) {
                 throw UNEXPECTED_TOKEN.createWithContext(reader);
+            }
             MolangExpression expression = parseExpression(reader, flags, true, allowMath);
-            if (reader.canRead())
+            if (reader.canRead()) {
                 throw TRAILING_STATEMENT.createWithContext(reader);
+            }
             return expression;
         }
 
@@ -213,8 +226,9 @@ public class MolangCompiler {
 
         // Check for 'this' keyword
         if (checkFlag(flags, CHECK_THIS_FLAG) && "this".equals(fullWord)) {
-            if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek()))
+            if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek())) {
                 throw TRAILING_STATEMENT.createWithContext(reader);
+            }
             return parseCondition(reader, new MolangThisNode(), flags, allowMath);
         }
 
@@ -235,7 +249,9 @@ public class MolangCompiler {
                     }
 
                     if (!reader.canRead()) // Failed to find the end of the condition
+                    {
                         throw TRAILING_STATEMENT.createWithContext(reader);
+                    }
                     reader.skipWhitespace();
 
                     MolangExpression first = parseExpression(new StringReader(fullWord), flags, true, true);
@@ -257,25 +273,29 @@ public class MolangCompiler {
 
         // Check for 'true' keyword
         if ("true".equals(fullWord) || "false".equals(fullWord)) {
-            if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek()))
+            if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek())) {
                 throw TRAILING_STATEMENT.createWithContext(reader);
+            }
             return parseCondition(reader, MolangExpression.of("true".equals(fullWord)), flags, allowMath);
         }
 
         // Check for number
         if (isNumber(fullWord)) {
-            if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek()))
+            if (reader.canRead() && reader.peek() != '?' && reader.peek() != ':' && !MATH_OPERATORS.contains(reader.peek())) {
                 throw TRAILING_STATEMENT.createWithContext(reader);
+            }
             return parseCondition(reader, MolangExpression.of(Float.parseFloat(fullWord)), flags, allowMath);
         }
 
         // methods and params require at least both parts
-        if (currentKeyword.length == 1 || currentKeyword[0].isEmpty())
+        if (currentKeyword.length == 1 || currentKeyword[0].isEmpty()) {
             throw UNEXPECTED_TOKEN.createWithContext(reader);
+        }
 
         // objects are not allowed to start with numbers
-        if (isNumber(currentKeyword[0].substring(0, 1)))
+        if (isNumber(currentKeyword[0].substring(0, 1))) {
             throw UNEXPECTED_TOKEN.createWithContext(reader);
+        }
 
         // Check for methods
         if (checkFlag(flags, CHECK_METHOD_FLAG) && reader.canRead() && reader.peek() == '(') {
@@ -284,8 +304,9 @@ public class MolangCompiler {
             MolangExpression[] parameters = null;
             int parentheses = 0;
             while (reader.canRead() && start != -1) {
-                if (reader.peek() == '(')
+                if (reader.peek() == '(') {
                     parentheses++;
+                }
                 if (reader.peek() == ')') {
                     if (parentheses > 0) {
                         parentheses--;
@@ -306,8 +327,9 @@ public class MolangCompiler {
                 }
                 reader.skip();
             }
-            if (start != -1)
+            if (start != -1) {
                 throw EXPECTED.createWithContext(reader, ')');
+            }
 
             reader.skipWhitespace();
             return parseCondition(reader, parseMethod(currentKeyword, parameters, flags), flags, allowMath);
@@ -324,10 +346,12 @@ public class MolangCompiler {
             if ("math".equalsIgnoreCase(currentKeyword[0])) // Attempt to reduce math constants
             {
                 MolangMath.MathFunction function = MolangMath.MathFunction.byName(currentKeyword[1]);
-                if (function == null || function.getOp() != null)
+                if (function == null || function.getOp() != null) {
                     throw INVALID_KEYWORD.create(currentKeyword[1]);
-                if (checkFlag(flags, REDUCE_FLAG))
+                }
+                if (checkFlag(flags, REDUCE_FLAG)) {
                     return function.getExpression();
+                }
             }
             return parseCondition(reader, new MolangGetVariableNode(currentKeyword[0], currentKeyword[1]), flags, allowMath);
         }
@@ -340,15 +364,18 @@ public class MolangCompiler {
             reader.skipWhitespace();
 
             int start = reader.getCursor();
-            while (reader.canRead() && reader.peek() != ':')
+            while (reader.canRead() && reader.peek() != ':') {
                 reader.skip();
+            }
 
-            if (!reader.canRead())
+            if (!reader.canRead()) {
                 throw TRAILING_STATEMENT.createWithContext(reader);
+            }
 
             MolangExpression first = parseExpression(new StringReader(reader.getRead().substring(start)), flags, true, allowMath);
-            if (!reader.canRead())
+            if (!reader.canRead()) {
                 throw TRAILING_STATEMENT.createWithContext(reader);
+            }
             reader.skip();
 
             MolangExpression branch = parseExpression(reader, flags, true, allowMath);
@@ -375,15 +402,18 @@ public class MolangCompiler {
                 reader.skip();
                 start = reader.getCursor();
             }
-            if (!reader.canRead())
+            if (!reader.canRead()) {
                 throw UNEXPECTED_TOKEN.createWithContext(reader);
+            }
             reader.skip();
         }
-        if (start < reader.getCursor())
+        if (start < reader.getCursor()) {
             keywords.add(reader.getRead().substring(start));
+        }
         if (keywords.stream().allMatch(String::isEmpty)) {
-            if (simple)
+            if (simple) {
                 return new String[0];
+            }
             throw UNEXPECTED_TOKEN.createWithContext(reader);
         }
         return keywords.toArray(new String[0]);
@@ -394,13 +424,15 @@ public class MolangCompiler {
         int parenthesis = -1;
         while (reader.canRead() && (isValidKeywordChar(reader.peek()) || reader.peek() == '(' || reader.peek() == ')' || parenthesis >= 0)) {
             if (reader.peek() == '(') {
-                if (parenthesis == -1)
+                if (parenthesis == -1) {
                     parenthesis = 0;
+                }
                 parenthesis++;
             }
             if (reader.peek() == ')') {
-                if (parenthesis == 0)
+                if (parenthesis == 0) {
                     break;
+                }
                 parenthesis--;
             }
             if (!reader.canRead()) {
@@ -420,24 +452,30 @@ public class MolangCompiler {
             MolangMath.MathFunction function = MolangMath.MathFunction.byName(methodName[1] + "$" + parameters.length);
             if (function == null) {
                 function = MolangMath.MathFunction.byName(methodName[1]);
-                if (function == null)
+                if (function == null) {
                     throw INVALID_KEYWORD.create(methodName[1]);
+                }
             }
             if (function.getOp() == null) // Not a function
+            {
                 throw UNEXPECTED_TOKEN.create();
+            }
             if (function.getParameters() >= 0) {
-                if (parameters.length < function.getParameters())
+                if (parameters.length < function.getParameters()) {
                     throw NOT_ENOUGH_PARAMETERS.create(function.getParameters(), parameters.length);
-                if (parameters.length > function.getParameters())
+                }
+                if (parameters.length > function.getParameters()) {
                     throw TOO_MANY_PARAMETERS.create(function.getParameters(), parameters.length);
+                }
             }
 
             if (checkFlag(flags, REDUCE_FLAG) && function.canOptimize()) {
                 // Math functions are constant so these can be compiled down to raw numbers if all parameters are constants
                 boolean reduceFunction = true;
                 for (int i = 0; i < parameters.length; i++) {
-                    if (parameters[i] instanceof MolangConstantNode)
+                    if (parameters[i] instanceof MolangConstantNode) {
                         continue;
+                    }
                     try {
                         parameters[i] = MolangExpression.of(parameters[i].resolve(ENVIRONMENT));
                     } catch (MolangException e) {
@@ -480,12 +518,14 @@ public class MolangCompiler {
                 reader.skipWhitespace();
                 MolangExpression x = parseExpression(0);
                 reader.skipWhitespace();
-                if (reader.canRead())
+                if (reader.canRead()) {
                     throw TRAILING_STATEMENT.createWithContext(reader);
+                }
 
                 // Reduction is impossible because of runtime dependence
-                if (!this.canReduce)
+                if (!this.canReduce) {
                     return x;
+                }
 
                 // Attempt to reduce if possible
                 try {
@@ -526,10 +566,12 @@ public class MolangCompiler {
             }
 
             MolangExpression parseFactor(int extra) throws MolangSyntaxException {
-                if (accept('+'))
+                if (accept('+')) {
                     return parseFactor(extra); // unary plus
-                if (accept('-'))
+                }
+                if (accept('-')) {
                     return new MolangMathOperatorNode(MolangMathOperatorNode.MathOperation.MULTIPLY, parseFactor(extra), MolangExpression.of(-1)); // unary minus
+                }
 
                 if (accept('(')) {
                     MolangExpression expression = parseExpression(extra + 1);
@@ -545,11 +587,13 @@ public class MolangCompiler {
                 while (reader.canRead() && (hasMethod || hasCompare || Character.isWhitespace(reader.peek()) || (hasCompare = isCompareChar(reader.peek())) || !MATH_OPERATORS.contains(reader.peek()))) {
                     if (reader.peek() == '=') {
                         char before = reader.peekBefore(1);
-                        if (before == '>' || before == '<')
+                        if (before == '>' || before == '<') {
                             continue;
+                        }
                         reader.skip();
-                        if (reader.canRead() && ((reader.peek() == '=') ^ (before == '=')))
+                        if (reader.canRead() && ((reader.peek() == '=') ^ (before == '='))) {
                             continue;
+                        }
                         throw UNEXPECTED_TOKEN.createWithContext(reader);
                     }
                     if (reader.peek() == '(') {
@@ -558,16 +602,18 @@ public class MolangCompiler {
                     if (reader.peek() == ')') {
                         parentheses--;
                         if (parentheses <= 0) {
-                            if (parentheses == 0)
+                            if (parentheses == 0) {
                                 reader.skip();
+                            }
                             if (extra > 0 && reader.canRead(extra)) {
                                 StringReader parenthesisReader = new StringReader(reader.getRemaining());
                                 while (extra > 1 && parenthesisReader.peek() == ')') {
                                     extra--;
                                     parenthesisReader.skip();
                                 }
-                                if (extra == 1)
+                                if (extra == 1) {
                                     break;
+                                }
                             } else if (hasMethod) {
                                 break;
                             }
@@ -577,10 +623,12 @@ public class MolangCompiler {
                 }
 
                 MolangExpression expression = MolangCompiler.parseExpression(new StringReader(reader.getRead().substring(start)), flags, true, false);
-                if (!checkFlag(flags, REDUCE_FLAG))
+                if (!checkFlag(flags, REDUCE_FLAG)) {
                     return expression;
-                if (this.canReduce && (expression instanceof MolangSetVariableNode || expression instanceof MolangInvokeFunctionNode || expression instanceof MolangCompareNode || expression instanceof MolangConditionalNode || expression instanceof MolangGetVariableNode || expression instanceof MolangThisNode))
+                }
+                if (this.canReduce && (expression instanceof MolangSetVariableNode || expression instanceof MolangInvokeFunctionNode || expression instanceof MolangCompareNode || expression instanceof MolangConditionalNode || expression instanceof MolangGetVariableNode || expression instanceof MolangThisNode)) {
                     this.canReduce = false;
+                }
                 return expression;
             }
         }.parse();
@@ -602,13 +650,16 @@ public class MolangCompiler {
     }
 
     private static boolean isNumber(String input) {
-        if (input.isEmpty())
+        if (input.isEmpty()) {
             return false;
-        if (input.charAt(input.length() - 1) == '.')
+        }
+        if (input.charAt(input.length() - 1) == '.') {
             return false;
+        }
         if (input.charAt(0) == '-') {
-            if (input.length() == 1)
+            if (input.length() == 1) {
                 return false;
+            }
             return withDecimalsParsing(input, 1);
         }
         return withDecimalsParsing(input, 0);
@@ -618,12 +669,15 @@ public class MolangCompiler {
         int decimalPoints = 0;
         for (int i = beginIndex; i < str.length(); i++) {
             boolean isDecimalPoint = str.charAt(i) == '.';
-            if (isDecimalPoint)
+            if (isDecimalPoint) {
                 decimalPoints++;
-            if (decimalPoints > 1)
+            }
+            if (decimalPoints > 1) {
                 return false;
-            if (!isDecimalPoint && !Character.isDigit(str.charAt(i)))
+            }
+            if (!isDecimalPoint && !Character.isDigit(str.charAt(i))) {
                 return false;
+            }
         }
         return true;
     }
@@ -660,11 +714,6 @@ public class MolangCompiler {
 
         @Override
         public MolangExpression getParameter(int parameter) throws MolangException {
-            throw new MolangException("Invalid Call");
-        }
-
-        @Override
-        public boolean hasParameter(int parameter) throws MolangException {
             throw new MolangException("Invalid Call");
         }
 

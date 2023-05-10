@@ -31,8 +31,12 @@ public class MolangStaticNode implements MolangExpression, MolangVariable {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MolangStaticNode that = (MolangStaticNode) o;
         return this.value.getValue() == that.value.getValue();
     }

@@ -24,12 +24,14 @@ public class MolangScopeNode implements MolangExpression {
     @Override
     public float get(MolangEnvironment environment) throws MolangException {
         MolangObject object = environment.get("temp");
-        if (object instanceof MolangVariableStack)
+        if (object instanceof MolangVariableStack) {
             ((MolangVariableStack) object).push();
+        }
 
         float result = this.expression.resolve(environment);
-        if (object instanceof MolangVariableStack)
+        if (object instanceof MolangVariableStack) {
             ((MolangVariableStack) object).pop();
+        }
         return result;
     }
 
@@ -40,8 +42,12 @@ public class MolangScopeNode implements MolangExpression {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MolangScopeNode that = (MolangScopeNode) o;
         return this.expression.equals(that.expression);
     }

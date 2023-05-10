@@ -33,8 +33,12 @@ public class MolangGetVariableNode implements MolangExpression {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MolangGetVariableNode that = (MolangGetVariableNode) o;
         return this.object.equals(that.object) && this.name.equals(that.name);
     }

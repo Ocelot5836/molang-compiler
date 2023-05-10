@@ -35,8 +35,12 @@ public class MolangConditionalNode implements MolangExpression {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MolangConditionalNode that = (MolangConditionalNode) o;
         return this.condition.equals(that.condition) && this.first.equals(that.first) && this.branch.equals(that.branch);
     }

@@ -53,8 +53,9 @@ public class MolangRuntime implements MolangEnvironment {
         StringBuilder builder = new StringBuilder("==Start MoLang Runtime Dump==\n\n");
         builder.append("==Start Objects==\n");
         for (Map.Entry<String, MolangObject> entry : this.objects.entrySet()) {
-            if (!this.aliases.contains(entry.getKey()))
+            if (!this.aliases.contains(entry.getKey())) {
                 builder.append(entry.getKey()).append('=').append(entry.getValue()).append('\n');
+            }
         }
         builder.deleteCharAt(builder.length() - 2);
         builder.append("==End Objects==\n\n");
@@ -96,8 +97,9 @@ public class MolangRuntime implements MolangEnvironment {
     @Override
     public MolangObject get(String name) throws MolangException {
         name = name.toLowerCase(Locale.ROOT);
-        if (!this.objects.containsKey(name))
+        if (!this.objects.containsKey(name)) {
             throw new MolangException("Unknown MoLang object: " + name);
+        }
         return this.objects.get(name);
     }
 
@@ -110,8 +112,8 @@ public class MolangRuntime implements MolangEnvironment {
     }
 
     @Override
-    public boolean hasParameter(int parameter) {
-        return parameter >= 0 && parameter < this.parameters.size();
+    public int getParameters() {
+        return this.parameters.size();
     }
 
     @Override

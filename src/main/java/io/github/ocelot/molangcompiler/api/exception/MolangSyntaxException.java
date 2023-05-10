@@ -38,8 +38,9 @@ public class MolangSyntaxException extends MolangException {
     public String getMessage() {
         String message = this.message;
         String context = this.getContext();
-        if (context != null)
+        if (context != null) {
             message += " at position " + cursor + ": " + context;
+        }
         return message;
     }
 
@@ -54,13 +55,15 @@ public class MolangSyntaxException extends MolangException {
      * @return The additional context if there is any
      */
     public String getContext() {
-        if (this.input == null || this.cursor < 0)
+        if (this.input == null || this.cursor < 0) {
             return null;
+        }
         StringBuilder builder = new StringBuilder();
         int cursor = Math.min(this.input.length(), this.cursor);
 
-        if (cursor > CONTEXT_AMOUNT)
+        if (cursor > CONTEXT_AMOUNT) {
             builder.append("...");
+        }
 
         builder.append(this.input, Math.max(0, cursor - CONTEXT_AMOUNT), cursor);
         builder.append("<--[HERE]");

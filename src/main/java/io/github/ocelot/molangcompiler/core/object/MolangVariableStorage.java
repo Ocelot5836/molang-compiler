@@ -36,8 +36,9 @@ public class MolangVariableStorage implements MolangObject {
             this.getStorage().remove(name);
             return;
         }
-        if (!this.allowMethods && value instanceof MolangFunction)
+        if (!this.allowMethods && value instanceof MolangFunction) {
             throw new IllegalStateException("Cannot set functions on objects that do not allow functions");
+        }
         this.getStorage().put(name, value);
     }
 

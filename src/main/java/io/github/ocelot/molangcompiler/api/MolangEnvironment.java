@@ -84,7 +84,9 @@ public interface MolangEnvironment {
      * @param parameter The parameter to check
      * @return Whether a parameter is present
      */
-    boolean hasParameter(int parameter) throws MolangException;
+    default boolean hasParameter(int parameter) {
+        return parameter >= 0 && parameter < this.getParameters();
+    }
 
     /**
      * @return The number of parameters loaded
@@ -114,7 +116,7 @@ public interface MolangEnvironment {
     }
 
     /**
-     * Resolves the float value of the specified expression in this environment. Catches any exception thrown and returns <code>0.0</code>.
+     * <p>Resolves the float value of the specified expression in this environment. Catches any exception thrown and returns <code>0.0</code>.</p>
      * <p>This allows environments to fine-tune how expressions are evaluated.
      *
      * @param expression The expression to evaluate

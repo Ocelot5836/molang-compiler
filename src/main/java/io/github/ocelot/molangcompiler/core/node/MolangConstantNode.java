@@ -30,8 +30,12 @@ public class MolangConstantNode implements MolangExpression {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MolangConstantNode that = (MolangConstantNode) o;
         return Float.compare(that.value, this.value) == 0;
     }

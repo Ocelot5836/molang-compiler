@@ -18,8 +18,9 @@ public class MolangLazyNode implements MolangExpression {
 
     public MolangLazyNode(Supplier<Float> value) {
         this.value = () -> {
-            if (this.result == null)
+            if (this.result == null) {
                 this.result = value.get();
+            }
             return this.result;
         };
     }
@@ -36,8 +37,12 @@ public class MolangLazyNode implements MolangExpression {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MolangLazyNode that = (MolangLazyNode) o;
         return this.value.get().equals(that.value.get());
     }

@@ -47,8 +47,9 @@ public class MolangMath extends MolangLibrary {
         {
             float value = parameters.resolve(0);
             float min = parameters.resolve(1);
-            if (value <= min)
+            if (value <= min) {
                 return min;
+            }
             return Math.min(value, parameters.resolve(2));
         }),
         COS(1, parameters ->
@@ -56,13 +57,15 @@ public class MolangMath extends MolangLibrary {
         DIE_ROLL(3, false, parameters ->
         {
             int count = (int) parameters.resolve(0);
-            if (count <= 0)
+            if (count <= 0) {
                 return 0.0F;
+            }
 
             float min = parameters.resolve(1);
             float max = parameters.resolve(2);
-            if (min == max)
+            if (min == max) {
                 return min * count;
+            }
 
             float sum = 0.0F;
             for (int i = 0; i < count; i++)
@@ -72,16 +75,19 @@ public class MolangMath extends MolangLibrary {
         DIE_ROLL_INTEGER(3, false, parameters ->
         {
             int count = (int) parameters.resolve(0);
-            if (count <= 0)
+            if (count <= 0) {
                 return 0.0F;
+            }
 
             int min = (int) parameters.resolve(1);
             int max = (int) parameters.resolve(2);
-            if (min == max)
+            if (min == max) {
                 return min * count;
+            }
 
-            if (min > max)
+            if (min > max) {
                 throw new MolangException("Invalid random range: " + min + " to " + max);
+            }
 
             int sum = 0;
             for (int i = 0; i < count; i++)
@@ -100,29 +106,35 @@ public class MolangMath extends MolangLibrary {
         LERP(3, parameters ->
         {
             float pct = parameters.resolve(2);
-            if (pct <= 0)
+            if (pct <= 0) {
                 return parameters.resolve(0);
-            if (pct >= 1)
+            }
+            if (pct >= 1) {
                 return parameters.resolve(1);
+            }
             float min = parameters.resolve(0);
             return min + (parameters.resolve(1) - min) * pct;
         }),
         LERPROTATE(3, parameters ->
         {
             float pct = parameters.resolve(2);
-            if (pct <= 0)
+            if (pct <= 0) {
                 return parameters.resolve(0);
-            if (pct >= 1)
+            }
+            if (pct >= 1) {
                 return parameters.resolve(1);
+            }
 
             float min = parameters.resolve(0);
             float max = parameters.resolve(1);
 
             float difference = max - min;
-            while (difference < -180.0F)
+            while (difference < -180.0F) {
                 difference += 360.0F;
-            while (difference >= 180.0F)
+            }
+            while (difference >= 180.0F) {
                 difference -= 360.0F;
+            }
 
             return min + difference * pct;
         }),
@@ -141,16 +153,18 @@ public class MolangMath extends MolangLibrary {
         {
             float min = parameters.resolve(0);
             float max = parameters.resolve(1);
-            if (min > max)
+            if (min > max) {
                 throw new MolangException("Invalid random range: " + min + " to " + max);
+            }
             return min + RNG.nextFloat() * (max - min);
         }),
         RANDOM_INTEGER(2, false, parameters ->
         {
             int min = (int) parameters.resolve(0);
             int max = (int) parameters.resolve(1);
-            if (min > max)
+            if (min > max) {
                 throw new MolangException("Invalid random range: " + min + " to " + max);
+            }
             return min + RNG.nextInt(max - min);
         }),
         ROUND(1, parameters ->
@@ -215,8 +229,9 @@ public class MolangMath extends MolangLibrary {
         @Nullable
         public static MolangMath.MathFunction byName(String name) {
             for (MathFunction function : MathFunction.values())
-                if (function.functionName.equals(name))
+                if (function.functionName.equals(name)) {
                     return function;
+                }
             return null;
         }
     }

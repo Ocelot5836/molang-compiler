@@ -33,7 +33,7 @@ public class MolangFunction implements MolangExpression {
             parameters = new MolangExpression[this.params];
             for (int i = 0; i < parameters.length; i++) {
                 if (!environment.hasParameter(i)) {
-                    throw new IllegalStateException("Function requires " + parameters.length + " parameters");
+                    throw new MolangException("Function requires " + parameters.length + " parameters");
                 }
                 parameters[i] = environment.getParameter(i);
             }

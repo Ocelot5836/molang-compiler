@@ -32,8 +32,7 @@ public class MolangSetVariableNode implements MolangExpression {
 
         MolangObject object = environment.get(this.object);
         MolangExpression old = object.get(this.name);
-        if (old instanceof MolangVariable) {
-            MolangVariable variable = (MolangVariable) old;
+        if (old instanceof MolangVariable variable) {
             variable.setValue(value);
             return variable.getValue(); // Return the new value of the variable
         } else {
@@ -49,8 +48,12 @@ public class MolangSetVariableNode implements MolangExpression {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MolangSetVariableNode that = (MolangSetVariableNode) o;
         return this.object.equals(that.object) && this.name.equals(that.name) && this.expression.equals(that.expression);
     }

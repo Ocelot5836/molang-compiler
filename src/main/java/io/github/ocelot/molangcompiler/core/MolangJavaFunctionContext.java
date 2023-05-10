@@ -22,8 +22,9 @@ public class MolangJavaFunctionContext implements MolangJavaFunction.Context {
 
     @Override
     public MolangExpression get(int parameter) throws MolangException {
-        if (parameter < 0 || parameter >= this.parameters.length)
+        if (parameter < 0 || parameter >= this.parameters.length) {
             throw new MolangException("Invalid parameter: " + parameter);
+        }
         return this.parameters[parameter];
     }
 

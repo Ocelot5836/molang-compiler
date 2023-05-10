@@ -31,7 +31,8 @@ public class MolangVariableStack extends MolangVariableStorage {
     }
 
     public void pop() {
-        if (this.stack.size() > 1)
+        if (this.stack.size() > 1) {
             this.stack.pop();
+        }
     }
 }

@@ -54,8 +54,9 @@ public abstract class MolangLibrary implements MolangObject {
         StringBuilder builder = new StringBuilder(this.getName()).append('\n');
         for (Map.Entry<String, MolangExpression> entry : this.functions.entrySet()) {
             builder.append('\t').append(entry.getKey());
-            if (entry.getValue() instanceof MolangFunction)
+            if (entry.getValue() instanceof MolangFunction) {
                 builder.append("()");
+            }
             builder.append('\n');
         }
         return builder.toString();

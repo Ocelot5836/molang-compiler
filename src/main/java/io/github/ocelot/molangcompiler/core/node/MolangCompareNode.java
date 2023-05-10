@@ -35,8 +35,12 @@ public class MolangCompareNode implements MolangExpression {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         MolangCompareNode that = (MolangCompareNode) o;
         return first.equals(that.first) && second.equals(that.second) && mode == that.mode;
     }
