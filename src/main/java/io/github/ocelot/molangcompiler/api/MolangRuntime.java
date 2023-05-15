@@ -193,7 +193,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setQuery(String name, float value) {
-            this.query.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.of(value));
+            this.query.set(name, MolangExpression.of(value));
             return this;
         }
 
@@ -204,7 +204,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setQuery(String name, Supplier<Float> value) {
-            this.query.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.lazy(value));
+            this.query.set(name, MolangExpression.lazy(value));
             return this;
         }
 
@@ -238,7 +238,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setGlobal(String name, float value) {
-            this.global.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.of(value));
+            this.global.set(name, MolangExpression.of(value));
             return this;
         }
 
@@ -249,7 +249,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setGlobal(String name, Supplier<Float> value) {
-            this.global.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.lazy(value));
+            this.global.set(name, MolangExpression.lazy(value));
             return this;
         }
 
@@ -272,7 +272,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param value The resulting number
          */
         public Builder setVariable(String name, MolangVariable value) {
-            this.variable.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.of(value)); // Variables are assumed to be used later
+            this.variable.set(name, MolangExpression.of(value)); // Variables are assumed to be used later
             return this;
         }
 
@@ -321,12 +321,12 @@ public class MolangRuntime implements MolangEnvironment {
 
                 @Override
                 public void removeVariable(String name) {
-                    variable.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.ZERO);
+                    variable.set(name, MolangExpression.ZERO);
                 }
 
                 @Override
                 public void removeQuery(String name) {
-                    query.set(name, io.github.ocelot.molangcompiler.api.MolangExpression.ZERO);
+                    query.set(name, MolangExpression.ZERO);
                 }
             });
             return this;
