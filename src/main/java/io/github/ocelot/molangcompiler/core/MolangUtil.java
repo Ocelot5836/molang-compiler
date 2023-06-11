@@ -73,18 +73,17 @@ public class MolangUtil {
         }
     }
 
-    public static void setValue(MolangEnvironment environment, String object, String name, float value) throws MolangRuntimeException {
-        MolangObject obj = environment.get(object);
-        if (!obj.has(name)) {
-            obj.set(name, new MolangVariableNode(MolangVariable.create(value)));
+    public static void setValue(MolangEnvironment environment, MolangObject object, String name, float value) throws MolangRuntimeException {
+        if (!object.has(name)) {
+            object.set(name, new MolangVariableNode(MolangVariable.create(value)));
             return;
         }
 
-        MolangExpression old = obj.get(name);
+        MolangExpression old = object.get(name);
         if (old instanceof MolangVariable variable) {
             variable.setValue(value);
         } else {
-            obj.set(name, new MolangConstantNode(value));
+            object.set(name, new MolangConstantNode(value));
         }
     }
 }

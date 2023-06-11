@@ -2,6 +2,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Random;
 
+/**
+ * @author Buddy
+ */
 public class TestGenerator {
 	static class Term {
 		Object a;

@@ -7,17 +7,18 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 
+/**
+ * @author Buddy
+ */
 public class StressTest {
     private static final int TEST_COUNT = 10_000_000;
 
-    private static long moonflower_elapsedExecutingTime = 0;
-    private static long moonflower_elapsedParsingTime = 0;
     private static long elapsedParsingTime = 0;
     private static long elapsedExecutingBytecodeTime = 0;
 
     private static final MolangCompiler COMPILER = new MolangCompiler();
     private static final MolangCompiler DEBUG_COMPILER = new MolangCompiler(MolangCompiler.DEFAULT_FLAGS | MolangCompiler.WRITE_CLASSES_FLAG);
-    private static float[] PREVENT_OPTIMIZING = new float[TEST_COUNT];
+    private static final float[] PREVENT_OPTIMIZING = new float[TEST_COUNT];
 
     private static String longestTaken;
     private static long longestTakenTime = 0;
@@ -129,9 +130,9 @@ public class StressTest {
         System.out.println("Execution (with bytecode): " + formatTime(elapsedExecutingBytecodeTime));
         System.out.println("Longest taken: " + longestTaken + " " + formatTime(longestTakenTime));
 
-//        if (longestTaken != null) {
-//            DEBUG_COMPILER.compile(longestTaken);
-//        }
+        if (longestTaken != null) {
+            DEBUG_COMPILER.compile(longestTaken);
+        }
     }
 
     private static String formatTime(long t) {

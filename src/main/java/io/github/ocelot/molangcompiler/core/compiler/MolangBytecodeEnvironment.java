@@ -6,24 +6,24 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Ocelot
  */
 @ApiStatus.Internal
 public record MolangBytecodeEnvironment(Map<String, Integer> variables,
-                                        Set<String> modifiedVariables,
+                                        List<String> modifiedVariables,
                                         boolean optimize) {
 
     public MolangBytecodeEnvironment(MolangBytecodeEnvironment environment) {
-        this(new HashMap<>(environment.variables), new HashSet<>(), environment.optimize);
+        this(new HashMap<>(environment.variables), new LinkedList<>(), environment.optimize);
     }
 
     public MolangBytecodeEnvironment(int flags) {
-        this(new HashMap<>(), new HashSet<>(), (flags & BytecodeCompiler.FLAG_OPTIMIZE) > 0);
+        this(new HashMap<>(), new LinkedList<>(), (flags & BytecodeCompiler.FLAG_OPTIMIZE) > 0);
     }
 
     /**
@@ -197,15 +197,17 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
                 throw new MolangSyntaxException("Expected 2 variable parts for " + name + ", got " + parts.length);
             }
 
+            int objectIndex = this.getObjectIndex(method, parts[0]);
+
             method.visitVarInsn(Opcodes.ALOAD, BytecodeCompiler.RUNTIME_INDEX);
-            method.visitLdcInsn(parts[0]);
+            method.visitVarInsn(Opcodes.ALOAD, objectIndex);
             method.visitLdcInsn(parts[1]);
             method.visitVarInsn(Opcodes.FLOAD, index);
             method.visitMethodInsn(
                     Opcodes.INVOKESTATIC,
                     "io/github/ocelot/molangcompiler/core/MolangUtil",
                     "setValue",
-                    "(Lio/github/ocelot/molangcompiler/api/MolangEnvironment;Ljava/lang/String;Ljava/lang/String;F)V",
+                    "(Lio/github/ocelot/molangcompiler/api/MolangEnvironment;Lio/github/ocelot/molangcompiler/api/object/MolangObject;Ljava/lang/String;F)V",
                     false
             );
         }
