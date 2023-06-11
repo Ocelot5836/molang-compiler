@@ -127,14 +127,6 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
                 "get",
                 "(Ljava/lang/String;)Lio/github/ocelot/molangcompiler/api/object/MolangObject;",
                 true);
-        method.visitMethodInsn(
-                Opcodes.INVOKESTATIC,
-                "java/util/Objects",
-                "requireNonNull",
-                "(Ljava/lang/Object;)Ljava/lang/Object;",
-                false
-        );
-        method.visitTypeInsn(Opcodes.CHECKCAST, "io/github/ocelot/molangcompiler/api/object/MolangObject");
         method.visitVarInsn(Opcodes.ASTORE, index);
 
         return index;

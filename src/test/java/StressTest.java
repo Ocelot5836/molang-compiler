@@ -130,9 +130,9 @@ public class StressTest {
         System.out.println("Execution (with bytecode): " + formatTime(elapsedExecutingBytecodeTime));
         System.out.println("Longest taken: " + longestTaken + " " + formatTime(longestTakenTime));
 
-        if (longestTaken != null) {
-            DEBUG_COMPILER.compile(longestTaken);
-        }
+//        if (longestTaken != null) {
+//            DEBUG_COMPILER.compile(longestTaken);
+//        }
     }
 
     private static String formatTime(long t) {

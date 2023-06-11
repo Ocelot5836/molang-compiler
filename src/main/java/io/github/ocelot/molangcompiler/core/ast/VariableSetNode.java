@@ -42,6 +42,8 @@ public record VariableSetNode(String object,
 
     @Override
     public void writeBytecode(MethodNode method, MolangBytecodeEnvironment environment, @Nullable Label breakLabel, @Nullable Label continueLabel) throws MolangException {
+        // Insert at earliest opportunity if required
+        environment.getObjectIndex(method, this.object);
         int index = environment.allocateVariable(this.object + "." + this.name);
         this.value.writeBytecode(method, environment, breakLabel, continueLabel);
         method.visitVarInsn(Opcodes.FSTORE, index);
