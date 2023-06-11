@@ -1,4 +1,4 @@
-package io.github.ocelot.molangcompiler.core.object;
+package io.github.ocelot.molangcompiler.core.node;
 
 import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
@@ -10,12 +10,12 @@ import org.jetbrains.annotations.ApiStatus;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangFunction implements MolangExpression {
+public class MolangFunctionNode implements MolangExpression {
 
     private final int params;
     private final MolangJavaFunction consumer;
 
-    public MolangFunction(int params, MolangJavaFunction consumer) {
+    public MolangFunctionNode(int params, MolangJavaFunction consumer) {
         this.params = params;
         this.consumer = consumer;
     }

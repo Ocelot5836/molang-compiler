@@ -6,7 +6,7 @@ import io.github.ocelot.molangcompiler.api.bridge.MolangVariableProvider;
 import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.api.object.ImmutableMolangObject;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
-import io.github.ocelot.molangcompiler.core.object.MolangFunction;
+import io.github.ocelot.molangcompiler.core.node.MolangFunctionNode;
 import io.github.ocelot.molangcompiler.core.object.MolangVariableStorage;
 
 import java.util.*;
@@ -211,7 +211,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param function The function to execute
          */
         public Builder setQuery(String name, int params, MolangJavaFunction function) {
-            this.query.set(params < 0 ? name : (name + "$" + params), new MolangFunction(params, function));
+            this.query.set(params < 0 ? name : (name + "$" + params), new MolangFunctionNode(params, function));
             return this;
         }
 
@@ -256,7 +256,7 @@ public class MolangRuntime implements MolangEnvironment {
          * @param function The function to execute
          */
         public Builder setGlobal(String name, int params, MolangJavaFunction function) {
-            this.global.set(params < 0 ? name : (name + "$" + params), new MolangFunction(params, function));
+            this.global.set(params < 0 ? name : (name + "$" + params), new MolangFunctionNode(params, function));
             return this;
         }
 

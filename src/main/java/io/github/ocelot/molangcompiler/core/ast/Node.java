@@ -14,6 +14,9 @@ public interface Node {
     @Override
     String toString();
 
+    /**
+     * @return Whether this node can be evaluated without a runtime environment
+     */
     boolean isConstant();
 
     /**
@@ -31,6 +34,15 @@ public interface Node {
         throw new MolangException("Cannot statically evaluate " + this.getClass().getSimpleName());
     }
 
+    /**
+     * Writes java bytecode representing this node to the specified method.
+     *
+     * @param method        The method to write into
+     * @param environment   The bytecode compilation environment
+     * @param breakLabel    A label to break out of loops or <code>null</code> if not in a loop
+     * @param continueLabel A label to continue to the next loop iteration or <code>null</code> if not in a loop
+     * @throws MolangException If any syntax problems prevent the expression from being written
+     */
     default void writeBytecode(MethodNode method, MolangBytecodeEnvironment environment, @Nullable Label breakLabel, @Nullable Label continueLabel) throws MolangException {
         throw new MolangException("Not implemented (" + this.getClass().getSimpleName() + " " + this + ")");
     }

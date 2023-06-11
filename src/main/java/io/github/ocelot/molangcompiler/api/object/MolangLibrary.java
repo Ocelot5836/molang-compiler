@@ -2,7 +2,7 @@ package io.github.ocelot.molangcompiler.api.object;
 
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
-import io.github.ocelot.molangcompiler.core.object.MolangFunction;
+import io.github.ocelot.molangcompiler.core.node.MolangFunctionNode;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,7 +59,7 @@ public abstract class MolangLibrary implements MolangObject {
         StringBuilder builder = new StringBuilder(this.getName()).append('\n');
         for (Map.Entry<String, MolangExpression> entry : this.functions.entrySet()) {
             builder.append('\t').append(entry.getKey());
-            if (entry.getValue() instanceof MolangFunction) {
+            if (entry.getValue() instanceof MolangFunctionNode) {
                 builder.append("()");
             }
             builder.append('\n');
