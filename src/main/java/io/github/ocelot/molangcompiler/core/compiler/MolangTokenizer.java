@@ -75,7 +75,7 @@ public final class MolangTokenizer {
         NULL_COALESCING("\\?\\?"),
         INCREMENT("\\+\\+"),
         DECREMENT("\\-\\-"),
-        SPECIAL("[<>&|!?:]+"),
+        SPECIAL("[<>&|!?:]"),
         BINARY_OPERATION("[-+*/]"),
         LEFT_PARENTHESIS("\\("),
         RIGHT_PARENTHESIS("\\)"),

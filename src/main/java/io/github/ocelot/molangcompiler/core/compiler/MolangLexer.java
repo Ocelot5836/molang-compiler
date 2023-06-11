@@ -181,7 +181,7 @@ public final class MolangLexer {
             }
 
             switch (token.type()) {
-                case NUMERAL, ALPHANUMERIC, INCREMENT, DECREMENT, LEFT_PARENTHESIS, LEFT_BRACE -> {
+                case NUMERAL, ALPHANUMERIC, LEFT_PARENTHESIS, LEFT_BRACE -> {
                     if (result != null) {
                         throw error("Unexpected token", reader);
                     }
@@ -196,13 +196,13 @@ public final class MolangLexer {
                         // obj.name&&...
                         case "&" -> {
                             expect(reader, MolangTokenizer.TokenType.SPECIAL, "&");
-                            reader.skip();
+                            reader.skip(2);
                             result = new BinaryOperationNode(BinaryOperation.AND, result, parseNode(reader));
                         }
                         // obj.name||...
                         case "|" -> {
                             expect(reader, MolangTokenizer.TokenType.SPECIAL, "|");
-                            reader.skip();
+                            reader.skip(2);
                             result = new BinaryOperationNode(BinaryOperation.OR, result, parseNode(reader));
                         }
                         // obj.name??... or obj.name?b...
@@ -268,7 +268,7 @@ public final class MolangLexer {
                     }
                     result = parseBinaryExpression(result, reader);
                 }
-                default -> throw error("Unexpected token", reader);
+                default -> throw error("Unexpected token: " + token, reader);
             }
         }
 
@@ -333,10 +333,12 @@ public final class MolangLexer {
         }
         // obj.name++
         if (operand.type() == MolangTokenizer.TokenType.INCREMENT) {
+            reader.skip();
             return new VariableSetNode(object, name, new BinaryOperationNode(BinaryOperation.ADD, new VariableGetNode(object, name), new ConstNode(1.0F)));
         }
         // obj.name--
         if (operand.type() == MolangTokenizer.TokenType.DECREMENT) {
+            reader.skip();
             return new VariableSetNode(object, name, new BinaryOperationNode(BinaryOperation.SUBTRACT, new VariableGetNode(object, name), new ConstNode(1.0F)));
         }
         // obj.name*=, obj.name+=, obj.name--, ...
@@ -351,13 +353,14 @@ public final class MolangLexer {
             // +=, -=, *=, /=
             if (secondOperand.type() == MolangTokenizer.TokenType.EQUAL) {
                 reader.skip(2);
-                return switch (operand.value()) {
+                Node value = switch (operand.value()) {
                     case "-" -> new BinaryOperationNode(BinaryOperation.SUBTRACT, left, parseExpression(reader));
                     case "+" -> new BinaryOperationNode(BinaryOperation.ADD, left, parseExpression(reader));
                     case "*" -> new BinaryOperationNode(BinaryOperation.MULTIPLY, left, parseExpression(reader));
                     case "/" -> new BinaryOperationNode(BinaryOperation.DIVIDE, left, parseExpression(reader));
                     default -> throw error("Unexpected token", reader);
                 };
+                return new VariableSetNode(object, name, value);
             }
         }
         // obj.func(..
@@ -437,6 +440,10 @@ public final class MolangLexer {
 
     private static Node parseTerm(TokenReader reader) throws MolangSyntaxException {
         Node left = parseNode(reader);
+        if (!reader.canRead()) {
+            return left;
+        }
+
         MolangTokenizer.Token token = reader.peek();
         if (token.type() == MolangTokenizer.TokenType.BINARY_OPERATION) {
             switch (token.value()) {
