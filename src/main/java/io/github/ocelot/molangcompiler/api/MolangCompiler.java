@@ -1,13 +1,13 @@
 package io.github.ocelot.molangcompiler.api;
 
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
-import io.github.ocelot.molangcompiler.core.MolangJavaFunctionContext;
-import io.github.ocelot.molangcompiler.core.compiler.Dynamic2MolangExceptionType;
-import io.github.ocelot.molangcompiler.core.compiler.DynamicMolangExceptionType;
-import io.github.ocelot.molangcompiler.core.compiler.SimpleMolangExceptionType;
-import io.github.ocelot.molangcompiler.core.compiler.StringReader;
+import io.github.ocelot.molangcompiler.core.util.Dynamic2MolangExceptionType;
+import io.github.ocelot.molangcompiler.core.util.DynamicMolangExceptionType;
+import io.github.ocelot.molangcompiler.core.util.SimpleMolangExceptionType;
+import io.github.ocelot.molangcompiler.core.util.StringReader;
 import io.github.ocelot.molangcompiler.core.node.*;
 import io.github.ocelot.molangcompiler.core.object.MolangMath;
 
@@ -34,7 +34,7 @@ public class MolangCompiler {
     /**
      * Whether to reduce math to constant values if possible. E.g. <code>4 * 4 + 2</code> would become <code>18</code>. This should almost always be on.
      */
-    public static final int REDUCE_FLAG = 0b00000001;
+    public static final int OPTIMIZE_FLAG = 0b00000001;
     /**
      * Whether to check for 'this' keyword.
      */
@@ -71,7 +71,7 @@ public class MolangCompiler {
      * @throws MolangSyntaxException If any error occurs
      */
     public static MolangExpression compile(String input) throws MolangSyntaxException {
-        return compile(input, REDUCE_FLAG);
+        return compile(input, OPTIMIZE_FLAG);
     }
 
     /**
@@ -256,7 +256,7 @@ public class MolangCompiler {
 
                     MolangExpression first = parseExpression(new StringReader(fullWord), flags, true, true);
                     MolangExpression second = parseExpression(new StringReader(reader.getRead().substring(start)), flags, true, true);
-                    if (checkFlag(flags, REDUCE_FLAG) && first instanceof MolangConstantNode && second instanceof MolangConstantNode) {
+                    if (checkFlag(flags, OPTIMIZE_FLAG) && first instanceof MolangConstantNode && second instanceof MolangConstantNode) {
                         try {
                             return parseCondition(reader, MolangExpression.of(mode.resolve(first, second, ENVIRONMENT)), flags, true);
                         } catch (MolangException e) {
@@ -349,7 +349,7 @@ public class MolangCompiler {
                 if (function == null || function.getOp() != null) {
                     throw INVALID_KEYWORD.create(currentKeyword[1]);
                 }
-                if (checkFlag(flags, REDUCE_FLAG)) {
+                if (checkFlag(flags, OPTIMIZE_FLAG)) {
                     return function.getExpression();
                 }
             }
@@ -380,7 +380,7 @@ public class MolangCompiler {
 
             MolangExpression branch = parseExpression(reader, flags, true, allowMath);
             MolangExpression condition = new MolangConditionalNode(conditionExpression, first, branch);
-            if (checkFlag(flags, REDUCE_FLAG) && conditionExpression instanceof MolangConstantNode) {
+            if (checkFlag(flags, OPTIMIZE_FLAG) && conditionExpression instanceof MolangConstantNode) {
                 try {
                     return conditionExpression.resolve(ENVIRONMENT) != 0.0 ? first : branch;
                 } catch (MolangException e) {
@@ -469,7 +469,7 @@ public class MolangCompiler {
                 }
             }
 
-            if (checkFlag(flags, REDUCE_FLAG) && function.canOptimize()) {
+            if (checkFlag(flags, OPTIMIZE_FLAG) && function.canOptimize()) {
                 // Math functions are constant so these can be compiled down to raw numbers if all parameters are constants
                 boolean reduceFunction = true;
                 for (int i = 0; i < parameters.length; i++) {
@@ -485,14 +485,14 @@ public class MolangCompiler {
                     }
                 }
 
-                if (reduceFunction) {
-                    try {
-                        return MolangExpression.of(function.getOp().resolve(new MolangJavaFunctionContext(ENVIRONMENT, parameters)));
-                    } catch (MolangException e) {
-                        // Something went horribly wrong with the above checks
-                        e.printStackTrace();
-                    }
-                }
+//                if (reduceFunction) {
+//                    try {
+//                        return MolangExpression.of(function.getOp().resolve(new MolangJavaFunctionContext(parameters)));
+//                    } catch (MolangException e) {
+//                        // Something went horribly wrong with the above checks
+//                        e.printStackTrace();
+//                    }
+//                }
             }
         }
         // Other functions may or may not work, the runtime determines if they will
@@ -503,7 +503,7 @@ public class MolangCompiler {
     // Stack Overflow! Every programmer's best friend!
     private static MolangExpression compute(StringReader reader, int flags) throws MolangSyntaxException {
         return new Object() {
-            private boolean canReduce = checkFlag(flags, REDUCE_FLAG);
+            private boolean canReduce = checkFlag(flags, OPTIMIZE_FLAG);
 
             boolean accept(int charToEat) {
                 reader.skipWhitespace();
@@ -623,7 +623,7 @@ public class MolangCompiler {
                 }
 
                 MolangExpression expression = MolangCompiler.parseExpression(new StringReader(reader.getRead().substring(start)), flags, true, false);
-                if (!checkFlag(flags, REDUCE_FLAG)) {
+                if (!checkFlag(flags, OPTIMIZE_FLAG)) {
                     return expression;
                 }
                 if (this.canReduce && (expression instanceof MolangSetVariableNode || expression instanceof MolangInvokeFunctionNode || expression instanceof MolangCompareNode || expression instanceof MolangConditionalNode || expression instanceof MolangGetVariableNode || expression instanceof MolangThisNode)) {
@@ -693,28 +693,28 @@ public class MolangCompiler {
         }
 
         @Override
-        public void loadParameter(MolangExpression expression) throws MolangException {
-            throw new MolangException("Invalid Call");
+        public void loadParameter(float value) throws MolangRuntimeException {
+            throw new MolangRuntimeException("Invalid Call");
         }
 
         @Override
-        public void clearParameters() throws MolangException {
-            throw new MolangException("Invalid Call");
+        public void clearParameters() throws MolangRuntimeException {
+            throw new MolangRuntimeException("Invalid Call");
         }
 
         @Override
-        public float getThis() throws MolangException {
-            throw new MolangException("Invalid Call");
+        public float getThis() throws MolangRuntimeException {
+            throw new MolangRuntimeException("Invalid Call");
         }
 
         @Override
-        public MolangObject get(String name) throws MolangException {
-            throw new MolangException("Invalid Call");
+        public MolangObject get(String name) throws MolangRuntimeException {
+            throw new MolangRuntimeException("Invalid Call");
         }
 
         @Override
-        public MolangExpression getParameter(int parameter) throws MolangException {
-            throw new MolangException("Invalid Call");
+        public float getParameter(int parameter) throws MolangRuntimeException {
+            throw new MolangRuntimeException("Invalid Call");
         }
 
         @Override

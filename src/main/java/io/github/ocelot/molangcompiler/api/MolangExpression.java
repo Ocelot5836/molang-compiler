@@ -2,6 +2,7 @@ package io.github.ocelot.molangcompiler.api;
 
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.core.node.MolangConstantNode;
 import io.github.ocelot.molangcompiler.core.node.MolangDynamicNode;
 import io.github.ocelot.molangcompiler.core.node.MolangLazyNode;
@@ -27,19 +28,19 @@ public interface MolangExpression {
      *
      * @param environment The environment to execute in
      * @return The resulting value
-     * @throws MolangException If any error occurs when resolving the value
+     * @throws MolangRuntimeException If any error occurs when resolving the value
      */
     @ApiStatus.OverrideOnly
-    float get(MolangEnvironment environment) throws MolangException;
+    float get(MolangEnvironment environment) throws MolangRuntimeException;
 
     /**
      * Resolves the float value of this expression.
      *
      * @param environment The environment to execute in
      * @return The resulting value
-     * @throws MolangException If any error occurs when resolving the value
+     * @throws MolangRuntimeException If any error occurs when resolving the value
      */
-    default float resolve(MolangEnvironment environment) throws MolangException {
+    default float resolve(MolangEnvironment environment) throws MolangRuntimeException {
         return environment.resolve(this);
     }
 

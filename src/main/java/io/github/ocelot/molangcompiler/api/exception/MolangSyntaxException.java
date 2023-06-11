@@ -27,6 +27,13 @@ public class MolangSyntaxException extends MolangException {
         this.cursor = -1;
     }
 
+    public MolangSyntaxException(String message, Throwable t) {
+        super(message, t);
+        this.message = message;
+        this.input = null;
+        this.cursor = -1;
+    }
+
     public MolangSyntaxException(String message, String input, int cursor) {
         super(message);
         this.message = message;
@@ -39,7 +46,7 @@ public class MolangSyntaxException extends MolangException {
         String message = this.message;
         String context = this.getContext();
         if (context != null) {
-            message += " at position " + cursor + ": " + context;
+            message += " at position " + this.cursor + ": " + context;
         }
         return message;
     }

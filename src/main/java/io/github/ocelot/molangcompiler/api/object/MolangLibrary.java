@@ -1,6 +1,7 @@
 package io.github.ocelot.molangcompiler.api.object;
 
 import io.github.ocelot.molangcompiler.api.MolangExpression;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.core.object.MolangFunction;
 
 import java.util.HashMap;
@@ -35,13 +36,17 @@ public abstract class MolangLibrary implements MolangObject {
     protected abstract String getName();
 
     @Override
-    public void set(String name, MolangExpression value) {
-        throw new UnsupportedOperationException("Cannot set values on a library");
+    public void set(String name, MolangExpression value) throws MolangRuntimeException {
+        throw new MolangRuntimeException("Cannot set values on a library");
     }
 
     @Override
-    public MolangExpression get(String name) {
-        return this.functions.getOrDefault(name, MolangExpression.ZERO);
+    public MolangExpression get(String name) throws MolangRuntimeException {
+        MolangExpression expression = this.functions.get(name);
+        if (expression == null) {
+            throw new MolangRuntimeException("");
+        }
+        return expression;
     }
 
     @Override

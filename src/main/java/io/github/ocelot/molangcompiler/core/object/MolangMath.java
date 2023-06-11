@@ -3,6 +3,7 @@ package io.github.ocelot.molangcompiler.core.object;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.api.object.MolangLibrary;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -32,37 +33,37 @@ public class MolangMath extends MolangLibrary {
 
     public enum MathFunction {
         ABS(1, parameters ->
-                Math.abs(parameters.resolve(0))),
+                Math.abs(parameters.get(0))),
         ACOS(1, parameters ->
-                (float) Math.acos(parameters.resolve(0))),
+                (float) Math.acos(parameters.get(0))),
         ASIN(1, parameters ->
-                (float) Math.asin(parameters.resolve(0))),
+                (float) Math.asin(parameters.get(0))),
         ATAN(1, parameters ->
-                (float) Math.atan(parameters.resolve(0))),
+                (float) Math.atan(parameters.get(0))),
         ATAN2(2, parameters ->
-                (float) Math.atan2(parameters.resolve(0), parameters.resolve(1))),
+                (float) Math.atan2(parameters.get(0), parameters.get(1))),
         CEIL(1, parameters ->
-                (float) Math.ceil(parameters.resolve(0))),
+                (float) Math.ceil(parameters.get(0))),
         CLAMP(3, parameters ->
         {
-            float value = parameters.resolve(0);
-            float min = parameters.resolve(1);
+            float value = parameters.get(0);
+            float min = parameters.get(1);
             if (value <= min) {
                 return min;
             }
-            return Math.min(value, parameters.resolve(2));
+            return Math.min(value, parameters.get(2));
         }),
         COS(1, parameters ->
-                (float) Math.cos(parameters.resolve(0) * Math.PI / 180.0F)),
+                (float) Math.cos(parameters.get(0) * Math.PI / 180.0F)),
         DIE_ROLL(3, false, parameters ->
         {
-            int count = (int) parameters.resolve(0);
+            int count = (int) parameters.get(0);
             if (count <= 0) {
                 return 0.0F;
             }
 
-            float min = parameters.resolve(1);
-            float max = parameters.resolve(2);
+            float min = parameters.get(1);
+            float max = parameters.get(2);
             if (min == max) {
                 return min * count;
             }
@@ -74,19 +75,19 @@ public class MolangMath extends MolangLibrary {
         }),
         DIE_ROLL_INTEGER(3, false, parameters ->
         {
-            int count = (int) parameters.resolve(0);
+            int count = (int) parameters.get(0);
             if (count <= 0) {
                 return 0.0F;
             }
 
-            int min = (int) parameters.resolve(1);
-            int max = (int) parameters.resolve(2);
+            int min = (int) parameters.get(1);
+            int max = (int) parameters.get(2);
             if (min == max) {
                 return min * count;
             }
 
             if (min > max) {
-                throw new MolangException("Invalid random range: " + min + " to " + max);
+                throw new MolangRuntimeException("Invalid random range: " + min + " to " + max);
             }
 
             int sum = 0;
@@ -95,38 +96,38 @@ public class MolangMath extends MolangLibrary {
             return sum;
         }),
         EXP(1, parameters ->
-                (float) Math.exp(parameters.resolve(0))),
+                (float) Math.exp(parameters.get(0))),
         FLOOR(1, parameters ->
-                (float) Math.floor(parameters.resolve(0))),
+                (float) Math.floor(parameters.get(0))),
         HERMITE_BLEND(1, parameters ->
         {
-            float x = parameters.resolve(0);
+            float x = parameters.get(0);
             return 3 * x * x - 2 * x * x * x;
         }),
         LERP(3, parameters ->
         {
-            float pct = parameters.resolve(2);
+            float pct = parameters.get(2);
             if (pct <= 0) {
-                return parameters.resolve(0);
+                return parameters.get(0);
             }
             if (pct >= 1) {
-                return parameters.resolve(1);
+                return parameters.get(1);
             }
-            float min = parameters.resolve(0);
-            return min + (parameters.resolve(1) - min) * pct;
+            float min = parameters.get(0);
+            return min + (parameters.get(1) - min) * pct;
         }),
         LERPROTATE(3, parameters ->
         {
-            float pct = parameters.resolve(2);
+            float pct = parameters.get(2);
             if (pct <= 0) {
-                return parameters.resolve(0);
+                return parameters.get(0);
             }
             if (pct >= 1) {
-                return parameters.resolve(1);
+                return parameters.get(1);
             }
 
-            float min = parameters.resolve(0);
-            float max = parameters.resolve(1);
+            float min = parameters.get(0);
+            float max = parameters.get(1);
 
             float difference = max - min;
             while (difference < -180.0F) {
@@ -139,47 +140,47 @@ public class MolangMath extends MolangLibrary {
             return min + difference * pct;
         }),
         LN(1, parameters ->
-                (float) Math.log(parameters.resolve(0))),
+                (float) Math.log(parameters.get(0))),
         MAX(2, parameters ->
-                Math.max(parameters.resolve(0), parameters.resolve(1))),
+                Math.max(parameters.get(0), parameters.get(1))),
         MIN(2, parameters ->
-                Math.min(parameters.resolve(0), parameters.resolve(1))),
+                Math.min(parameters.get(0), parameters.get(1))),
         MOD(2, parameters ->
-                parameters.resolve(0) % parameters.resolve(1)),
+                parameters.get(0) % parameters.get(1)),
         PI(MolangExpression.of((float) Math.PI)),
         POW(2, parameters ->
-                (float) Math.pow(parameters.resolve(0), parameters.resolve(1))),
+                (float) Math.pow(parameters.get(0), parameters.get(1))),
         RANDOM(2, false, parameters ->
         {
-            float min = parameters.resolve(0);
-            float max = parameters.resolve(1);
+            float min = parameters.get(0);
+            float max = parameters.get(1);
             if (min > max) {
-                throw new MolangException("Invalid random range: " + min + " to " + max);
+                throw new MolangRuntimeException("Invalid random range: " + min + " to " + max);
             }
             return min + RNG.nextFloat() * (max - min);
         }),
         RANDOM_INTEGER(2, false, parameters ->
         {
-            int min = (int) parameters.resolve(0);
-            int max = (int) parameters.resolve(1);
+            int min = (int) parameters.get(0);
+            int max = (int) parameters.get(1);
             if (min > max) {
-                throw new MolangException("Invalid random range: " + min + " to " + max);
+                throw new MolangRuntimeException("Invalid random range: " + min + " to " + max);
             }
             return min + RNG.nextInt(max - min);
         }),
         ROUND(1, parameters ->
-                (float) Math.round(parameters.resolve(0))),
+                (float) Math.round(parameters.get(0))),
         SIN(1, parameters ->
-                (float) Math.sin(parameters.resolve(0) * Math.PI / 180.0F)),
+                (float) Math.sin(parameters.get(0) * Math.PI / 180.0F)),
         SQRT(1, parameters ->
-                (float) Math.sqrt(parameters.resolve(0))),
+                (float) Math.sqrt(parameters.get(0))),
         TRUNC(1, parameters ->
-                (int) parameters.resolve(0)),
+                (int) parameters.get(0)),
         // Extended function
         TRIANGLE_WAVE(2, parameters ->
         {
-            float x = parameters.resolve(0);
-            float period = parameters.resolve(1);
+            float x = parameters.get(0);
+            float period = parameters.get(1);
             return (Math.abs(x % period - period * 0.5F) - period * 0.25F) / (period * 0.25F);
         });
 

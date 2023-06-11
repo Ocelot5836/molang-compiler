@@ -4,6 +4,7 @@ import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -26,7 +27,7 @@ public class MolangSetVariableNode implements MolangExpression {
     }
 
     @Override
-    public float get(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangRuntimeException {
         // This evaluates the value before setting it
         float value = this.expression.resolve(environment);
 

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license.
 
-package io.github.ocelot.molangcompiler.core.compiler;
+package io.github.ocelot.molangcompiler.core.util;
 
 import org.jetbrains.annotations.ApiStatus;
 

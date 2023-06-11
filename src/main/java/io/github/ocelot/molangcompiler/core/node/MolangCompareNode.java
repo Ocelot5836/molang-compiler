@@ -3,6 +3,7 @@ package io.github.ocelot.molangcompiler.core.node;
 import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Objects;
@@ -24,7 +25,7 @@ public class MolangCompareNode implements MolangExpression {
     }
 
     @Override
-    public float get(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangRuntimeException {
         return this.mode.resolve(this.first, this.second, environment);
     }
 
@@ -65,7 +66,7 @@ public class MolangCompareNode implements MolangExpression {
             this.op = op;
         }
 
-        public float resolve(MolangExpression a, MolangExpression b, MolangEnvironment environment) throws MolangException {
+        public float resolve(MolangExpression a, MolangExpression b, MolangEnvironment environment) throws MolangRuntimeException {
             return this.op.apply(a, b, environment) ? 1.0F : 0.0F;
         }
 
@@ -76,6 +77,6 @@ public class MolangCompareNode implements MolangExpression {
 
     @FunctionalInterface
     private interface CompareOp {
-        boolean apply(MolangExpression a, MolangExpression b, MolangEnvironment environment) throws MolangException;
+        boolean apply(MolangExpression a, MolangExpression b, MolangEnvironment environment) throws MolangRuntimeException;
     }
 }

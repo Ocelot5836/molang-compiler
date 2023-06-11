@@ -4,6 +4,7 @@ import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.core.MolangJavaFunctionContext;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -22,22 +23,22 @@ public class MolangFunction implements MolangExpression {
     }
 
     @Override
-    public float get(MolangEnvironment environment) throws MolangException {
-        MolangExpression[] parameters;
+    public float get(MolangEnvironment environment) throws MolangRuntimeException {
+        float[] parameters;
         if (this.params < 0) {
-            parameters = new MolangExpression[environment.getParameters()];
+            parameters = new float[environment.getParameters()];
             for (int i = 0; i < parameters.length; i++) {
                 parameters[i] = environment.getParameter(i);
             }
         } else {
-            parameters = new MolangExpression[this.params];
+            parameters = new float[this.params];
             for (int i = 0; i < parameters.length; i++) {
                 if (!environment.hasParameter(i)) {
-                    throw new MolangException("Function requires " + parameters.length + " parameters");
+                    throw new MolangRuntimeException("Function requires " + parameters.length + " parameters");
                 }
                 parameters[i] = environment.getParameter(i);
             }
         }
-        return this.consumer.resolve(new MolangJavaFunctionContext(environment, parameters));
+        return this.consumer.resolve(new MolangJavaFunctionContext(parameters));
     }
 }

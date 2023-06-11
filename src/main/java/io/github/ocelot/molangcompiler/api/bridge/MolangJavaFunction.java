@@ -1,7 +1,6 @@
 package io.github.ocelot.molangcompiler.api.bridge;
 
-import io.github.ocelot.molangcompiler.api.MolangExpression;
-import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 
 /**
  * Executes java code from MoLang expressions.
@@ -17,9 +16,9 @@ public interface MolangJavaFunction {
      *
      * @param context The parameters to execute using
      * @return The resulting float value
-     * @throws MolangException If any error occurs
+     * @throws MolangRuntimeException If any error occurs
      */
-    float resolve(Context context) throws MolangException;
+    float resolve(Context context) throws MolangRuntimeException;
 
     /**
      * Provides parameters for MoLang Java functions.
@@ -30,22 +29,13 @@ public interface MolangJavaFunction {
     interface Context {
 
         /**
-         * Retrieves a value for the specified parameter
-         *
-         * @param parameter The parameter to get the value for
-         * @return The parameter value
-         * @throws MolangException If the parameter does not exist
-         */
-        MolangExpression get(int parameter) throws MolangException;
-
-        /**
          * Resolves the specified parameter.
          *
          * @param parameter The parameter to resolve
          * @return The float result of that parameter
-         * @throws MolangException If the expression could not be resolved
+         * @throws MolangRuntimeException If the expression could not be resolved
          */
-        float resolve(int parameter) throws MolangException;
+        float get(int parameter) throws MolangRuntimeException;
 
         /**
          * @return The number of parameters provided

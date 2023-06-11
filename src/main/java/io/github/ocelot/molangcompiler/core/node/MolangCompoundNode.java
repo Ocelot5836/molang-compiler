@@ -3,6 +3,7 @@ package io.github.ocelot.molangcompiler.core.node;
 import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Arrays;
@@ -20,7 +21,7 @@ public class MolangCompoundNode implements MolangExpression {
     }
 
     @Override
-    public float get(MolangEnvironment environment) throws MolangException {
+    public float get(MolangEnvironment environment) throws MolangRuntimeException {
         for (int i = 0; i < this.expressions.length; i++) {
             float result = this.expressions[i].resolve(environment);
             if (i >= this.expressions.length - 1) // The last expression is expected to have the `return`

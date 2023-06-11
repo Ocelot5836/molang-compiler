@@ -4,6 +4,7 @@ import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariableProvider;
 import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.api.object.ImmutableMolangObject;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import io.github.ocelot.molangcompiler.core.object.MolangFunction;
@@ -25,7 +26,7 @@ public class MolangRuntime implements MolangEnvironment {
     private float thisValue;
     private final Map<String, MolangObject> objects;
     private final Set<String> aliases;
-    private final List<MolangExpression> parameters;
+    private final List<Float> parameters;
 
     private MolangRuntime(MolangObject query, MolangObject global, MolangObject variable, Map<String, MolangObject> libraries) {
         this.thisValue = 0.0F;
@@ -80,7 +81,7 @@ public class MolangRuntime implements MolangEnvironment {
     }
 
     @Override
-    public void loadParameter(MolangExpression expression) {
+    public void loadParameter(float expression) {
         this.parameters.add(expression);
     }
 
@@ -95,20 +96,20 @@ public class MolangRuntime implements MolangEnvironment {
     }
 
     @Override
-    public MolangObject get(String name) throws MolangException {
+    public MolangObject get(String name) throws MolangRuntimeException {
         name = name.toLowerCase(Locale.ROOT);
         if (!this.objects.containsKey(name)) {
-            throw new MolangException("Unknown MoLang object: " + name);
+            throw new MolangRuntimeException("Unknown MoLang object: " + name);
         }
         return this.objects.get(name);
     }
 
     @Override
-    public MolangExpression getParameter(int parameter) {
+    public float getParameter(int parameter) {
         if (parameter >= 0 && parameter < this.parameters.size()) {
             return this.parameters.get(parameter);
         }
-        return MolangExpression.ZERO;
+        return 0;
     }
 
     @Override

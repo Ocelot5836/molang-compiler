@@ -1,6 +1,7 @@
 package io.github.ocelot.molangcompiler.api.object;
 
 import io.github.ocelot.molangcompiler.api.MolangExpression;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 
 /**
  * A {@link MolangObject} that cannot have any values modified.
@@ -17,12 +18,12 @@ public class ImmutableMolangObject implements MolangObject {
     }
 
     @Override
-    public void set(String name, MolangExpression value) {
-        throw new UnsupportedOperationException("Cannot set values on an immutable object");
+    public void set(String name, MolangExpression value) throws MolangRuntimeException {
+        throw new MolangRuntimeException("Cannot set values on an immutable object");
     }
 
     @Override
-    public MolangExpression get(String name) {
+    public MolangExpression get(String name) throws MolangRuntimeException {
         return this.parent.get(name);
     }
 
