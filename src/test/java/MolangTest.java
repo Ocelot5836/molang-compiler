@@ -242,4 +242,15 @@ public class MolangTest {
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(1, test.getValue());
     }
+
+    @Test
+    void testLoop() throws MolangException {
+        MolangCompiler compiler = new MolangCompiler(MolangCompiler.DEFAULT_FLAGS | MolangCompiler.WRITE_CLASSES_FLAG);
+        MolangExpression expression = compiler.compile("loop(10, 14)");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = runtime.resolve(expression);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(0, result);
+    }
 }

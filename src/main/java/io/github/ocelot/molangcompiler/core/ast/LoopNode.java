@@ -19,7 +19,7 @@ public record LoopNode(Node iterations, Node body) implements Node {
 
     @Override
     public String toString() {
-        return "loop(" + this.iterations + ", {" + this.body + "}";
+        return "loop(" + this.iterations + ", {" + this.body + "})";
     }
 
     @Override
@@ -43,11 +43,19 @@ public record LoopNode(Node iterations, Node body) implements Node {
 
         BytecodeCompiler.writeIntConst(method, 0); // int i = 0;
         method.visitLabel(begin);
-        this.body.writeBytecode(method, environment, end, begin);
+
+        MolangBytecodeEnvironment localEnvironment = new MolangBytecodeEnvironment(environment);
+        this.body.writeBytecode(method, localEnvironment, end, begin);
+        if (this.body.hasValue()) { // Must return void
+            method.visitInsn(Opcodes.POP);
+        }
+
         method.visitInsn(Opcodes.ICONST_1);
         method.visitInsn(Opcodes.IADD); // i++
         method.visitInsn(Opcodes.DUP2);
         method.visitJumpInsn(Opcodes.IF_ICMPGT, begin);
         method.visitLabel(end);
+
+        localEnvironment.writeModifiedVariables(method);
     }
 }
