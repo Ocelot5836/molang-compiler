@@ -27,13 +27,24 @@ public class MolangTest {
 //        MolangCompiler.compile("temp.my_temp_var = Math.sin(query.anim_time * 1.23);\n" +
 //                "temp.my_other_temp_var = Math.cos(query.life_time + 2.0);\n" +
 //                "return temp.my_temp_var * temp.my_temp_var + temp.my_other_temp_var;");
-                compiler.compile("math.trunc(math.pi)");
+                compiler.compile("""
+                        math.trunc(math.pi);
+                        v.test = q.anim_time;
+                        v.test/=30;
+                        v.test--;
+                        v.test--;
+                        v.test--;
+                        v.test+=3;
+                        return v.test;
+                        """);
         compileTime.stop();
 
         MolangRuntime runtime = MolangRuntime.runtime()
                 .setQuery("anim_time", 90)
                 .setQuery("life_time", 0)
                 .create();
+
+        System.out.println(expression);
 
         int iterations = 10000;
         long[] times = new long[iterations];
@@ -245,7 +256,7 @@ public class MolangTest {
 
     @Test
     void testLoop() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler(MolangCompiler.DEFAULT_FLAGS | MolangCompiler.WRITE_CLASSES_FLAG);
+        MolangCompiler compiler = new MolangCompiler();
         MolangExpression expression = compiler.compile("""
                 v.test = 0;
                 loop(10, {
@@ -259,5 +270,16 @@ public class MolangTest {
         float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(10, result);
+    }
+
+    @Test
+    void testCompare() throws MolangException {
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("5<5");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = runtime.resolve(expression);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(0.0F, result);
     }
 }
