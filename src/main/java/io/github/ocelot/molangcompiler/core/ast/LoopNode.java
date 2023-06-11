@@ -56,6 +56,7 @@ public record LoopNode(Node iterations, Node body) implements Node {
         method.visitJumpInsn(Opcodes.IF_ICMPGT, begin);
         method.visitLabel(end);
 
+        environment.modifiedVariables().removeAll(localEnvironment.modifiedVariables());
         localEnvironment.writeModifiedVariables(method);
     }
 }

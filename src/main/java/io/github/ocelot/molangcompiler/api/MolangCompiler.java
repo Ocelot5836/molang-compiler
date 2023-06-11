@@ -31,10 +31,18 @@ public class MolangCompiler {
 
     private final BytecodeCompiler compiler;
 
+    /**
+     * Creates a new compiler with the default compilation flags.
+     */
     public MolangCompiler() {
         this(DEFAULT_FLAGS);
     }
 
+    /**
+     * Creates a new compiler with the specified compilation flags.
+     *
+     * @param flags The flags to use
+     */
     public MolangCompiler(int flags) {
         this.compiler = new BytecodeCompiler(flags);
     }

@@ -6,6 +6,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 /**
  * @author Ocelot
@@ -17,30 +18,40 @@ public final class MolangLexer {
         if (tokens.length == 0) {
             throw new MolangSyntaxException("Expected token");
         }
+        return parseTokensUntil(new TokenReader(tokens), true, token -> false);
+    }
 
+    private static Node parseTokensUntil(TokenReader reader, boolean insertReturn, Predicate<MolangTokenizer.Token> filter) throws MolangSyntaxException {
         List<Node> nodes = new ArrayList<>(2);
 
-        TokenReader reader = new TokenReader(tokens);
-        while (reader.canRead()) {
+        while (reader.canRead() && !filter.test(reader.peek())) {
             Node node = parseExpression(reader);
-            if (reader.canRead()) {
-                if (reader.peek().type() != MolangTokenizer.TokenType.SEMICOLON) {
-                    throw error("Trailing statement", reader);
-                }
-                reader.skip();
-            }
             nodes.add(node);
+
+            if (reader.canRead()) {
+                MolangTokenizer.Token token = reader.peek();
+                if (token.type().isTerminating()) {
+                    reader.skip();
+                    continue;
+                }
+                if (filter.test(token)) {
+                    break;
+                }
+                throw error("Trailing statement", reader);
+            }
         }
 
         if (nodes.isEmpty()) {
             throw new MolangSyntaxException("Expected node");
         }
-        Node node = nodes.get(nodes.size() - 1);
-        if (!(node instanceof ReturnNode)) {
-            if (node instanceof OptionalValueNode setNode) {
-                node = setNode.withReturnValue();
+        if (insertReturn) {
+            Node node = nodes.get(nodes.size() - 1);
+            if (!(node instanceof ReturnNode)) {
+                if (node instanceof OptionalValueNode setNode) {
+                    node = setNode.withReturnValue();
+                }
+                nodes.set(nodes.size() - 1, new ReturnNode(node));
             }
-            nodes.set(nodes.size() - 1, new ReturnNode(node));
         }
         if (nodes.size() == 1) {
             return nodes.get(0);
@@ -77,15 +88,16 @@ public final class MolangLexer {
                 expect(reader, MolangTokenizer.TokenType.LEFT_PARENTHESIS);
                 reader.skip();
 
-                Node iterations = parseExpression(reader);
+                Node iterations = parseTokensUntil(reader, false, t -> t.type() == MolangTokenizer.TokenType.COMMA);
                 expect(reader, MolangTokenizer.TokenType.COMMA);
                 reader.skip();
 
-                Node body = parseExpression(reader);
+                Node body = parseTokensUntil(reader, false, t -> t.type() == MolangTokenizer.TokenType.RIGHT_PARENTHESIS);
                 expect(reader, MolangTokenizer.TokenType.RIGHT_PARENTHESIS);
                 reader.skip();
 
-                yield new LoopNode(iterations, body);
+                // Ignore the top level scope since the loop is already a "scope"
+                yield new LoopNode(iterations, body instanceof ScopeNode scopeNode ? scopeNode.node() : body);
             }
             case THIS -> {
                 reader.skip();
@@ -146,10 +158,7 @@ public final class MolangLexer {
             }
             case LEFT_BRACE -> {
                 reader.skip();
-                Node node = parseExpression(reader);
-                if (reader.canRead() && reader.peek().type().isTerminating()) {
-                    reader.skip();
-                }
+                Node node = parseTokensUntil(reader, false, t -> t.type() == MolangTokenizer.TokenType.RIGHT_BRACE);
                 expect(reader, MolangTokenizer.TokenType.RIGHT_BRACE);
                 reader.skip();
                 yield new ScopeNode(node);
