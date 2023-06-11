@@ -16,6 +16,7 @@ public interface MolangObject {
      *
      * @param name The name of the value to get
      * @return The value found
+     * @throws MolangRuntimeException If the value does not exist. Use {@link #has(String)} to make sure the value exists.
      */
     MolangExpression get(String name) throws MolangRuntimeException;
 
@@ -24,6 +25,7 @@ public interface MolangObject {
      *
      * @param name  The name of the value to set
      * @param value The value to set to the name
+     * @throws MolangRuntimeException If the value could not be set for any reason
      */
     void set(String name, MolangExpression value) throws MolangRuntimeException;
 

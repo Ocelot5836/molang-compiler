@@ -11,6 +11,7 @@ import io.github.ocelot.molangcompiler.core.node.MolangVariableNode;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
+@SuppressWarnings("unused") // Methods are referenced in ASM
 public class MolangUtil {
 
     public static float clamp(float value, float min, float max) {

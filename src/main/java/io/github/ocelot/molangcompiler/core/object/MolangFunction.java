@@ -3,9 +3,7 @@ package io.github.ocelot.molangcompiler.core.object;
 import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
-import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
-import io.github.ocelot.molangcompiler.core.MolangJavaFunctionContext;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -39,6 +37,6 @@ public class MolangFunction implements MolangExpression {
                 parameters[i] = environment.getParameter(i);
             }
         }
-        return this.consumer.resolve(new MolangJavaFunctionContext(parameters));
+        return this.consumer.resolve(new MolangJavaFunction.Context(parameters));
     }
 }

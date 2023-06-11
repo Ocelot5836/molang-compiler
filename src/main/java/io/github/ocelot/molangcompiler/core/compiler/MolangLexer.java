@@ -2,12 +2,10 @@ package io.github.ocelot.molangcompiler.core.compiler;
 
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
 import io.github.ocelot.molangcompiler.core.ast.*;
-import io.github.ocelot.molangcompiler.core.util.TokenReader;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * @author Ocelot

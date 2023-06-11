@@ -23,6 +23,9 @@ public record MathNode(MathOperation function, Node... arguments) implements Nod
 
     @Override
     public String toString() {
+        if (this.function.getParameters() == 0) {
+            return this.function.getName();
+        }
         return this.function.getName() + "(" + Arrays.stream(this.arguments).map(Node::toString).collect(Collectors.joining(", ")) + ")";
     }
 

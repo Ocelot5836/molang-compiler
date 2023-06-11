@@ -1,7 +1,6 @@
 package io.github.ocelot.molangcompiler.core.compiler;
 
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
-import io.github.ocelot.molangcompiler.core.util.StringReader;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;

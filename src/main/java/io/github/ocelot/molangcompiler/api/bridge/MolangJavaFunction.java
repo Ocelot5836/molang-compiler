@@ -26,7 +26,7 @@ public interface MolangJavaFunction {
      * @author Ocelot
      * @since 1.0.0
      */
-    interface Context {
+    record Context(float[] parameters) {
 
         /**
          * Resolves the specified parameter.
@@ -35,11 +35,18 @@ public interface MolangJavaFunction {
          * @return The float result of that parameter
          * @throws MolangRuntimeException If the expression could not be resolved
          */
-        float get(int parameter) throws MolangRuntimeException;
+        public float get(int parameter) throws MolangRuntimeException {
+            if (parameter < 0 || parameter >= this.parameters.length) {
+                throw new MolangRuntimeException("Invalid parameter: " + parameter);
+            }
+            return this.parameters[parameter];
+        }
 
         /**
          * @return The number of parameters provided
          */
-        int getParameters();
+        public int getParameters() {
+            return this.parameters.length;
+        }
     }
 }

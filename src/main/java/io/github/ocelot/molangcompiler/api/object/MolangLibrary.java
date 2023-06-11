@@ -43,10 +43,10 @@ public abstract class MolangLibrary implements MolangObject {
     @Override
     public MolangExpression get(String name) throws MolangRuntimeException {
         MolangExpression expression = this.functions.get(name);
-        if (expression == null) {
-            throw new MolangRuntimeException("");
+        if (expression != null) {
+            return expression;
         }
-        return expression;
+        throw new MolangRuntimeException("Unknown MoLang expression: " + name);
     }
 
     @Override

@@ -1,6 +1,5 @@
-package io.github.ocelot.molangcompiler.core.util;
+package io.github.ocelot.molangcompiler.core.compiler;
 
-import io.github.ocelot.molangcompiler.core.compiler.MolangTokenizer;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
