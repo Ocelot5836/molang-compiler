@@ -26,6 +26,11 @@ public record NegateNode(Node value) implements Node {
     }
 
     @Override
+    public boolean hasValue() {
+        return true;
+    }
+
+    @Override
     public float evaluate(MolangBytecodeEnvironment environment) throws MolangException {
         return this.value.evaluate(environment) == 0.0F ? 1.0F : 0.0F;
     }

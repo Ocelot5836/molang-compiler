@@ -29,6 +29,9 @@ public interface MolangExpression {
     @ApiStatus.OverrideOnly
     float get(MolangEnvironment environment) throws MolangRuntimeException;
 
+    @Override
+    String toString();
+
     /**
      * Resolves the float value of this expression.
      *

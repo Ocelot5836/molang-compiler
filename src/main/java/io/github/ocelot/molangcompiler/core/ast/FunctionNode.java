@@ -32,6 +32,11 @@ public record FunctionNode(String object, String function, Node... arguments) im
     }
 
     @Override
+    public boolean hasValue() {
+        return true;
+    }
+
+    @Override
     public void writeBytecode(MethodNode method, MolangBytecodeEnvironment environment, @Nullable Label breakLabel, @Nullable Label continueLabel) throws MolangException {
         int objectIndex = environment.getObjectIndex(method, this.object);
 

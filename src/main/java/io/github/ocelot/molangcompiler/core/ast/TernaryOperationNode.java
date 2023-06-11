@@ -28,6 +28,11 @@ public record TernaryOperationNode(Node value, Node left, Node right) implements
     }
 
     @Override
+    public boolean hasValue() {
+        return this.left.hasValue() && this.right.hasValue();
+    }
+
+    @Override
     public float evaluate(MolangBytecodeEnvironment environment) throws MolangException {
         return this.value.evaluate(environment) != 0.0F ? this.left.evaluate(environment) : this.right.evaluate(environment);
     }
@@ -40,8 +45,16 @@ public record TernaryOperationNode(Node value, Node left, Node right) implements
         if (environment.optimize() && this.value.isConstant()) {
             if (this.value.evaluate(environment) != 0.0F) {
                 this.left.writeBytecode(method, environment, breakLabel, continueLabel);
+                if (this.left.hasValue() && !this.hasValue()) {
+                    // Discard return value if both branches don't return a value
+                    method.visitInsn(Opcodes.POP);
+                }
             } else {
                 this.right.writeBytecode(method, environment, breakLabel, continueLabel);
+                if (this.right.hasValue() && !this.hasValue()) {
+                    // Discard return value if both branches don't return a value
+                    method.visitInsn(Opcodes.POP);
+                }
             }
             return;
         }
@@ -55,11 +68,19 @@ public record TernaryOperationNode(Node value, Node left, Node right) implements
 
         //[left]
         this.left.writeBytecode(method, environment, breakLabel, continueLabel);
+        if (this.left.hasValue() && !this.hasValue()) {
+            // Discard return value if both branches don't return a value
+            method.visitInsn(Opcodes.POP);
+        }
         method.visitJumpInsn(Opcodes.GOTO, label_end);
 
         //: [right]
         method.visitLabel(label_right);
         this.right.writeBytecode(method, environment, breakLabel, continueLabel);
+        if (this.right.hasValue() && !this.hasValue()) {
+            // Discard return value if both branches don't return a value
+            method.visitInsn(Opcodes.POP);
+        }
 
         method.visitLabel(label_end);
     }

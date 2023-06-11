@@ -1,7 +1,6 @@
 package io.github.ocelot.molangcompiler.core.compiler;
 
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
-import io.github.ocelot.molangcompiler.core.util.SimpleMolangExceptionType;
 import io.github.ocelot.molangcompiler.core.util.StringReader;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -10,6 +9,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * @author Ocelot
+ */
 @ApiStatus.Internal
 public final class MolangTokenizer {
 
@@ -52,23 +54,30 @@ public final class MolangTokenizer {
         NUMERAL("-?\\d+"),
         ALPHANUMERIC("[A-Za-z_][A-Za-z0-9_]*"),
         NULL_COALESCING("\\?\\?"),
-        SPECIAL("[-+*/<>&|!?:]+"),
+        INCREMENT("\\+\\+"),
+        DECREMENT("\\-\\-"),
+        SPECIAL("[<>&|!?:]+"),
+        BINARY_OPERATION("[-+*/]"),
         LEFT_PARENTHESIS("\\("),
         RIGHT_PARENTHESIS("\\)"),
-//        LEFT_BRACKET("\\["),
-//        RIGHT_BRACKET("\\]"),
         LEFT_BRACE("\\{"),
         RIGHT_BRACE("\\}"),
         DOT("\\."),
         COMMA("\\,"),
         EQUAL("="),
-        SEMICOLON(";");
-//        ARROW("->");
+        SEMICOLON(";"),
+        RETURN("return"),
+        LOOP("loop"),
+        THIS("this");
 
         private final Pattern pattern;
 
         TokenType(String regex) {
             this.pattern = Pattern.compile(regex);
+        }
+
+        public boolean isTerminating() {
+            return this == SEMICOLON;
         }
     }
 }

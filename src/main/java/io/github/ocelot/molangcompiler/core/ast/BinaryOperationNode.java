@@ -30,6 +30,11 @@ public record BinaryOperationNode(BinaryOperation operator, Node left, Node righ
     }
 
     @Override
+    public boolean hasValue() {
+        return true;
+    }
+
+    @Override
     public float evaluate(MolangBytecodeEnvironment environment) throws MolangException {
         float left = this.left.evaluate(environment);
         float right = this.right.evaluate(environment);

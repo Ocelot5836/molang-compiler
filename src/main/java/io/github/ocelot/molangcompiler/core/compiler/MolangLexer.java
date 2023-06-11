@@ -3,11 +3,16 @@ package io.github.ocelot.molangcompiler.core.compiler;
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
 import io.github.ocelot.molangcompiler.core.ast.*;
 import io.github.ocelot.molangcompiler.core.util.TokenReader;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MolangLexer {
+/**
+ * @author Ocelot
+ */
+@ApiStatus.Internal
+public final class MolangLexer {
 
     public static Node parseTokens(MolangTokenizer.Token[] tokens) throws MolangSyntaxException {
         if (tokens.length == 0) {
@@ -20,7 +25,10 @@ public class MolangLexer {
         while (reader.canRead()) {
             Node node = parseExpression(reader);
             if (reader.canRead()) {
-                expect(reader, MolangTokenizer.TokenType.SEMICOLON);
+                if (reader.peek().type() != MolangTokenizer.TokenType.SEMICOLON) {
+                    throw error("Trailing statement", reader);
+                }
+                reader.skip();
             }
             nodes.add(node);
         }
@@ -28,54 +36,59 @@ public class MolangLexer {
         if (nodes.isEmpty()) {
             throw new MolangSyntaxException("Expected node");
         }
-        return nodes.size() == 1 ? nodes.get(0) : new CompoundNode(nodes.toArray(Node[]::new));
+        Node node = nodes.get(nodes.size() - 1);
+        if (!(node instanceof ReturnNode)) {
+            if (node instanceof OptionalValueNode setNode) {
+                node = setNode.withReturnValue();
+            }
+            nodes.set(nodes.size() - 1, new ReturnNode(node));
+        }
+        return new CompoundNode(nodes.toArray(Node[]::new));
     }
 
-    private static Node parseExpression(TokenReader reader) throws MolangSyntaxException {
-        if (!reader.canRead()) {
-            throw error("Expected token", reader);
-        }
+    // Parses a single token statement. Eg temp.a=4 or variable.test from variable.test * 2;
+    private static Node parseNode(TokenReader reader) throws MolangSyntaxException {
+        expectLength(reader, 1);
 
         MolangTokenizer.Token token = reader.peek();
-        switch (token.type()) {
+        return switch (token.type()) {
             case NUMERAL -> {
+                try {
+                    // 3
+                    float value = Integer.parseInt(token.value());
+                    reader.skip();
+
+                    // 3.14
+                    if (reader.canRead() && reader.peek().type() == MolangTokenizer.TokenType.DOT) {
+                        reader.skip();
+                        expect(reader, MolangTokenizer.TokenType.NUMERAL);
+                        int decimal = Integer.parseInt(reader.peek().value());
+                        reader.skip();
+
+                        if (decimal > 0) {
+                            value += 1.0F / decimal;
+                        }
+                    }
+
+                    yield new ConstNode(value);
+                } catch (Exception e) {
+                    throw new MolangSyntaxException("Error parsing numeral", e);
+                }
             }
-            case ALPHANUMERIC -> {
-                reader.skip();
-                return parseAlphanumeric(token, reader);
-            }
+            case ALPHANUMERIC -> parseAlphanumeric(reader);
             case SPECIAL -> {
                 switch (token.value()) {
                     case "-" -> {
-
+                        expect(reader, MolangTokenizer.TokenType.NUMERAL);
+                        reader.skip();
+                        yield new BinaryOperationNode(BinaryOperation.MULTIPLY, new ConstNode(-1.0F), parseNode(reader));
                     }
                     case "+" -> {
-
+                        expect(reader, MolangTokenizer.TokenType.NUMERAL);
+                        reader.skip();
+                        yield parseNode(reader);
                     }
-                    case "*" -> {
-
-                    }
-                    case "/" -> {
-
-                    }
-                    case "<" -> {
-
-                    }
-                    case ">" -> {
-
-                    }
-                    case "&" -> {
-
-                    }
-                    case "|" -> {
-
-                    }
-                    case "!" -> {
-
-                    }
-                    case "?" -> {
-
-                    }
+                    default -> throw error("Expected +num or -num", reader);
                 }
             }
             case LEFT_PARENTHESIS -> {
@@ -83,82 +96,264 @@ public class MolangLexer {
                 Node node = parseExpression(reader);
                 expect(reader, MolangTokenizer.TokenType.RIGHT_PARENTHESIS);
                 reader.skip();
-                return node;
+                yield node;
             }
             case LEFT_BRACE -> {
                 reader.skip();
                 Node node = parseExpression(reader);
                 expect(reader, MolangTokenizer.TokenType.RIGHT_BRACE);
                 reader.skip();
-                return new ScopeNode(node);
+                yield new ScopeNode(node);
+            }
+            case RETURN -> {
+                reader.skip();
+
+                Node value = parseExpression(reader);
+                // Skip ;
+                if (reader.canRead() && reader.peek().type().isTerminating()) {
+                    reader.skip();
+                }
+                // Expect end
+                if (reader.canRead()) {
+                    throw error("Trailing statement", reader);
+                }
+                if (value instanceof OptionalValueNode setNode) {
+                    value = setNode.withReturnValue();
+                }
+                yield new ReturnNode(value);
+            }
+            case LOOP -> {
+                reader.skip();
+                expect(reader, MolangTokenizer.TokenType.LEFT_PARENTHESIS);
+                reader.skip();
+
+                Node iterations = parseExpression(reader);
+                expect(reader, MolangTokenizer.TokenType.COMMA);
+                reader.skip();
+
+                Node body = parseExpression(reader);
+                expect(reader, MolangTokenizer.TokenType.RIGHT_PARENTHESIS);
+                reader.skip();
+
+                yield new LoopNode(iterations, body);
+            }
+            case THIS -> {
+                reader.skip();
+                yield new ThisNode();
+            }
+            default -> throw error("Unexpected token", reader);
+        };
+    }
+
+    // Parses a full expression by parsing each node inside
+    private static Node parseExpression(TokenReader reader) throws MolangSyntaxException {
+        Node result = parseNode(reader);
+        while (reader.canRead()) {
+            MolangTokenizer.Token token = reader.peek();
+            if (token.type() == MolangTokenizer.TokenType.SEMICOLON) {
+                return result;
+            }
+
+            if (result instanceof OptionalValueNode setNode) {
+                result = setNode.withReturnValue();
+            }
+
+            switch (token.type()) {
+                case NUMERAL, ALPHANUMERIC, NULL_COALESCING, INCREMENT, DECREMENT, LEFT_PARENTHESIS, LEFT_BRACE -> {
+                    if (result != null) {
+                        throw error("Unexpected token", reader);
+                    }
+                    result = parseNode(reader);
+                }
+                case SPECIAL -> {
+                    switch (token.value()) {
+                        // obj.name&&...
+                        case "&" -> {
+                            expect(reader, MolangTokenizer.TokenType.SPECIAL, "&");
+                            reader.skip();
+                            result = new BinaryOperationNode(BinaryOperation.AND, result, parseNode(reader));
+                        }
+                        // obj.name||...
+                        case "|" -> {
+                            expect(reader, MolangTokenizer.TokenType.SPECIAL, "|");
+                            reader.skip();
+                            result = new BinaryOperationNode(BinaryOperation.OR, result, parseNode(reader));
+                        }
+                        // obj.name??... or obj.name?b...
+                        case "?" -> {
+                            MolangTokenizer.Token secondOperand = reader.peek();
+                            reader.skip();
+
+                            // ??
+                            if (secondOperand.type() == MolangTokenizer.TokenType.SPECIAL && "?".equals(secondOperand.value())) {
+                                result = new BinaryOperationNode(BinaryOperation.NULL_COALESCING, result, parseExpression(reader));
+                                break;
+                            }
+
+                            // value ? left : right
+                            Node left = parseExpression(reader);
+                            if (reader.canRead() && !reader.peek().type().isTerminating()) {
+                                expect(reader, MolangTokenizer.TokenType.SPECIAL, ":");
+                                reader.skip();
+                                result = new TernaryOperationNode(result, left, parseExpression(reader));
+                                break;
+                            }
+
+                            // value ? left
+                            result = new BinaryConditionalNode(result, left);
+                        }
+                        case "!" -> {
+                            reader.skip();
+
+                            if (reader.peek().type() == MolangTokenizer.TokenType.EQUAL) {
+                                reader.skip();
+                                result = new BinaryOperationNode(BinaryOperation.NOT_EQUALS, result, parseNode(reader));
+                                break;
+                            }
+
+                            if (result != null) {
+                                throw error("Unexpected token", reader);
+                            }
+                            result = new NegateNode(parseNode(reader));
+                        }
+                        case ">" -> {
+                            reader.skip();
+
+                            if (!reader.canRead() || reader.peek().type().isTerminating()) {
+                                result = new BinaryOperationNode(BinaryOperation.GREATER, result, parseNode(reader));
+                                break;
+                            }
+
+                            if (reader.peek().type() == MolangTokenizer.TokenType.EQUAL) {
+                                reader.skip();
+                                result = new BinaryOperationNode(BinaryOperation.GREATER_EQUALS, result, parseNode(reader));
+                                break;
+                            }
+
+                            throw error("Unexpected token", reader);
+                        }
+                        case "<" -> {
+                            reader.skip();
+
+                            if (!reader.canRead() || reader.peek().type().isTerminating()) {
+                                result = new BinaryOperationNode(BinaryOperation.LESS, result, parseNode(reader));
+                                break;
+                            }
+
+                            if (reader.peek().type() == MolangTokenizer.TokenType.EQUAL) {
+                                reader.skip();
+                                result = new BinaryOperationNode(BinaryOperation.LESS_EQUALS, result, parseNode(reader));
+                                break;
+                            }
+
+                            throw error("Unexpected token", reader);
+                        }
+                        default -> throw error("Unexpected token", reader);
+                    }
+                }
+                case BINARY_OPERATION -> {
+                    switch (token.value()) {
+                        case "-" -> {
+                            reader.skip();
+                            result = new BinaryOperationNode(BinaryOperation.SUBTRACT, result, parseNode(reader));
+                        }
+                        case "+" -> {
+                            reader.skip();
+                            result = new BinaryOperationNode(BinaryOperation.ADD, result, parseNode(reader));
+                        }
+                        case "*" -> {
+                            reader.skip();
+                            result = new BinaryOperationNode(BinaryOperation.MULTIPLY, result, parseNode(reader));
+                        }
+                        case "/" -> {
+                            reader.skip();
+                            result = new BinaryOperationNode(BinaryOperation.DIVIDE, result, parseNode(reader));
+                        }
+                        default -> throw error("Unexpected token", reader);
+                    }
+                }
+                default -> throw error("Unexpected token", reader);
             }
         }
 
-        throw error("", reader);
+        return result;
     }
 
-    private static Node parseAlphanumeric(MolangTokenizer.Token word, TokenReader reader) throws MolangSyntaxException {
+    private static Node parseAlphanumeric(TokenReader reader) throws MolangSyntaxException {
         expectLength(reader, 2);
 
-        String object = word.value();
-
+        // object.name
+        String object = reader.peek().value();
+        reader.skip();
         expect(reader, MolangTokenizer.TokenType.DOT);
         reader.skip();
-
         expect(reader, MolangTokenizer.TokenType.ALPHANUMERIC);
         String name = reader.peek().value();
         reader.skip();
 
         MathOperation mathOperation = parseMathOperation(object, name, reader);
-        if (!reader.canRead()) {
+        if (mathOperation != null && mathOperation.getParameters() == 0) {
+            return new MathNode(mathOperation);
+        }
+
+        // obj.name
+        if (!reader.canRead() || reader.peek().type().isTerminating()) {
             if (mathOperation != null) {
-                if (mathOperation.getParameters() == 0) {
-                    return new MathNode(mathOperation);
-                }
                 throw error("Cannot get value of a math function", reader);
             }
             return new VariableGetNode(object, name);
         }
 
         MolangTokenizer.Token operand = reader.peek();
-        reader.skip();
 
-        if (mathOperation == null) {
-            // obj.name=...
-            if (operand.type() == MolangTokenizer.TokenType.EQUAL) {
-                return new VariableSetNode(object, name, parseExpression(reader));
+        // obj.name=...
+        if (operand.type() == MolangTokenizer.TokenType.EQUAL) {
+            // obj.name==...
+            if (reader.canRead() && reader.peekAfter(1).type() == MolangTokenizer.TokenType.EQUAL) {
+                // == will be handled by the next step
+                return new VariableGetNode(object, name);
             }
-            // obj.name*...
-            if (operand.type() == MolangTokenizer.TokenType.SPECIAL) {
-                boolean assign = reader.canRead() && reader.peek().type() == MolangTokenizer.TokenType.EQUAL;
-                if (assign) {
-                    reader.skip();
-                }
 
-                VariableGetNode left = new VariableGetNode(object, name);
-                Node operation = switch (operand.value()) {
-                    case "-" -> parseBinaryOperation(reader, left, BinaryOperation.SUBTRACT, assign);
-                    case "+" -> parseBinaryOperation(reader, left, BinaryOperation.ADD, assign);
-                    case "*" -> parseBinaryOperation(reader, left, BinaryOperation.MULTIPLY, assign);
-                    case "/" -> parseBinaryOperation(reader, left, BinaryOperation.DIVIDE, assign);
-                    default -> null;
+            if (mathOperation != null) {
+                throw error("Cannot set value of a math function", reader);
+            }
+            reader.skip();
+            return new VariableSetNode(object, name, parseExpression(reader));
+        }
+        // obj.name++
+        if (operand.type() == MolangTokenizer.TokenType.INCREMENT) {
+            return new VariableSetNode(object, name, new BinaryOperationNode(BinaryOperation.ADD, new VariableGetNode(object, name), new ConstNode(1.0F)));
+        }
+        // obj.name--
+        if (operand.type() == MolangTokenizer.TokenType.DECREMENT) {
+            return new VariableSetNode(object, name, new BinaryOperationNode(BinaryOperation.SUBTRACT, new VariableGetNode(object, name), new ConstNode(1.0F)));
+        }
+        // obj.name*=, obj.name+=, obj.name--, ...
+        if (reader.canRead(2) && operand.type() == MolangTokenizer.TokenType.BINARY_OPERATION) {
+            if (mathOperation != null) {
+                throw error("Cannot set value of a math function", reader);
+            }
+
+            VariableGetNode left = new VariableGetNode(object, name);
+            MolangTokenizer.Token secondOperand = reader.peekAfter(1);
+
+            // +=, -=, *=, /=
+            if (secondOperand.type() == MolangTokenizer.TokenType.EQUAL) {
+                reader.skip(2);
+                return switch (operand.value()) {
+                    case "-" -> new BinaryOperationNode(BinaryOperation.SUBTRACT, left, parseExpression(reader));
+                    case "+" -> new BinaryOperationNode(BinaryOperation.ADD, left, parseExpression(reader));
+                    case "*" -> new BinaryOperationNode(BinaryOperation.MULTIPLY, left, parseExpression(reader));
+                    case "/" -> new BinaryOperationNode(BinaryOperation.DIVIDE, left, parseExpression(reader));
+                    default -> throw error("Unexpected token", reader);
                 };
-
-                // *=, +=, etc
-                if (operation != null) {
-                    return assign ? new VariableSetNode(object, name, operation) : operation;
-                }
-
-                if (!assign) {
-                    return parseSpecial(reader, left, operand);
-                }
             }
+
+            throw error("Unexpected token", reader);
         }
         // obj.func(..
         if (operand.type() == MolangTokenizer.TokenType.LEFT_PARENTHESIS) {
-            if (mathOperation != null && mathOperation.getParameters() == 0) {
-                throw error("Unexpected token", reader);
-            }
+            reader.skip();
 
             // obj.func()
             if (reader.peek().type() == MolangTokenizer.TokenType.RIGHT_PARENTHESIS) {
@@ -189,57 +384,10 @@ public class MolangLexer {
 
                 return new FunctionNode(object, name, parameters.toArray(Node[]::new));
             }
+            expectLength(reader, 1);
         }
 
-        throw error("Unexpected token", reader);
-    }
-
-    // Parses left &&..., left ??..., left ? right, left ? right : else
-    private static Node parseSpecial(TokenReader reader, Node value, MolangTokenizer.Token operand) throws MolangSyntaxException {
-        switch (operand.value()) {
-            // obj.name&&...
-            case "&" -> {
-                expect(reader, MolangTokenizer.TokenType.SPECIAL, "&");
-                reader.skip();
-                return new BinaryOperationNode(BinaryOperation.AND, value, parseExpression(reader));
-            }
-            // obj.name??... or obj.name?b...
-            case "?" -> {
-                MolangTokenizer.Token token = reader.peek();
-                reader.skip();
-
-                // ??
-                if (token.type() == MolangTokenizer.TokenType.SPECIAL && "?".equals(token.value())) {
-                    return new BinaryOperationNode(BinaryOperation.NULL_COALESCING, value, parseExpression(reader));
-                }
-
-                Node left = parseExpression(reader);
-                if (reader.canRead()) {
-                    expect(reader, MolangTokenizer.TokenType.SPECIAL, ":");
-                    reader.skip();
-                    return new TernaryOperationNode(value, left, parseExpression(reader));
-                }
-
-                return new BinaryConditionalNode(value, left);
-            }
-        }
-
-        throw error("Unexpected token", reader);
-    }
-
-    private static Node parseBinaryOperation(TokenReader reader, VariableGetNode left, BinaryOperation operation, boolean assign) throws MolangSyntaxException {
-        if (!assign && reader.canRead()) {
-            MolangTokenizer.Token token = reader.peek();
-
-            // ++, --, etc
-            if (token.type() == MolangTokenizer.TokenType.SPECIAL) {
-                expect(reader, MolangTokenizer.TokenType.SPECIAL, operation.getValue());
-                reader.skip();
-                return new VariableSetNode(left.object(), left.name(), new BinaryOperationNode(operation, left, new ConstNode(1.0F)));
-            }
-        }
-
-        return new BinaryOperationNode(operation, left, parseExpression(reader));
+        return new VariableGetNode(object, name);
     }
 
     private static MathOperation parseMathOperation(String object, String name, TokenReader reader) throws MolangSyntaxException {
@@ -275,6 +423,6 @@ public class MolangLexer {
     }
 
     private static MolangSyntaxException error(String error, TokenReader reader) {
-        return new MolangSyntaxException(error, reader.getString(), reader.getCursorOffset());
+        return new MolangSyntaxException(error, reader.getString(), reader.getCursorOffset() + 1);
     }
 }

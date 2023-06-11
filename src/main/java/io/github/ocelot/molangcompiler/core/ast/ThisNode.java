@@ -24,6 +24,11 @@ public record ThisNode() implements Node {
     }
 
     @Override
+    public boolean hasValue() {
+        return true;
+    }
+
+    @Override
     public void writeBytecode(MethodNode method, MolangBytecodeEnvironment environment, @Nullable Label breakLabel, @Nullable Label continueLabel) throws MolangException {
         Integer index = environment.variables().get("this");
         if (index == null) {

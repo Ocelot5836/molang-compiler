@@ -1,7 +1,9 @@
 package io.github.ocelot.molangcompiler.api;
 
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
+import io.github.ocelot.molangcompiler.core.ast.Node;
 import io.github.ocelot.molangcompiler.core.compiler.BytecodeCompiler;
+import io.github.ocelot.molangcompiler.core.compiler.MolangLexer;
 import io.github.ocelot.molangcompiler.core.compiler.MolangTokenizer;
 
 /**
@@ -37,7 +39,7 @@ public class MolangCompiler {
      */
     public MolangExpression compile(String input) throws MolangSyntaxException {
         MolangTokenizer.Token[] tokens = MolangTokenizer.createTokens(input);
-        // TODO lexer
-        return this.compiler.build(null);
+        Node node = MolangLexer.parseTokens(tokens);
+        return this.compiler.build(node);
     }
 }

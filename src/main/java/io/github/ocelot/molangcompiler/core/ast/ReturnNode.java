@@ -27,6 +27,11 @@ public record ReturnNode(Node value) implements Node {
     }
 
     @Override
+    public boolean hasValue() {
+        return false;
+    }
+
+    @Override
     public float evaluate(MolangBytecodeEnvironment environment) throws MolangException {
         return this.value.evaluate(environment);
     }
@@ -37,6 +42,9 @@ public record ReturnNode(Node value) implements Node {
             BytecodeCompiler.writeFloatConst(method, this.evaluate(environment));
         } else {
             this.value.writeBytecode(method, environment, breakLabel, continueLabel);
+            if (!this.value.hasValue()) {
+                method.visitInsn(Opcodes.FCONST_0);
+            }
         }
         environment.writeModifiedVariables(method);
         method.visitInsn(Opcodes.FRETURN);

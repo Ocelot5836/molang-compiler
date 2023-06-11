@@ -17,6 +17,11 @@ public interface Node {
     boolean isConstant();
 
     /**
+     * @return Whether this node pushes a value onto the stack that can be returned
+     */
+    boolean hasValue();
+
+    /**
      * Attempts to statically evaluate this expression. This will fail if {@link #isConstant()} is <code>false</code>.
      *
      * @return The static float value of this node

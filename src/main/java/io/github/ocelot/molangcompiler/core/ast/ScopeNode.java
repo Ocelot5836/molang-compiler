@@ -25,6 +25,11 @@ public record ScopeNode(Node node) implements Node {
     }
 
     @Override
+    public boolean hasValue() {
+        return this.node.hasValue();
+    }
+
+    @Override
     public float evaluate(MolangBytecodeEnvironment environment) throws MolangException {
         return this.node.evaluate(environment);
     }

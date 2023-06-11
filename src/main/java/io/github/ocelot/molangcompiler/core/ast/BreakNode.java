@@ -21,6 +21,11 @@ public record BreakNode() implements Node {
     }
 
     @Override
+    public boolean hasValue() {
+        return false;
+    }
+
+    @Override
     public void writeBytecode(MethodNode method, MolangBytecodeEnvironment environment, @Nullable Label breakLabel, @Nullable Label continueLabel) throws MolangException {
         if (breakLabel == null) {
             throw new MolangSyntaxException("Cannot break outside of loop");

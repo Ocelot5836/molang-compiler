@@ -27,6 +27,11 @@ public record VariableGetNode(String object, String name) implements Node {
     }
 
     @Override
+    public boolean hasValue() {
+        return true;
+    }
+
+    @Override
     public void writeBytecode(MethodNode method, MolangBytecodeEnvironment environment, @Nullable Label breakLabel, @Nullable Label continueLabel) throws MolangException {
         int index = environment.loadVariable(method, this.object, this.name);
         method.visitVarInsn(Opcodes.FLOAD, index);

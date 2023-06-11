@@ -29,6 +29,11 @@ public record CompoundNode(Node... nodes) implements Node {
     }
 
     @Override
+    public boolean hasValue() {
+        return this.nodes.length > 0 && this.nodes[this.nodes.length - 1].hasValue();
+    }
+
+    @Override
     public float evaluate(MolangBytecodeEnvironment environment) throws MolangException {
         return this.nodes[0].evaluate(environment);
     }

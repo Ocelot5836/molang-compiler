@@ -27,6 +27,11 @@ public record BinaryConditionalNode(Node value, Node branch) implements Node {
     }
 
     @Override
+    public boolean hasValue() {
+        return false;
+    }
+
+    @Override
     public float evaluate(MolangBytecodeEnvironment environment) throws MolangException {
         return this.value.evaluate(environment) != 0.0F ? this.branch.evaluate(environment) : 0.0F;
     }

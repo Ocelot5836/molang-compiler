@@ -41,6 +41,11 @@ public record MathNode(MathOperation function, Node... arguments) implements Nod
     }
 
     @Override
+    public boolean hasValue() {
+        return true;
+    }
+
+    @Override
     public float evaluate(MolangBytecodeEnvironment environment) throws MolangException {
         float[] values = new float[this.arguments.length];
         for (int i = 0; i < values.length; i++) {

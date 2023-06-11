@@ -7,7 +7,6 @@ import org.jetbrains.annotations.ApiStatus;
 public class TokenReader extends StringReader {
 
     private final MolangTokenizer.Token[] tokens;
-    private int cursor;
 
     public TokenReader(MolangTokenizer.Token[] tokens) {
         super("");
@@ -30,14 +29,18 @@ public class TokenReader extends StringReader {
 
     public int getCursorOffset() {
         int offset = 0;
-        for (int i = 0; i < this.cursor; i++) {
+        for (int i = 0; i <= this.cursor; i++) {
             offset += this.tokens[i].value().length();
         }
         return offset;
     }
 
-    public MolangTokenizer.Token peekBefore(int i) {
-        return this.tokens[i - 1];
+    public MolangTokenizer.Token peekBefore(int amount) {
+        return this.tokens[amount - 1];
+    }
+
+    public MolangTokenizer.Token peekAfter(int amount) {
+        return this.tokens[amount - 1];
     }
 
     public MolangTokenizer.Token peek() {

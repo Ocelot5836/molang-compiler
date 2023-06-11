@@ -26,6 +26,11 @@ public record ConstNode(float value) implements Node {
     }
 
     @Override
+    public boolean hasValue() {
+        return true;
+    }
+
+    @Override
     public float evaluate(MolangBytecodeEnvironment environment) throws MolangException {
         return this.value;
     }

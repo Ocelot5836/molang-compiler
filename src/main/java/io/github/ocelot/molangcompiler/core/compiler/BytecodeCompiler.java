@@ -1,6 +1,8 @@
 package io.github.ocelot.molangcompiler.core.compiler;
 
+import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
+import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
 import io.github.ocelot.molangcompiler.core.ast.Node;
 import org.jetbrains.annotations.ApiStatus;
@@ -31,11 +33,9 @@ public class BytecodeCompiler extends ClassLoader {
     private static final boolean DEBUG_WRITE_CLASSES = false;
 
     private final MolangBytecodeEnvironment environment;
-    private final AtomicInteger compileId;
 
     public BytecodeCompiler(int flags) {
         this.environment = new MolangBytecodeEnvironment(flags);
-        this.compileId = new AtomicInteger();
     }
 
     public MolangExpression build(Node node) throws MolangSyntaxException {
@@ -49,7 +49,7 @@ public class BytecodeCompiler extends ClassLoader {
             ClassNode classNode = new ClassNode(Opcodes.ASM5);
             classNode.version = Opcodes.V1_8;
             classNode.superName = "java/lang/Object";
-            classNode.name = "Expression_" + this.compileId.getAndIncrement();
+            classNode.name = "Expression_" + System.nanoTime();
             classNode.access = Opcodes.ACC_PUBLIC;
             classNode.interfaces.add("io/github/ocelot/molangcompiler/api/MolangExpression");
 
@@ -57,7 +57,6 @@ public class BytecodeCompiler extends ClassLoader {
             init.access = Opcodes.ACC_PUBLIC;
             init.name = "<init>";
             init.desc = "()V";
-            init.exceptions = new ArrayList<>();
             init.visitVarInsn(Opcodes.ALOAD, 0);
             init.visitMethodInsn(Opcodes.INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
             init.visitInsn(Opcodes.RETURN);
@@ -68,11 +67,17 @@ public class BytecodeCompiler extends ClassLoader {
             method.name = "get";
             method.desc = "(Lio/github/ocelot/molangcompiler/api/MolangEnvironment;)F";
             method.exceptions = List.of("io/github/ocelot/molangcompiler/api/exception/MolangRuntimeException");
-
-            // Populate method
             node.writeBytecode(method, this.environment, null, null);
-
             classNode.methods.add(method);
+
+            MethodNode toString = new MethodNode();
+            toString.access = Opcodes.ACC_PUBLIC;
+            toString.name = "toString";
+            toString.desc = "()Ljava/lang/String;";
+            toString.visitLdcInsn(node.toString());
+            toString.visitInsn(Opcodes.ARETURN);
+            toString.visitInsn(Opcodes.RETURN);
+            classNode.methods.add(toString);
 
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
             classNode.accept(cw);
@@ -145,4 +150,17 @@ public class BytecodeCompiler extends ClassLoader {
 //            e.printStackTrace();
 //        }
 //    }
+
+    private static class Test implements MolangExpression {
+
+        @Override
+        public float get(MolangEnvironment environment) throws MolangRuntimeException {
+            return 0;
+        }
+
+        @Override
+        public String toString() {
+            return "test";
+        }
+    }
 }
