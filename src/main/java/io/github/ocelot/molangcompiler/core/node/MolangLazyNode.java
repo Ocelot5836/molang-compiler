@@ -14,14 +14,18 @@ import java.util.function.Supplier;
 public class MolangLazyNode implements MolangExpression {
 
     private final Supplier<Float> value;
-    private Float result = null;
 
     public MolangLazyNode(Supplier<Float> value) {
-        this.value = () -> {
-            if (this.result == null) {
-                this.result = value.get();
+        this.value = new Supplier<>() {
+            private Float result = null;
+
+            @Override
+            public Float get() {
+                if (this.result == null) {
+                    this.result = value.get();
+                }
+                return this.result;
             }
-            return this.result;
         };
     }
 

@@ -1,12 +1,8 @@
 package io.github.ocelot.molangcompiler.api;
 
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
-import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
-import io.github.ocelot.molangcompiler.core.node.MolangConstantNode;
-import io.github.ocelot.molangcompiler.core.node.MolangDynamicNode;
-import io.github.ocelot.molangcompiler.core.node.MolangLazyNode;
-import io.github.ocelot.molangcompiler.core.node.MolangStaticNode;
+import io.github.ocelot.molangcompiler.core.node.*;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.BooleanSupplier;
@@ -39,7 +35,9 @@ public interface MolangExpression {
      * @param environment The environment to execute in
      * @return The resulting value
      * @throws MolangRuntimeException If any error occurs when resolving the value
+     * @deprecated Use {@link MolangEnvironment#resolve(MolangExpression)}
      */
+    @Deprecated
     default float resolve(MolangEnvironment environment) throws MolangRuntimeException {
         return environment.resolve(this);
     }
@@ -49,7 +47,9 @@ public interface MolangExpression {
      *
      * @param environment The environment to execute in
      * @return The resulting value
+     * @deprecated Use {@link MolangEnvironment#safeResolve(MolangExpression)}
      */
+    @Deprecated
     default float safeResolve(MolangEnvironment environment) {
         return environment.safeResolve(this);
     }
@@ -122,6 +122,23 @@ public interface MolangExpression {
      * @since 2.0.0
      */
     static MolangExpression of(MolangVariable value) {
-        return new MolangStaticNode(value);
+        return new MolangVariableNode(value);
+    }
+
+    /**
+     * Creates a {@link MolangExpression} that runs all expressions in order.
+     *
+     * @param expressions The expressions to represent as an expression
+     * @return A new expression with that value
+     * @since 3.0.0
+     */
+    static MolangExpression compound(MolangExpression... expressions) {
+        if (expressions.length == 0) {
+            return MolangExpression.ZERO;
+        }
+        if (expressions.length == 1) {
+            return expressions[0];
+        }
+        return new MolangCompoundNode(expressions);
     }
 }

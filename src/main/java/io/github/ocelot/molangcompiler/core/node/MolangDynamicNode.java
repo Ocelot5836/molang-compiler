@@ -10,14 +10,8 @@ import java.util.function.Supplier;
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangDynamicNode implements MolangExpression {
-
-    private final Supplier<Float> value;
-
-    public MolangDynamicNode(Supplier<Float> value) {
-        this.value = value;
-    }
-
+public record MolangDynamicNode(Supplier<Float> value) implements MolangExpression {
+    
     @Override
     public float get(MolangEnvironment environment) {
         return this.value.get();
@@ -27,6 +21,4 @@ public class MolangDynamicNode implements MolangExpression {
     public String toString() {
         return Float.toString(this.value.get());
     }
-
-    // No equals or hashcode because every dynamic node is considered "unique"
 }

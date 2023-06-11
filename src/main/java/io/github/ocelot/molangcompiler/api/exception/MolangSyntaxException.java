@@ -5,6 +5,7 @@ package io.github.ocelot.molangcompiler.api.exception;
 
 import org.jetbrains.annotations.Nullable;
 
+
 /**
  * Thrown when any exception occurs when parsing a MoLang expression.
  *
@@ -32,6 +33,10 @@ public class MolangSyntaxException extends MolangException {
         this.message = message;
         this.input = null;
         this.cursor = -1;
+    }
+
+    public MolangSyntaxException(String message, String input) {
+        this(message, input, input.length());
     }
 
     public MolangSyntaxException(String message, String input, int cursor) {

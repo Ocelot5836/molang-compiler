@@ -12,59 +12,37 @@ import org.jetbrains.annotations.ApiStatus;
 public class StringReader {
 
     private final String string;
-    private int cursor;
+    protected int cursor;
 
     public StringReader(String string) {
         this.string = string;
     }
 
     public String getString() {
-        return string;
-    }
-
-    public void setCursor(final int cursor) {
-        this.cursor = cursor;
+        return this.string;
     }
 
     public int getCursor() {
-        return cursor;
+        return this.cursor;
     }
 
-    public String getRead() {
-        return this.string.substring(0, this.cursor);
+    public void setCursor(int cursor) {
+        this.cursor = cursor;
     }
 
-    public String getRemaining() {
-        return this.string.substring(this.cursor);
-    }
-
-    public boolean canRead(final int length) {
+    public boolean canRead(int length) {
         return this.cursor + length <= this.string.length();
     }
 
     public boolean canRead() {
-        return canRead(1);
-    }
-
-    public char peekBefore(int i) {
-        return this.string.charAt(this.cursor - i);
-    }
-
-    public char peek() {
-        return this.string.charAt(this.cursor);
-    }
-
-    public void skip() {
-        this.cursor++;
+        return this.canRead(1);
     }
 
     public void skip(int amount) {
         this.cursor += amount;
     }
 
-    public void skipWhitespace() {
-        while (this.canRead() && Character.isWhitespace(this.peek())) {
-            this.skip();
-        }
+    public void skip() {
+        this.cursor++;
     }
 }

@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 public final class MolangTokenizer {
 
     private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s");
-    private static final SimpleMolangExceptionType UNKNOWN_TOKEN = new SimpleMolangExceptionType("Unknown Token");
 
     public static Token[] createTokens(String input) throws MolangSyntaxException {
         StringReader reader = new StringReader(WHITESPACE_PATTERN.matcher(input).replaceAll(""));
@@ -27,7 +26,7 @@ public final class MolangTokenizer {
                 continue;
             }
 
-            throw UNKNOWN_TOKEN.createWithContext(reader);
+            throw new MolangSyntaxException("Unknown Token", reader.getString(), reader.getCursor());
         }
 
         return tokens.toArray(Token[]::new);
@@ -49,22 +48,22 @@ public final class MolangTokenizer {
     public record Token(TokenType type, String value) {
     }
 
-    private enum TokenType {
+    public enum TokenType {
         NUMERAL("-?\\d+"),
         ALPHANUMERIC("[A-Za-z_][A-Za-z0-9_]*"),
-        SPECIAL("[-+*/<>&|!@#$%?:]+"),
+        NULL_COALESCING("\\?\\?"),
+        SPECIAL("[-+*/<>&|!?:]+"),
         LEFT_PARENTHESIS("\\("),
         RIGHT_PARENTHESIS("\\)"),
-        LEFT_BRACKET("\\["),
-        RIGHT_BRACKET("\\]"),
+//        LEFT_BRACKET("\\["),
+//        RIGHT_BRACKET("\\]"),
         LEFT_BRACE("\\{"),
         RIGHT_BRACE("\\}"),
         DOT("\\."),
         COMMA("\\,"),
         EQUAL("="),
-        SEMICOLON(";"),
-        ARROW("-->"),
-        COLON(":");
+        SEMICOLON(";");
+//        ARROW("->");
 
         private final Pattern pattern;
 

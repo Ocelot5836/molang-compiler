@@ -15,7 +15,7 @@ import org.objectweb.asm.tree.MethodNode;
  * @param right The value to use when false
  * @author Buddy
  */
-public record TernaryOperation(Node value, Node left, Node right) implements Node {
+public record TernaryOperationNode(Node value, Node left, Node right) implements Node {
 
     @Override
     public String toString() {

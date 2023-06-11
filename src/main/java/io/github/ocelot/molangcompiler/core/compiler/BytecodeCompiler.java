@@ -1,9 +1,8 @@
 package io.github.ocelot.molangcompiler.core.compiler;
 
 import io.github.ocelot.molangcompiler.api.MolangExpression;
-import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
-import io.github.ocelot.molangcompiler.core.ast.*;
+import io.github.ocelot.molangcompiler.core.ast.Node;
 import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -39,7 +38,7 @@ public class BytecodeCompiler extends ClassLoader {
         this.compileId = new AtomicInteger();
     }
 
-    public MolangExpression build(Node node) throws MolangException {
+    public MolangExpression build(Node node) throws MolangSyntaxException {
         this.environment.reset();
         try {
             if (this.environment.optimize() && node.isConstant()) {
@@ -79,7 +78,7 @@ public class BytecodeCompiler extends ClassLoader {
             classNode.accept(cw);
             byte[] data = cw.toByteArray();
 
-            if(DEBUG_WRITE_CLASSES) {
+            if (DEBUG_WRITE_CLASSES) {
                 Path path = Paths.get(classNode.name + ".class");
                 if (!Files.exists(path)) {
                     Files.createFile(path);

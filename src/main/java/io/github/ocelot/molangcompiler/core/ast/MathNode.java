@@ -106,6 +106,12 @@ public record MathNode(MathOperation function, Node... arguments) implements Nod
                 method.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Math", this.function.getName(), "(DD)D", false);
                 method.visitInsn(Opcodes.D2F);
             }
+            // Single-argument Float->Int
+            case ROUND -> {
+                this.arguments[0].writeBytecode(method, env, breakLabel, continueLabel);
+                method.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Math", this.function.getName(), "(F)I", false);
+                method.visitInsn(Opcodes.I2F);
+            }
             // Operations
             case MOD -> {
                 this.arguments[0].writeBytecode(method, env, breakLabel, continueLabel);

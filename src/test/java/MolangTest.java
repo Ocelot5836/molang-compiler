@@ -11,6 +11,7 @@ public class MolangTest {
 
     @Test
     void testSpeed() throws MolangException {
+        MolangCompiler compiler = new MolangCompiler();
         Stopwatch compileTime = Stopwatch.createStarted();
         MolangExpression expression =
 //                MolangCompiler.compile("2");
@@ -21,7 +22,7 @@ public class MolangTest {
 //        MolangCompiler.compile("temp.my_temp_var = Math.sin(query.anim_time * 1.23);\n" +
 //                "temp.my_other_temp_var = Math.cos(query.life_time + 2.0);\n" +
 //                "return temp.my_temp_var * temp.my_temp_var + temp.my_other_temp_var;");
-                MolangCompiler.compile("math.trunc(math.pi)");
+                compiler.compile("math.trunc(math.pi)");
         compileTime.stop();
 
         MolangRuntime runtime = MolangRuntime.runtime()
@@ -29,7 +30,7 @@ public class MolangTest {
                 .setQuery("life_time", 0)
                 .create();
         Stopwatch runTime = Stopwatch.createStarted();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         runTime.stop();
 
         System.out.println("Took " + compileTime + " to compile, " + runTime + " to execute");
@@ -39,17 +40,19 @@ public class MolangTest {
 
     @Test
     void testSimplify() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("math.pi*2+(3/2+53)*((7)/5)");
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("math.pi*2+(3/2+53)*((7)/5)");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(82.58318328857422, result);
     }
 
     @Test
     void testScopes() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("""
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("""
                         temp.a = 4;
                         temp.b = 4;
                         {
@@ -60,14 +63,15 @@ public class MolangTest {
                 """);
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(20, result);
     }
 
     @Test
     void testReturnScopes() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("""
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("""
                         temp.a = 4;
                         temp.b = 2;
                         temp.c = {
@@ -79,17 +83,18 @@ public class MolangTest {
                 """);
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(8, result);
     }
 
     @Test
     void testRandom() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("math.die_roll(1, 0, 1)");
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("math.die_roll(1, 0, 1)");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
     }
 
@@ -97,27 +102,29 @@ public class MolangTest {
 
     @Test
     void testGetVariable() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("""
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("""
                 t.a = 14;
                 return v.test + t.a;
                 """);
 
         MolangRuntime runtime = MolangRuntime.runtime()
                 .setVariable("test", this.testVariable).create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(21, result);
     }
 
     @Test
     void testSetVariable() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("""
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("""
                 v.test = 2;
                 """);
 
         MolangRuntime runtime = MolangRuntime.runtime()
                 .setVariable("test", this.testVariable).create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(2, result);
         Assertions.assertEquals(2, this.testVariable.getValue());
@@ -125,49 +132,54 @@ public class MolangTest {
 
     @Test
     void testMultiple() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("v.b = 2;v.a = 3;v.ab = v.b;v.c = 1;");
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("v.b = 2;v.a = 3;v.ab = v.b;v.c = 1;");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
     }
 
     @Test
     void testCondition() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("1 > 2 ? 10 : 20", 0);
+        MolangCompiler compiler = new MolangCompiler(0);
+        MolangExpression expression = compiler.compile("1 > 2 ? 10 : 20");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(20, result);
     }
 
     @Test
     void testComplexCondition() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("math.clamp(0.5 + variable.particle_random_4/7 + (variable.particle_random_3>0.2 ? 0.4 : 0), 0, 1)");
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("math.clamp(0.5 + variable.particle_random_4/7 + (variable.particle_random_3>0.2 ? 0.4 : 0), 0, 1)");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(0.5, result);
     }
 
     @Test
     void testNegativeCondition() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("+variable.particle_random_3>0.2 ? -10 : -4");
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("+variable.particle_random_3>0.2 ? -10 : -4");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(-4, result);
     }
 
     @Test
     void testWeird() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("((((-7))*((((((((variable.particle_random_3>(0.2) * (((4))) ? (-10) : -4))))))))))");
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("((((-7))*((((((((variable.particle_random_3>(0.2) * (((4))) ? (-10) : -4))))))))))");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(28, result);
     }
@@ -185,22 +197,24 @@ public class MolangTest {
 
     @Test
     void testContainer() throws MolangException {
-        MolangExpression expression = MolangCompiler.compile("v.screen_aspect_ratio > v.aspect_ratio ? q.screen.width : q.screen.height * v.aspect_ratio");
+        MolangCompiler compiler = new MolangCompiler();
+        MolangExpression expression = compiler.compile("v.screen_aspect_ratio > v.aspect_ratio ? q.screen.width : q.screen.height * v.aspect_ratio");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
     }
 
     @Test
     void testImmutable() throws MolangException {
+        MolangCompiler compiler = new MolangCompiler();
         MolangVariable test = MolangVariable.create(1);
         MolangVariable testImmutable = test.immutable();
 
-        MolangExpression expression = MolangCompiler.compile("v.test=2");
+        MolangExpression expression = compiler.compile("v.test=2");
 
         MolangRuntime runtime = MolangRuntime.runtime().setVariable("test", testImmutable).create();
-        float result = expression.resolve(runtime);
+        float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(1, test.getValue());
     }

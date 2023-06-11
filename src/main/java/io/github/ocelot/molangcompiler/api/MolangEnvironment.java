@@ -1,6 +1,5 @@
 package io.github.ocelot.molangcompiler.api;
 
-import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
 
@@ -34,6 +33,7 @@ public interface MolangEnvironment {
      * Loads a parameter into the next parameter slot.
      *
      * @param value The value to use as a parameter
+     * @throws MolangRuntimeException If there is an issue loading the parameter
      * @since 3.0.0
      */
     void loadParameter(float value) throws MolangRuntimeException;
@@ -41,12 +41,12 @@ public interface MolangEnvironment {
     /**
      * Clears all stored parameters.
      */
-    void clearParameters() throws MolangRuntimeException;
+    void clearParameters();
 
     /**
      * @return The value of <code>this</code> in MoLang
      */
-    float getThis() throws MolangRuntimeException;
+    float getThis();
 
     /**
      * Retrieves a {@link MolangObject} by the specified domain name.
@@ -61,7 +61,8 @@ public interface MolangEnvironment {
      * Retrieves an expression by the specified parameter index.
      *
      * @param parameter The parameter to fetch
-     * @return The parameter value or <code>0</code> if there is no parameter with that index
+     * @return The parameter value
+     * @throws MolangRuntimeException If the parameter does not exist
      */
     float getParameter(int parameter) throws MolangRuntimeException;
 
@@ -113,8 +114,8 @@ public interface MolangEnvironment {
     default float safeResolve(MolangExpression expression) {
         try {
             return this.resolve(expression);
-        } catch (MolangException e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            t.printStackTrace();
             return 0.0F;
         }
     }

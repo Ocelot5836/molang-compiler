@@ -3,13 +3,10 @@ package io.github.ocelot.molangcompiler.api;
 import io.github.ocelot.molangcompiler.api.bridge.MolangJavaFunction;
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
 import io.github.ocelot.molangcompiler.api.bridge.MolangVariableProvider;
-import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.api.object.ImmutableMolangObject;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import io.github.ocelot.molangcompiler.core.object.MolangFunction;
-import io.github.ocelot.molangcompiler.core.object.MolangMath;
-import io.github.ocelot.molangcompiler.core.object.MolangVariableStack;
 import io.github.ocelot.molangcompiler.core.object.MolangVariableStorage;
 
 import java.util.*;
@@ -32,17 +29,13 @@ public class MolangRuntime implements MolangEnvironment {
         this.thisValue = 0.0F;
         this.objects = new HashMap<>();
         this.aliases = new HashSet<>();
-        MolangObject temp = new MolangVariableStack(false);
         this.objects.putAll(libraries);
         this.objects.put("context", query); // This is static accesses
         this.objects.put("query", query); // This is static accesses
-        this.objects.put("math", new MolangMath()); // The MoLang math "library"
         this.objects.put("global", global); // This is parameter access
-        this.objects.put("temp", temp); // This is specifically for expression variables
         this.objects.put("variable", variable); // This can be accessed by Java code
         this.loadAlias("c", query); // Alias
         this.loadAlias("q", query); // Alias
-        this.loadAlias("t", temp); // Alias
         this.loadAlias("v", variable); // Alias
         this.parameters = new ArrayList<>(8);
     }
@@ -356,21 +349,21 @@ public class MolangRuntime implements MolangEnvironment {
          * @return The query variable object
          */
         public MolangObject getQuery() {
-            return query;
+            return this.query;
         }
 
         /**
          * @return The global variable object
          */
         public MolangObject getGlobal() {
-            return global;
+            return this.global;
         }
 
         /**
          * @return The variable object
          */
         public MolangObject getVariable() {
-            return variable;
+            return this.variable;
         }
     }
 }

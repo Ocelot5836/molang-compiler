@@ -2,30 +2,21 @@ package io.github.ocelot.molangcompiler.core.node;
 
 import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
-import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import org.jetbrains.annotations.ApiStatus;
-
-import java.util.Arrays;
 
 /**
  * @author Ocelot
  */
 @ApiStatus.Internal
-public class MolangCompoundNode implements MolangExpression {
-
-    private final MolangExpression[] expressions;
-
-    public MolangCompoundNode(MolangExpression... expressions) {
-        this.expressions = expressions;
-    }
+public record MolangCompoundNode(MolangExpression... expressions) implements MolangExpression {
 
     @Override
     public float get(MolangEnvironment environment) throws MolangRuntimeException {
         for (int i = 0; i < this.expressions.length; i++) {
-            float result = this.expressions[i].resolve(environment);
-            if (i >= this.expressions.length - 1) // The last expression is expected to have the `return`
-            {
+            float result = environment.resolve(this.expressions[i]);
+            // The last expression is expected to have the `return`
+            if (i >= this.expressions.length - 1) {
                 return result;
             }
         }
@@ -46,22 +37,5 @@ public class MolangCompoundNode implements MolangExpression {
             }
         }
         return builder.toString();
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        MolangCompoundNode that = (MolangCompoundNode) o;
-        return Arrays.equals(this.expressions, that.expressions);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(this.expressions);
     }
 }
