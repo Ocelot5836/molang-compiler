@@ -18,12 +18,21 @@ public class MolangCompiler {
     /**
      * Whether to reduce math to constant values if possible. E.g. <code>4 * 4 + 2</code> would become <code>18</code>. This should almost always be on.
      */
-    public static final int OPTIMIZE_FLAG = 0b1;
+    public static final int OPTIMIZE_FLAG = 0b01;
+    /**
+     * Whether to write the java bytecode to a class file. This is only for debugging.
+     */
+    public static final int WRITE_CLASSES_FLAG = 0b10;
+
+    /**
+     * All default compilation flags. This may change in future versions as more options are added.
+     */
+    public static final int DEFAULT_FLAGS = OPTIMIZE_FLAG;
 
     private final BytecodeCompiler compiler;
 
     public MolangCompiler() {
-        this(OPTIMIZE_FLAG);
+        this(DEFAULT_FLAGS);
     }
 
     public MolangCompiler(int flags) {

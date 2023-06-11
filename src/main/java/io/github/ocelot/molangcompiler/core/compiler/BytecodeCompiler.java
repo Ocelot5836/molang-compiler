@@ -1,5 +1,6 @@
 package io.github.ocelot.molangcompiler.core.compiler;
 
+import io.github.ocelot.molangcompiler.api.MolangCompiler;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
 import io.github.ocelot.molangcompiler.core.ast.Node;
@@ -26,12 +27,12 @@ public class BytecodeCompiler extends ClassLoader {
     public static final int RUNTIME_INDEX = 1;
     public static final int VARIABLE_START = 2;
 
-    private static final boolean DEBUG_WRITE_CLASSES = false;
-
     private final MolangBytecodeEnvironment environment;
+    private final boolean writeClasses;
 
     public BytecodeCompiler(int flags) {
         this.environment = new MolangBytecodeEnvironment(flags);
+        this.writeClasses = (flags & MolangCompiler.WRITE_CLASSES_FLAG) > 0;
     }
 
     public MolangExpression build(Node node) throws MolangSyntaxException {
@@ -78,7 +79,7 @@ public class BytecodeCompiler extends ClassLoader {
             classNode.accept(cw);
             byte[] data = cw.toByteArray();
 
-            if (DEBUG_WRITE_CLASSES) {
+            if (this.writeClasses) {
                 Path path = Paths.get(classNode.name + ".class");
                 if (!Files.exists(path)) {
                     Files.createFile(path);
