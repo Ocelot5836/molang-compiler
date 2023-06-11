@@ -7,6 +7,7 @@ import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.api.object.MolangObject;
 import io.github.ocelot.molangcompiler.core.node.MolangConstantNode;
+import io.github.ocelot.molangcompiler.core.node.MolangVariableNode;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
@@ -73,6 +74,11 @@ public class MolangUtil {
 
     public static void setValue(MolangEnvironment environment, String object, String name, float value) throws MolangRuntimeException {
         MolangObject obj = environment.get(object);
+        if (!obj.has(name)) {
+            obj.set(name, new MolangVariableNode(MolangVariable.create(value)));
+            return;
+        }
+
         MolangExpression old = obj.get(name);
         if (old instanceof MolangVariable variable) {
             variable.setValue(value);

@@ -91,10 +91,11 @@ public class MolangRuntime implements MolangEnvironment {
     @Override
     public MolangObject get(String name) throws MolangRuntimeException {
         name = name.toLowerCase(Locale.ROOT);
-        if (!this.objects.containsKey(name)) {
-            throw new MolangRuntimeException("Unknown MoLang object: " + name);
+        MolangObject object = this.objects.get(name);
+        if (object != null) {
+            return object;
         }
-        return this.objects.get(name);
+        throw new MolangRuntimeException("Unknown MoLang object: " + name);
     }
 
     @Override

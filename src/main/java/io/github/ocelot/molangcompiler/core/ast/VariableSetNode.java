@@ -16,7 +16,10 @@ import org.objectweb.asm.tree.MethodNode;
  * @param returnValue Whether to return the new value of the variable
  * @author Ocelot
  */
-public record VariableSetNode(String object, String name, Node value, boolean returnValue) implements OptionalValueNode {
+public record VariableSetNode(String object,
+                              String name,
+                              Node value,
+                              boolean returnValue) implements OptionalValueNode {
 
     public VariableSetNode(String object, String name, Node value) {
         this(object, name, value, false);
@@ -24,7 +27,7 @@ public record VariableSetNode(String object, String name, Node value, boolean re
 
     @Override
     public String toString() {
-        return "variable." + this.name + " = " + this.value;
+        return this.object + "." + this.name + " = " + this.value;
     }
 
     @Override
@@ -39,7 +42,7 @@ public record VariableSetNode(String object, String name, Node value, boolean re
 
     @Override
     public void writeBytecode(MethodNode method, MolangBytecodeEnvironment environment, @Nullable Label breakLabel, @Nullable Label continueLabel) throws MolangException {
-        int index = environment.loadVariable(method, this.object, this.name);
+        int index = environment.allocateVariable(this.object + "." + this.name);
         this.value.writeBytecode(method, environment, breakLabel, continueLabel);
         method.visitVarInsn(Opcodes.FSTORE, index);
         if (this.returnValue) {

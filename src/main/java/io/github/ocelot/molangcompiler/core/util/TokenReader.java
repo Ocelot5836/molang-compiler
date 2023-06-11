@@ -29,18 +29,14 @@ public class TokenReader extends StringReader {
 
     public int getCursorOffset() {
         int offset = 0;
-        for (int i = 0; i <= this.cursor; i++) {
+        for (int i = 0; i <= Math.min(this.cursor, this.tokens.length - 1); i++) {
             offset += this.tokens[i].value().length();
         }
         return offset;
     }
 
-    public MolangTokenizer.Token peekBefore(int amount) {
-        return this.tokens[amount - 1];
-    }
-
     public MolangTokenizer.Token peekAfter(int amount) {
-        return this.tokens[amount - 1];
+        return this.tokens[this.cursor + amount];
     }
 
     public MolangTokenizer.Token peek() {

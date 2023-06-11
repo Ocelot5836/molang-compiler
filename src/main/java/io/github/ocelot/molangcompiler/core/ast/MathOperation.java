@@ -12,7 +12,7 @@ public enum MathOperation {
     ATAN(1),
     ATAN2(2),
     CEIL(1),
-    CLAMP(33),
+    CLAMP(3),
     COS(1),
     SIN(1),
     DIE_ROLL(3, false),

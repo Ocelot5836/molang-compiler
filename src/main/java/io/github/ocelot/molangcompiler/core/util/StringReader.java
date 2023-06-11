@@ -45,4 +45,10 @@ public class StringReader {
     public void skip() {
         this.cursor++;
     }
+
+    public void skipWhitespace() {
+        while (this.canRead() && Character.isWhitespace(this.string.charAt(this.cursor))) {
+            this.skip();
+        }
+    }
 }

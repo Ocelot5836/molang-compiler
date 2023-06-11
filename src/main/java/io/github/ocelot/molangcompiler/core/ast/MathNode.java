@@ -148,9 +148,13 @@ public record MathNode(MathOperation function, Node... arguments) implements Nod
                 method.visitInsn(Opcodes.F2I);
                 this.arguments[1].writeBytecode(method, env, breakLabel, continueLabel);
                 method.visitInsn(Opcodes.F2I);
+                method.visitInsn(Opcodes.I2F);
                 this.arguments[2].writeBytecode(method, env, breakLabel, continueLabel);
                 method.visitInsn(Opcodes.F2I);
-                method.visitMethodInsn(Opcodes.INVOKESTATIC, "io/github/ocelot/molangcompiler/core/MolangUtil", "dieRoll", "(III)F", false);
+                method.visitInsn(Opcodes.I2F);
+                method.visitMethodInsn(Opcodes.INVOKESTATIC, "io/github/ocelot/molangcompiler/core/MolangUtil", "dieRoll", "(IFF)F", false);
+                method.visitInsn(Opcodes.F2I);
+                method.visitInsn(Opcodes.I2F);
             }
             case HERMITE_BLEND -> {
                 this.arguments[0].writeBytecode(method, env, breakLabel, continueLabel);

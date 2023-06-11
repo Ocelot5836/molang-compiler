@@ -59,9 +59,6 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
             return index;
         }
 
-        // Calculate variable offset
-        index = this.allocateVariable(key);
-
         // Get variable
         int objectIndex = this.getObjectIndex(method, object);
         method.visitVarInsn(Opcodes.ALOAD, objectIndex);
@@ -85,6 +82,7 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
         );
 
         // Store result
+        index = this.allocateVariable(key);
         method.visitVarInsn(Opcodes.FSTORE, index);
         return index;
     }
@@ -150,6 +148,11 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
      * @param name   The name of the variable to test for
      */
     public void loadObjectHas(MethodNode method, String object, String name) {
+        if ("temp".equals(object)) {
+            method.visitLdcInsn(this.variables.containsKey("temp." + name));
+            return;
+        }
+
         int objectIndex = this.getObjectIndex(method, object);
         method.visitVarInsn(Opcodes.ALOAD, objectIndex);
         method.visitLdcInsn(name);
@@ -169,6 +172,10 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
      * @param name   The name of the variable to mark dirty
      */
     public void markDirty(String object, String name) {
+        // Don't try to save temporary variables
+        if ("temp".equals(object)) {
+            return;
+        }
         this.modifiedVariables.add(object + "." + name);
     }
 

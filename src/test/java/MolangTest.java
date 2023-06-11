@@ -7,11 +7,16 @@ import io.github.ocelot.molangcompiler.api.exception.MolangException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
 public class MolangTest {
 
     @Test
     void testSpeed() throws MolangException {
         MolangCompiler compiler = new MolangCompiler();
+        compiler.compile("0"); // load
+
         Stopwatch compileTime = Stopwatch.createStarted();
         MolangExpression expression =
 //                MolangCompiler.compile("2");
@@ -29,13 +34,19 @@ public class MolangTest {
                 .setQuery("anim_time", 90)
                 .setQuery("life_time", 0)
                 .create();
-        Stopwatch runTime = Stopwatch.createStarted();
-        float result = runtime.resolve(expression);
-        runTime.stop();
 
-        System.out.println("Took " + compileTime + " to compile, " + runTime + " to execute");
-        System.out.println(expression + "\n==RESULT==\n" + result);
-        Assertions.assertEquals(3, result);
+        int iterations = 10000;
+        long[] times = new long[iterations];
+        for (int i = 0; i < iterations; i++) {
+            Stopwatch runTime = Stopwatch.createStarted();
+            float result = runtime.resolve(expression);
+            runTime.stop();
+
+            Assertions.assertEquals(3, result);
+            times[i] = runTime.elapsed(TimeUnit.NANOSECONDS);
+        }
+
+        System.out.println("Took " + compileTime + " to compile, " + Arrays.stream(times).average().orElse(0) + "ns to execute " + iterations + " times");
     }
 
     @Test
@@ -91,7 +102,7 @@ public class MolangTest {
     @Test
     void testRandom() throws MolangException {
         MolangCompiler compiler = new MolangCompiler();
-        MolangExpression expression = compiler.compile("math.die_roll(1, 0, 1)");
+        MolangExpression expression = compiler.compile("math.die_roll(1, 0, 10)");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
         float result = runtime.resolve(expression);
@@ -156,7 +167,12 @@ public class MolangTest {
         MolangCompiler compiler = new MolangCompiler();
         MolangExpression expression = compiler.compile("math.clamp(0.5 + variable.particle_random_4/7 + (variable.particle_random_3>0.2 ? 0.4 : 0), 0, 1)");
 
-        MolangRuntime runtime = MolangRuntime.runtime().create();
+        MolangRuntime runtime = MolangRuntime.runtime()
+                .setVariable("particle_random_1", MolangExpression.ZERO)
+                .setVariable("particle_random_2", MolangExpression.ZERO)
+                .setVariable("particle_random_3", MolangExpression.ZERO)
+                .setVariable("particle_random_4", MolangExpression.ZERO)
+                .create();
         float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(0.5, result);
@@ -165,7 +181,7 @@ public class MolangTest {
     @Test
     void testNegativeCondition() throws MolangException {
         MolangCompiler compiler = new MolangCompiler();
-        MolangExpression expression = compiler.compile("+variable.particle_random_3>0.2 ? -10 : -4");
+        MolangExpression expression = compiler.compile("+variable.particle_random_3??0>0.2 ? -10 : -4");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
         float result = runtime.resolve(expression);
@@ -178,7 +194,9 @@ public class MolangTest {
         MolangCompiler compiler = new MolangCompiler();
         MolangExpression expression = compiler.compile("((((-7))*((((((((variable.particle_random_3>(0.2) * (((4))) ? (-10) : -4))))))))))");
 
-        MolangRuntime runtime = MolangRuntime.runtime().create();
+        MolangRuntime runtime = MolangRuntime.runtime()
+                .setVariable("particle_random_3", MolangExpression.ZERO)
+                .create();
         float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(28, result);
@@ -200,9 +218,15 @@ public class MolangTest {
         MolangCompiler compiler = new MolangCompiler();
         MolangExpression expression = compiler.compile("v.screen_aspect_ratio > v.aspect_ratio ? q.screen.width : q.screen.height * v.aspect_ratio");
 
-        MolangRuntime runtime = MolangRuntime.runtime().create();
+        MolangRuntime runtime = MolangRuntime.runtime()
+                .setVariable("screen_aspect_ratio", MolangExpression.of(7))
+                .setVariable("aspect_ratio", MolangExpression.of(2))
+                .setQuery("screen.width", MolangExpression.of(12))
+                .setQuery("screen.height", MolangExpression.of(12))
+                .create();
         float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(12, result);
     }
 
     @Test

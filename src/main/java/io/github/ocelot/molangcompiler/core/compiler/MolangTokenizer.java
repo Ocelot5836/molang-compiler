@@ -6,6 +6,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,15 +16,23 @@ import java.util.regex.Pattern;
 @ApiStatus.Internal
 public final class MolangTokenizer {
 
-    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("\\s");
+    private static final Pattern WHITESPACE_PATTERN = Pattern.compile("[\n\t]");
 
     public static Token[] createTokens(String input) throws MolangSyntaxException {
         StringReader reader = new StringReader(WHITESPACE_PATTERN.matcher(input).replaceAll(""));
         List<Token> tokens = new ArrayList<>();
 
         while (reader.canRead()) {
+            reader.skipWhitespace();
             Token token = getToken(reader);
             if (token != null) {
+                if (!tokens.isEmpty()) {
+                    Token lastToken = tokens.get(tokens.size() - 1);
+                    // Insert semicolon after scopes
+                    if (lastToken.type == TokenType.RIGHT_BRACE && token.type != TokenType.SEMICOLON) {
+                        tokens.add(new Token(TokenType.SEMICOLON, ";"));
+                    }
+                }
                 tokens.add(token);
                 continue;
             }
@@ -48,9 +57,20 @@ public final class MolangTokenizer {
     }
 
     public record Token(TokenType type, String value) {
+        public String lowercaseValue() {
+            return this.value.toLowerCase(Locale.ROOT);
+        }
+
+        @Override
+        public String toString() {
+            return this.type + "[" + this.value + "]";
+        }
     }
 
     public enum TokenType {
+        RETURN("return"),
+        LOOP("loop"),
+        THIS("this"),
         NUMERAL("-?\\d+"),
         ALPHANUMERIC("[A-Za-z_][A-Za-z0-9_]*"),
         NULL_COALESCING("\\?\\?"),
@@ -65,10 +85,7 @@ public final class MolangTokenizer {
         DOT("\\."),
         COMMA("\\,"),
         EQUAL("="),
-        SEMICOLON(";"),
-        RETURN("return"),
-        LOOP("loop"),
-        THIS("this");
+        SEMICOLON(";");
 
         private final Pattern pattern;
 
@@ -76,8 +93,20 @@ public final class MolangTokenizer {
             this.pattern = Pattern.compile(regex);
         }
 
+        public boolean validVariableName() {
+            return this == NUMERAL || this == ALPHANUMERIC || this == DOT;
+        }
+
+        public boolean canNegate() {
+            return this == NUMERAL || this == ALPHANUMERIC || this == THIS;
+        }
+
         public boolean isTerminating() {
             return this == SEMICOLON;
+        }
+
+        public boolean isOutOfScope() {
+            return this == RIGHT_PARENTHESIS || this == RIGHT_BRACE || this == COMMA;
         }
     }
 }

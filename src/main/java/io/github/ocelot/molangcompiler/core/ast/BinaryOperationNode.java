@@ -21,7 +21,7 @@ public record BinaryOperationNode(BinaryOperation operator, Node left, Node righ
 
     @Override
     public String toString() {
-        return "(" + this.left + ") " + this.operator + " (" + this.right + ")";
+        return "(" + this.left + " " + this.operator + " " + this.right + ")";
     }
 
     @Override
@@ -163,10 +163,10 @@ public record BinaryOperationNode(BinaryOperation operator, Node left, Node righ
                     case SUBTRACT -> method.visitInsn(Opcodes.FSUB);
                     case EQUALS -> writeComparision(method, Opcodes.IFEQ);
                     case NOT_EQUALS -> writeComparision(method, Opcodes.IFNE);
-                    case LESS_EQUALS -> writeComparision(method, Opcodes.IFLE);
-                    case LESS -> writeComparision(method, Opcodes.IFLT);
-                    case GREATER_EQUALS -> writeComparision(method, Opcodes.IFGE);
-                    case GREATER -> writeComparision(method, Opcodes.IFGT);
+                    case LESS_EQUALS -> writeComparision(method, Opcodes.IFGT);
+                    case LESS -> writeComparision(method, Opcodes.IFGE);
+                    case GREATER_EQUALS -> writeComparision(method, Opcodes.IFLT);
+                    case GREATER -> writeComparision(method, Opcodes.IFLE);
                 }
             }
         }
@@ -200,11 +200,11 @@ public record BinaryOperationNode(BinaryOperation operator, Node left, Node righ
         }
     }
 
-    private static void writeComparision(MethodNode method, int op) {
+    private static void writeComparision(MethodNode method, int success) {
         Label label_false = new Label();
         Label label_end = new Label();
         method.visitInsn(Opcodes.FCMPL);
-        method.visitJumpInsn(op, label_false);
+        method.visitJumpInsn(success, label_false);
         method.visitInsn(Opcodes.FCONST_1);
         method.visitJumpInsn(Opcodes.GOTO, label_end);
         method.visitLabel(label_false);

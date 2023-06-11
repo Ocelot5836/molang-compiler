@@ -1,8 +1,6 @@
 package io.github.ocelot.molangcompiler.core.compiler;
 
-import io.github.ocelot.molangcompiler.api.MolangEnvironment;
 import io.github.ocelot.molangcompiler.api.MolangExpression;
-import io.github.ocelot.molangcompiler.api.exception.MolangRuntimeException;
 import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
 import io.github.ocelot.molangcompiler.core.ast.Node;
 import org.jetbrains.annotations.ApiStatus;
@@ -14,9 +12,7 @@ import org.objectweb.asm.tree.MethodNode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Buddy, Ocelot
@@ -42,8 +38,7 @@ public class BytecodeCompiler extends ClassLoader {
         this.environment.reset();
         try {
             if (this.environment.optimize() && node.isConstant()) {
-                float value = node.evaluate(this.environment);
-                return unused -> value;
+                return MolangExpression.of(node.evaluate(this.environment));
             }
 
             ClassNode classNode = new ClassNode(Opcodes.ASM5);
@@ -150,17 +145,4 @@ public class BytecodeCompiler extends ClassLoader {
 //            e.printStackTrace();
 //        }
 //    }
-
-    private static class Test implements MolangExpression {
-
-        @Override
-        public float get(MolangEnvironment environment) throws MolangRuntimeException {
-            return 0;
-        }
-
-        @Override
-        public String toString() {
-            return "test";
-        }
-    }
 }

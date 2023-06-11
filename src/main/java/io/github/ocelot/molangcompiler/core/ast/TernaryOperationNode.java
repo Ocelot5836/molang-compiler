@@ -46,13 +46,11 @@ public record TernaryOperationNode(Node value, Node left, Node right) implements
             if (this.value.evaluate(environment) != 0.0F) {
                 this.left.writeBytecode(method, environment, breakLabel, continueLabel);
                 if (this.left.hasValue() && !this.hasValue()) {
-                    // Discard return value if both branches don't return a value
                     method.visitInsn(Opcodes.POP);
                 }
             } else {
                 this.right.writeBytecode(method, environment, breakLabel, continueLabel);
                 if (this.right.hasValue() && !this.hasValue()) {
-                    // Discard return value if both branches don't return a value
                     method.visitInsn(Opcodes.POP);
                 }
             }
@@ -66,20 +64,26 @@ public record TernaryOperationNode(Node value, Node left, Node right) implements
         //value ?
         method.visitJumpInsn(Opcodes.IFEQ, label_right);
 
-        //[left]
-        this.left.writeBytecode(method, environment, breakLabel, continueLabel);
-        if (this.left.hasValue() && !this.hasValue()) {
-            // Discard return value if both branches don't return a value
-            method.visitInsn(Opcodes.POP);
+        // [left]
+        {
+            MolangBytecodeEnvironment localEnvironment = new MolangBytecodeEnvironment(environment);
+            this.left.writeBytecode(method, localEnvironment, breakLabel, continueLabel);
+            if (this.left.hasValue() && !this.hasValue()) {
+                method.visitInsn(Opcodes.POP);
+            }
+            localEnvironment.writeModifiedVariables(method);
         }
         method.visitJumpInsn(Opcodes.GOTO, label_end);
 
         //: [right]
         method.visitLabel(label_right);
-        this.right.writeBytecode(method, environment, breakLabel, continueLabel);
-        if (this.right.hasValue() && !this.hasValue()) {
-            // Discard return value if both branches don't return a value
-            method.visitInsn(Opcodes.POP);
+        {
+            MolangBytecodeEnvironment localEnvironment = new MolangBytecodeEnvironment(environment);
+            this.right.writeBytecode(method, environment, breakLabel, continueLabel);
+            if (this.right.hasValue() && !this.hasValue()) {
+                method.visitInsn(Opcodes.POP);
+            }
+            localEnvironment.writeModifiedVariables(method);
         }
 
         method.visitLabel(label_end);
