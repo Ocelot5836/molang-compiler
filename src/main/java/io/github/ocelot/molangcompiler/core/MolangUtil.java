@@ -73,7 +73,7 @@ public class MolangUtil {
         }
     }
 
-    public static void setValue(MolangEnvironment environment, MolangObject object, String name, float value) throws MolangRuntimeException {
+    public static void setValue(MolangObject object, String name, float value) throws MolangRuntimeException {
         if (!object.has(name)) {
             object.set(name, new MolangVariableNode(MolangVariable.create(value)));
             return;

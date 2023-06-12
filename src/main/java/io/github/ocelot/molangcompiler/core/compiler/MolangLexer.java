@@ -341,7 +341,7 @@ public final class MolangLexer {
             reader.skip();
             return new VariableSetNode(object, name, new BinaryOperationNode(BinaryOperation.SUBTRACT, new VariableGetNode(object, name), new ConstNode(1.0F)));
         }
-        // obj.name*=, obj.name+=, obj.name--, ...
+        // obj.name*=, obj.name+=, obj.name-=, obj.name/=
         if (reader.canRead(2) && operand.type() == MolangTokenizer.TokenType.BINARY_OPERATION) {
             if (mathOperation != null) {
                 throw error("Cannot set value of a math function", reader);

@@ -44,8 +44,7 @@ public record LoopNode(Node iterations, Node body) implements Node {
         BytecodeCompiler.writeIntConst(method, 0); // int i = 0;
         method.visitLabel(begin);
 
-        MolangBytecodeEnvironment localEnvironment = new MolangBytecodeEnvironment(environment);
-        this.body.writeBytecode(method, localEnvironment, end, begin);
+        this.body.writeBytecode(method, environment, end, begin);
         if (this.body.hasValue()) { // Must return void
             method.visitInsn(Opcodes.POP);
         }
@@ -55,8 +54,5 @@ public record LoopNode(Node iterations, Node body) implements Node {
         method.visitInsn(Opcodes.DUP2);
         method.visitJumpInsn(Opcodes.IF_ICMPGT, begin);
         method.visitLabel(end);
-
-        environment.modifiedVariables().removeAll(localEnvironment.modifiedVariables());
-        localEnvironment.writeModifiedVariables(method);
     }
 }

@@ -42,14 +42,17 @@ public record VariableSetNode(String object,
 
     @Override
     public void writeBytecode(MethodNode method, MolangBytecodeEnvironment environment, @Nullable Label breakLabel, @Nullable Label continueLabel) throws MolangException {
-        // Insert at earliest opportunity if required
-        environment.getObjectIndex(method, this.object);
-        int index = environment.allocateVariable(this.object + "." + this.name);
-        this.value.writeBytecode(method, environment, breakLabel, continueLabel);
-        method.visitVarInsn(Opcodes.FSTORE, index);
-        if (this.returnValue) {
-            method.visitVarInsn(Opcodes.FLOAD, index);
+        if (!"temp".equals(this.object)) {
+            // Insert at earliest opportunity if required
+            environment.getObjectIndex(method, this.object);
         }
+
+        this.value.writeBytecode(method, environment, breakLabel, continueLabel);
+        if (this.returnValue) {
+            method.visitInsn(Opcodes.DUP);
+        }
+        int index = environment.allocateVariable(this.object + "." + this.name);
+        method.visitVarInsn(Opcodes.FSTORE, index);
         environment.markDirty(this.object, this.name);
     }
 

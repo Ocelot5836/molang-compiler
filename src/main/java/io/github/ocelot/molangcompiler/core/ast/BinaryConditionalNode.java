@@ -10,8 +10,8 @@ import org.objectweb.asm.tree.MethodNode;
 /**
  * Performs an "if" check on the specified value and executes the branch if it passes.
  *
- * @param value The value to check. If not zero it is considered <code>true</code>
- * @param branch  The value to use when the check passes
+ * @param value  The value to check. If not zero it is considered <code>true</code>
+ * @param branch The value to use when the check passes
  * @author Buddy
  */
 public record BinaryConditionalNode(Node value, Node branch) implements Node {

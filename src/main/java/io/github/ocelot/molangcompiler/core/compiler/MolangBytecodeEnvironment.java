@@ -6,24 +6,24 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.MethodNode;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Ocelot
  */
 @ApiStatus.Internal
 public record MolangBytecodeEnvironment(Map<String, Integer> variables,
-                                        List<String> modifiedVariables,
+                                        Set<String> modifiedVariables,
                                         boolean optimize) {
 
     public MolangBytecodeEnvironment(MolangBytecodeEnvironment environment) {
-        this(new HashMap<>(environment.variables), new LinkedList<>(), environment.optimize);
+        this(new HashMap<>(environment.variables), new LinkedHashSet<>(), environment.optimize);
     }
 
     public MolangBytecodeEnvironment(int flags) {
-        this(new HashMap<>(), new LinkedList<>(), (flags & BytecodeCompiler.FLAG_OPTIMIZE) > 0);
+        this(new HashMap<>(), new LinkedHashSet<>(), (flags & BytecodeCompiler.FLAG_OPTIMIZE) > 0);
     }
 
     /**
@@ -32,16 +32,6 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
     public void reset() {
         this.variables.clear();
         this.modifiedVariables.clear();
-    }
-
-    /**
-     * Allocates a local variable for temporary use. This can be re-used as many times as necessary
-     *
-     * @param index The index of the temporary variable
-     * @return The index of the local variable
-     */
-    public int getTempVariableIndex(int index) {
-        return this.allocateVariable("temp" + index);
     }
 
     /**
@@ -145,6 +135,15 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
             return;
         }
 
+        String key = object + "." + name + "$has";
+        Integer objectHasIndex = this.variables.get(key);
+        if (objectHasIndex != null) {
+            method.visitVarInsn(Opcodes.ILOAD, objectHasIndex);
+            return;
+        }
+
+        objectHasIndex = this.allocateVariable(key);
+
         int objectIndex = this.getObjectIndex(method, object);
         method.visitVarInsn(Opcodes.ALOAD, objectIndex);
         method.visitLdcInsn(name);
@@ -155,6 +154,8 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
                 "(Ljava/lang/String;)Z",
                 true
         );
+        method.visitInsn(Opcodes.DUP);
+        method.visitVarInsn(Opcodes.ISTORE, objectHasIndex);
     }
 
     /**
@@ -191,7 +192,6 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
 
             int objectIndex = this.getObjectIndex(method, parts[0]);
 
-            method.visitVarInsn(Opcodes.ALOAD, BytecodeCompiler.RUNTIME_INDEX);
             method.visitVarInsn(Opcodes.ALOAD, objectIndex);
             method.visitLdcInsn(parts[1]);
             method.visitVarInsn(Opcodes.FLOAD, index);
@@ -199,7 +199,7 @@ public record MolangBytecodeEnvironment(Map<String, Integer> variables,
                     Opcodes.INVOKESTATIC,
                     "io/github/ocelot/molangcompiler/core/MolangUtil",
                     "setValue",
-                    "(Lio/github/ocelot/molangcompiler/api/MolangEnvironment;Lio/github/ocelot/molangcompiler/api/object/MolangObject;Ljava/lang/String;F)V",
+                    "(Lio/github/ocelot/molangcompiler/api/object/MolangObject;Ljava/lang/String;F)V",
                     false
             );
         }

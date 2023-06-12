@@ -55,17 +55,15 @@ public record FunctionNode(String object, String function, Node... arguments) im
         method.visitVarInsn(Opcodes.ASTORE, expressionIndex);
 
         // Parameters
-        int temp = environment.getTempVariableIndex(0);
         for (Node node : this.arguments) {
             boolean full = !environment.optimize() || !node.isConstant();
             if (full) {
                 node.writeBytecode(method, environment, breakLabel, continueLabel);
-                method.visitVarInsn(Opcodes.FSTORE, temp);
             }
 
             method.visitVarInsn(Opcodes.ALOAD, BytecodeCompiler.RUNTIME_INDEX);
             if (full) {
-                method.visitVarInsn(Opcodes.FLOAD, temp);
+                method.visitInsn(Opcodes.SWAP);
             } else {
                 BytecodeCompiler.writeFloatConst(method, node.evaluate(environment));
             }
@@ -88,8 +86,6 @@ public record FunctionNode(String object, String function, Node... arguments) im
                 "(Lio/github/ocelot/molangcompiler/api/MolangEnvironment;)F",
                 true
         );
-        // Store result
-        method.visitVarInsn(Opcodes.FSTORE, temp);
 
         // Clear parameters
         method.visitVarInsn(Opcodes.ALOAD, BytecodeCompiler.RUNTIME_INDEX);
@@ -100,8 +96,5 @@ public record FunctionNode(String object, String function, Node... arguments) im
                 "()V",
                 true
         );
-
-        // Load result
-        method.visitVarInsn(Opcodes.FLOAD, temp);
     }
 }
