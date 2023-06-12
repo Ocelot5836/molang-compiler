@@ -1,8 +1,8 @@
-import io.github.ocelot.molangcompiler.api.MolangCompiler;
-import io.github.ocelot.molangcompiler.api.MolangEnvironment;
-import io.github.ocelot.molangcompiler.api.MolangExpression;
-import io.github.ocelot.molangcompiler.api.MolangRuntime;
-import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import gg.moonflower.molangcompiler.api.MolangCompiler;
+import gg.moonflower.molangcompiler.api.MolangEnvironment;
+import gg.moonflower.molangcompiler.api.MolangExpression;
+import gg.moonflower.molangcompiler.api.MolangRuntime;
+import gg.moonflower.molangcompiler.api.exception.MolangException;
 import org.junit.jupiter.api.Test;
 
 import java.util.Map;

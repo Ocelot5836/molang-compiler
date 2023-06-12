@@ -1,5 +1,5 @@
-import io.github.ocelot.molangcompiler.api.exception.MolangSyntaxException;
-import io.github.ocelot.molangcompiler.core.compiler.MolangTokenizer;
+import gg.moonflower.molangcompiler.api.exception.MolangSyntaxException;
+import gg.moonflower.molangcompiler.core.compiler.MolangTokenizer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

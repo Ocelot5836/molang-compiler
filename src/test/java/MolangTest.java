@@ -1,9 +1,9 @@
 import com.google.common.base.Stopwatch;
-import io.github.ocelot.molangcompiler.api.MolangCompiler;
-import io.github.ocelot.molangcompiler.api.MolangExpression;
-import io.github.ocelot.molangcompiler.api.MolangRuntime;
-import io.github.ocelot.molangcompiler.api.bridge.MolangVariable;
-import io.github.ocelot.molangcompiler.api.exception.MolangException;
+import gg.moonflower.molangcompiler.api.MolangCompiler;
+import gg.moonflower.molangcompiler.api.MolangExpression;
+import gg.moonflower.molangcompiler.api.MolangRuntime;
+import gg.moonflower.molangcompiler.api.bridge.MolangVariable;
+import gg.moonflower.molangcompiler.api.exception.MolangException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
