@@ -215,8 +215,8 @@ public class MolangTest {
 
     @Test
     void testCopy() {
-        MolangRuntime.Builder builder1 = MolangRuntime.runtime().setVariable("test", MolangVariable.create(10));
-        MolangRuntime.Builder builder2 = MolangRuntime.runtime(builder1).setVariable("test2", MolangVariable.create(100));
+        MolangRuntime.Builder builder1 = (MolangRuntime.Builder) MolangRuntime.runtime().setVariable("test", MolangVariable.create(10));
+        MolangRuntime.Builder builder2 = (MolangRuntime.Builder) MolangRuntime.runtime(builder1).setVariable("test2", MolangVariable.create(100));
 
         System.out.println("builder1");
         System.out.println(builder1.create().dump());

@@ -11,13 +11,7 @@ import java.util.Collection;
  * @author Ocelot
  * @since 1.0.0
  */
-public class ImmutableMolangObject implements MolangObject {
-
-    private final MolangObject parent;
-
-    public ImmutableMolangObject(MolangObject parent) {
-        this.parent = parent;
-    }
+public record ImmutableMolangObject(MolangObject parent) implements MolangObject {
 
     @Override
     public void set(String name, MolangExpression value) throws MolangRuntimeException {
