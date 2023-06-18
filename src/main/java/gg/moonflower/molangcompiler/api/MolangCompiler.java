@@ -1,10 +1,7 @@
 package gg.moonflower.molangcompiler.api;
 
 import gg.moonflower.molangcompiler.api.exception.MolangSyntaxException;
-import gg.moonflower.molangcompiler.core.ast.Node;
-import gg.moonflower.molangcompiler.core.compiler.BytecodeCompiler;
-import gg.moonflower.molangcompiler.core.compiler.MolangLexer;
-import gg.moonflower.molangcompiler.core.compiler.MolangTokenizer;
+import gg.moonflower.molangcompiler.core.MolangCompilerImpl;
 
 /**
  * <p>Compiles a {@link MolangExpression} from a string input.</p>
@@ -12,41 +9,23 @@ import gg.moonflower.molangcompiler.core.compiler.MolangTokenizer;
  *
  * @author Ocelot
  * @see GlobalMolangCompiler
- * @since 1.0.0
+ * @since 3.0.0
  */
-public final class MolangCompiler {
+public interface MolangCompiler {
 
     /**
      * Whether to reduce math to constant values if possible. E.g. <code>4 * 4 + 2</code> would become <code>18</code>. This should almost always be on.
      */
-    public static final int OPTIMIZE_FLAG = 0b01;
+    int OPTIMIZE_FLAG = 0b01;
     /**
      * Whether to write the java bytecode to a class file. This is only for debugging.
      */
-    public static final int WRITE_CLASSES_FLAG = 0b10;
+    int WRITE_CLASSES_FLAG = 0b10;
 
     /**
      * All default compilation flags. This may change in future versions as more options are added.
      */
-    public static final int DEFAULT_FLAGS = OPTIMIZE_FLAG;
-
-    private final BytecodeCompiler compiler;
-
-    /**
-     * Creates a new compiler with the default compilation flags.
-     */
-    public MolangCompiler() {
-        this(DEFAULT_FLAGS);
-    }
-
-    /**
-     * Creates a new compiler with the specified compilation flags.
-     *
-     * @param flags The flags to use
-     */
-    public MolangCompiler(int flags) {
-        this.compiler = new BytecodeCompiler(flags);
-    }
+    int DEFAULT_FLAGS = OPTIMIZE_FLAG;
 
     /**
      * Compiles a {@link MolangExpression} from the specified string input.
@@ -55,9 +34,27 @@ public final class MolangCompiler {
      * @return The compiled expression
      * @throws MolangSyntaxException If any error occurs
      */
-    public MolangExpression compile(String input) throws MolangSyntaxException {
-        MolangTokenizer.Token[] tokens = MolangTokenizer.createTokens(input);
-        Node node = MolangLexer.parseTokens(tokens);
-        return this.compiler.build(node);
+    MolangExpression compile(String input) throws MolangSyntaxException;
+
+    /**
+     * Creates a compiler with the {@linkplain MolangCompiler#DEFAULT_FLAGS default flags}.
+     *
+     * @return The compiler instance
+     */
+    static MolangCompiler create() {
+        return new MolangCompilerImpl(DEFAULT_FLAGS);
+    }
+
+    /**
+     * Creates a compiler with the specified flags. If unsure use {@link #create()}.
+     *
+     * @param flags The compiler flags to use
+     * @return The compiler instance
+     * @see MolangCompiler#OPTIMIZE_FLAG
+     * @see MolangCompiler#WRITE_CLASSES_FLAG
+     * @see MolangCompiler#DEFAULT_FLAGS
+     */
+    static MolangCompiler create(int flags) {
+        return new MolangCompilerImpl(flags);
     }
 }

@@ -32,7 +32,7 @@ public final class GlobalMolangCompiler {
      * @see MolangCompiler#DEFAULT_FLAGS
      */
     public static MolangCompiler get(int flags) {
-        return GLOBAL_COMPILERS.computeIfAbsent(flags, MolangCompiler::new);
+        return GLOBAL_COMPILERS.computeIfAbsent(flags, MolangCompiler::create);
     }
 
     /**

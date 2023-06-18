@@ -14,7 +14,7 @@ public class MolangTest {
 
     @Test
     void testSpeed() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         compiler.compile("0"); // load
 
         Stopwatch compileTime = Stopwatch.createStarted();
@@ -62,7 +62,7 @@ public class MolangTest {
 
     @Test
     void testSimplify() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("math.pi*2+(3/2+53)*((7)/5)");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
@@ -73,7 +73,7 @@ public class MolangTest {
 
     @Test
     void testScopes() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("""
                         temp.a = 4;
                         temp.b = 4;
@@ -92,7 +92,7 @@ public class MolangTest {
 
     @Test
     void testReturnScopes() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("""
                         temp.a = 4;
                         temp.b = 2;
@@ -112,7 +112,7 @@ public class MolangTest {
 
     @Test
     void testRandom() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("math.die_roll(1, 0, 10)");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
@@ -124,7 +124,7 @@ public class MolangTest {
 
     @Test
     void testGetVariable() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("""
                 t.a = 14;
                 return v.test + t.a;
@@ -139,7 +139,7 @@ public class MolangTest {
 
     @Test
     void testSetVariable() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("""
                 v.test = 2;
                 """);
@@ -154,7 +154,7 @@ public class MolangTest {
 
     @Test
     void testMultiple() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("v.b = 2;v.a = 3;v.ab = v.b;v.c = 1;");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
@@ -164,7 +164,7 @@ public class MolangTest {
 
     @Test
     void testCondition() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler(0);
+        MolangCompiler compiler = MolangCompiler.create(0);
         MolangExpression expression = compiler.compile("1 > 2 ? 10 : 20");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
@@ -175,7 +175,7 @@ public class MolangTest {
 
     @Test
     void testComplexCondition() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("math.clamp(0.5 + variable.particle_random_4/7 + (variable.particle_random_3>0.2 ? 0.4 : 0), 0, 1)");
 
         MolangRuntime runtime = MolangRuntime.runtime()
@@ -191,7 +191,7 @@ public class MolangTest {
 
     @Test
     void testNegativeCondition() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("+variable.particle_random_3??0>0.2 ? -10 : -4");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
@@ -202,7 +202,7 @@ public class MolangTest {
 
     @Test
     void testWeird() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("((((-7))*((((((((variable.particle_random_3>(0.2) * (((4))) ? (-10) : -4))))))))))");
 
         MolangRuntime runtime = MolangRuntime.runtime()
@@ -226,7 +226,7 @@ public class MolangTest {
 
     @Test
     void testContainer() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("v.screen_aspect_ratio > v.aspect_ratio ? q.screen.width : q.screen.height * v.aspect_ratio");
 
         MolangRuntime runtime = MolangRuntime.runtime()
@@ -242,7 +242,7 @@ public class MolangTest {
 
     @Test
     void testImmutable() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangVariable test = MolangVariable.create(1);
         MolangVariable testImmutable = test.immutable();
 
@@ -256,7 +256,7 @@ public class MolangTest {
 
     @Test
     void testLoop() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("""
                 v.test = 0;
                 loop(10, {
@@ -274,7 +274,7 @@ public class MolangTest {
 
     @Test
     void testCompare() throws MolangException {
-        MolangCompiler compiler = new MolangCompiler();
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("5<5");
 
         MolangRuntime runtime = MolangRuntime.runtime().create();
