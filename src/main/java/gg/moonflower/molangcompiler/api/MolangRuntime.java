@@ -132,13 +132,12 @@ public class MolangRuntime implements MolangEnvironment {
         return variableStorage;
     }
 
-    /**
-     * Creates a new builder for editing the current runtime.
-     * {@link MolangEnvironmentBuilder#create()} will return this runtime.
-     *
-     * @return A builder for modifying the current runtime
-     * @since 3.0.0
-     */
+    @Override
+    public boolean canEdit() {
+        return true;
+    }
+
+    @Override
     public MolangEnvironmentBuilder<MolangRuntime> edit() {
         MolangVariableStorage query = this.getStorage("query");
         MolangVariableStorage global = this.getStorage("global");

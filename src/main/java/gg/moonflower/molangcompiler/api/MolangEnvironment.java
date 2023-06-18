@@ -2,6 +2,7 @@ package gg.moonflower.molangcompiler.api;
 
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import gg.moonflower.molangcompiler.api.object.MolangObject;
+import gg.moonflower.molangcompiler.core.ImmutableMolangEnvironment;
 
 /**
  * A MoLang execution environment.
@@ -104,6 +105,21 @@ public interface MolangEnvironment {
     void setThisValue(float thisValue);
 
     /**
+     * @return Whether this environment can be edited
+     */
+    boolean canEdit();
+
+    /**
+     * Creates a new builder for editing the current runtime.
+     * {@link MolangEnvironmentBuilder#create()} will return this runtime.
+     *
+     * @return A builder for modifying the current runtime
+     * @throws IllegalStateException If {@link #canEdit()} is <code>false</code>
+     * @since 3.0.0
+     */
+    MolangEnvironmentBuilder<? extends MolangEnvironment> edit() throws IllegalStateException;
+
+    /**
      * <p>Resolves the float value of the specified expression in this environment.</p>
      * <p>This allows environments to fine-tune how expressions are evaluated.</p>
      *
@@ -131,5 +147,16 @@ public interface MolangEnvironment {
             t.printStackTrace();
             return 0.0F;
         }
+    }
+
+    /**
+     * Creates an environment that cannot be edited with {@link #edit()}.
+     *
+     * @param environment The environment to wrap if necessary
+     * @return An environment that is guaranteed to be immutable
+     * @since 3.0.0
+     */
+    static MolangEnvironment immutable(MolangEnvironment environment) {
+        return environment instanceof ImmutableMolangEnvironment immutableEnvironment ? immutableEnvironment : new ImmutableMolangEnvironment(environment);
     }
 }
