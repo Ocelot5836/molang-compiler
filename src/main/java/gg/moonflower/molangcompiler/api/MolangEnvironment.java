@@ -18,16 +18,29 @@ public interface MolangEnvironment {
      * @param object The object to use under that name
      * @since 2.0.0
      */
-    void loadLibrary(String name, MolangObject object);
+    default void loadLibrary(String name, MolangObject object) {
+        this.loadLibrary(name, object, new String[0]);
+    }
+
+    /**
+     * Loads a library under the specified name.
+     *
+     * @param name    The name of the library to load
+     * @param object  The object to use under that name
+     * @param aliases The alternate names for the library
+     * @since 3.0.0
+     */
+    void loadLibrary(String name, MolangObject object, String... aliases);
 
     /**
      * Loads an alias for a library under the specified name.
      *
-     * @param name   The name of the library to load
-     * @param object The object to use under that name
-     * @since 2.0.0
+     * @param name    The name of the library to load
+     * @param aliases The alternate names for the library
+     * @throws IllegalArgumentException If no library with the specified name exists
+     * @since 3.0.0
      */
-    void loadAlias(String name, MolangObject object);
+    void loadAlias(String name, String first, String... aliases) throws IllegalArgumentException;
 
     /**
      * Loads a parameter into the next parameter slot.

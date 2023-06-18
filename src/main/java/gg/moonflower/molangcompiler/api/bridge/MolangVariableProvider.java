@@ -70,17 +70,17 @@ public interface MolangVariableProvider {
         void addQuery(String name, int params, MolangJavaFunction function);
 
         /**
-         * Removes a variable with the specified name.
-         *
-         * @param name The name of the variable to remove
-         */
-        void removeVariable(String name);
-
-        /**
          * Removes a query with the specified name.
          *
          * @param name The name of the query to remove
          */
         void removeQuery(String name);
+
+        /**
+         * Removes a variable with the specified name.
+         *
+         * @param name The name of the variable to remove
+         */
+        void removeVariable(String name);
     }
 }

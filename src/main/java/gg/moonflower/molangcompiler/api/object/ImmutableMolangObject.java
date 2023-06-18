@@ -3,6 +3,8 @@ package gg.moonflower.molangcompiler.api.object;
 import gg.moonflower.molangcompiler.api.MolangExpression;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 
+import java.util.Collection;
+
 /**
  * A {@link MolangObject} that cannot have any values modified.
  *
@@ -23,6 +25,11 @@ public class ImmutableMolangObject implements MolangObject {
     }
 
     @Override
+    public void remove(String name) throws MolangRuntimeException {
+        throw new MolangRuntimeException("Cannot set values on an immutable object");
+    }
+
+    @Override
     public MolangExpression get(String name) throws MolangRuntimeException {
         return this.parent.get(name);
     }
@@ -33,7 +40,12 @@ public class ImmutableMolangObject implements MolangObject {
     }
 
     @Override
+    public Collection<String> getKeys() {
+        return this.parent.getKeys();
+    }
+
+    @Override
     public String toString() {
-        return String.valueOf(this.parent);
+        return this.parent.toString();
     }
 }

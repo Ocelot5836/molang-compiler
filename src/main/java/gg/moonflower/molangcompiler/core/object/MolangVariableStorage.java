@@ -6,6 +6,7 @@ import gg.moonflower.molangcompiler.api.object.MolangObject;
 import gg.moonflower.molangcompiler.core.node.MolangFunctionNode;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -28,12 +29,21 @@ public class MolangVariableStorage implements MolangObject {
         this.allowMethods = copy.allowMethods;
     }
 
+    public void clear() {
+        this.storage.clear();
+    }
+
     @Override
-    public void set(String name, MolangExpression value) {
+    public void set(String name, MolangExpression value) throws MolangRuntimeException {
         if (!this.allowMethods && value instanceof MolangFunctionNode) {
-            throw new IllegalStateException("Cannot set functions on objects that do not allow functions");
+            throw new MolangRuntimeException("Cannot set functions on objects that do not allow functions");
         }
         this.storage.put(name, value);
+    }
+
+    @Override
+    public void remove(String name) throws MolangRuntimeException {
+        this.storage.remove(name);
     }
 
     @Override
@@ -48,6 +58,11 @@ public class MolangVariableStorage implements MolangObject {
     @Override
     public boolean has(String name) {
         return this.storage.containsKey(name);
+    }
+
+    @Override
+    public Collection<String> getKeys() {
+        return this.storage.keySet();
     }
 
     @Override

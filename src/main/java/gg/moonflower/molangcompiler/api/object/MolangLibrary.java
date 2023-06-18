@@ -4,6 +4,7 @@ import gg.moonflower.molangcompiler.api.MolangExpression;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import gg.moonflower.molangcompiler.core.node.MolangFunctionNode;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -16,11 +17,11 @@ import java.util.function.BiConsumer;
  */
 public abstract class MolangLibrary implements MolangObject {
 
-    private final Map<String, MolangExpression> functions;
+    private final Map<String, MolangExpression> values;
 
     public MolangLibrary() {
-        this.functions = new HashMap<>();
-        this.populate(this.functions::put);
+        this.values = new HashMap<>();
+        this.populate(this.values::put);
     }
 
     /**
@@ -37,12 +38,17 @@ public abstract class MolangLibrary implements MolangObject {
 
     @Override
     public void set(String name, MolangExpression value) throws MolangRuntimeException {
-        throw new MolangRuntimeException("Cannot set values on a library");
+        throw new MolangRuntimeException("Cannot set values to " + this.getName());
+    }
+
+    @Override
+    public void remove(String name) throws MolangRuntimeException {
+        throw new MolangRuntimeException("Cannot remove values from " + this.getName());
     }
 
     @Override
     public MolangExpression get(String name) throws MolangRuntimeException {
-        MolangExpression expression = this.functions.get(name);
+        MolangExpression expression = this.values.get(name);
         if (expression != null) {
             return expression;
         }
@@ -51,13 +57,18 @@ public abstract class MolangLibrary implements MolangObject {
 
     @Override
     public boolean has(String name) {
-        return this.functions.containsKey(name);
+        return this.values.containsKey(name);
+    }
+
+    @Override
+    public Collection<String> getKeys() {
+        return this.values.keySet();
     }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(this.getName()).append('\n');
-        for (Map.Entry<String, MolangExpression> entry : this.functions.entrySet()) {
+        for (Map.Entry<String, MolangExpression> entry : this.values.entrySet()) {
             builder.append('\t').append(entry.getKey());
             if (entry.getValue() instanceof MolangFunctionNode) {
                 builder.append("()");
