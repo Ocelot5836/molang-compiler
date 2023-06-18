@@ -11,9 +11,10 @@ import gg.moonflower.molangcompiler.core.compiler.MolangTokenizer;
  * <p>A compiler instance must be created to allow garbage collection of generated classes when no longer in use.</p>
  *
  * @author Ocelot
+ * @see GlobalMolangCompiler
  * @since 1.0.0
  */
-public class MolangCompiler {
+public final class MolangCompiler {
 
     /**
      * Whether to reduce math to constant values if possible. E.g. <code>4 * 4 + 2</code> would become <code>18</code>. This should almost always be on.
