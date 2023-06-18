@@ -132,7 +132,7 @@ public interface MolangExpression {
      * @return A new expression with that value
      * @since 3.0.0
      */
-    static MolangExpression compound(MolangExpression... expressions) {
+    static MolangExpression of(MolangExpression... expressions) {
         if (expressions.length == 0) {
             return MolangExpression.ZERO;
         }
