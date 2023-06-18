@@ -57,8 +57,9 @@ public class MolangRuntime implements MolangEnvironment {
     @Override
     public void loadLibrary(String name, MolangObject object, String... aliases) {
         this.objects.put(name.toLowerCase(Locale.ROOT), object);
-        if (aliases.length > 0) {
-            this.aliases.addAll(Arrays.asList(aliases));
+        for (String alias : aliases) {
+            this.objects.put(alias.toLowerCase(Locale.ROOT), object);
+            this.aliases.add(alias);
         }
     }
 
