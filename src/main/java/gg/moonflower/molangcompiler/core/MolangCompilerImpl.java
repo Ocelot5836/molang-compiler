@@ -21,6 +21,10 @@ public class MolangCompilerImpl implements MolangCompiler {
         this.compiler = new BytecodeCompiler(flags);
     }
 
+    public MolangCompilerImpl(int flags, ClassLoader classLoader) {
+        this.compiler = new BytecodeCompiler(flags, classLoader);
+    }
+
     public MolangExpression compile(String input) throws MolangSyntaxException {
         MolangTokenizer.Token[] tokens = MolangTokenizer.createTokens(input);
         Node node = MolangLexer.parseTokens(tokens);

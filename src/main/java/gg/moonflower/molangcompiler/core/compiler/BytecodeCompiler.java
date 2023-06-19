@@ -30,9 +30,14 @@ public class BytecodeCompiler extends ClassLoader {
     private final MolangBytecodeEnvironment environment;
     private final boolean writeClasses;
 
-    public BytecodeCompiler(int flags) {
+    public BytecodeCompiler(int flags, ClassLoader parent) {
+        super(parent);
         this.environment = new MolangBytecodeEnvironment(flags);
         this.writeClasses = (flags & MolangCompiler.WRITE_CLASSES_FLAG) > 0;
+    }
+
+    public BytecodeCompiler(int flags) {
+        this(flags, getSystemClassLoader());
     }
 
     public MolangExpression build(Node node) throws MolangSyntaxException {
@@ -47,7 +52,7 @@ public class BytecodeCompiler extends ClassLoader {
             classNode.superName = "java/lang/Object";
             classNode.name = "Expression_" + System.nanoTime();
             classNode.access = Opcodes.ACC_PUBLIC;
-            classNode.interfaces.add("gg/moonflower/molangcompiler/api/MolangExpression");
+            classNode.interfaces.add(MolangExpression.class.getName().replaceAll("\\.", "/"));
 
             MethodNode init = new MethodNode();
             init.access = Opcodes.ACC_PUBLIC;

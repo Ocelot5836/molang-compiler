@@ -57,4 +57,19 @@ public interface MolangCompiler {
     static MolangCompiler create(int flags) {
         return new MolangCompilerImpl(flags);
     }
+
+    /**
+     * Creates a compiler with the specified flags. If unsure use {@link #create()}.
+     *
+     * @param flags  The compiler flags to use
+     * @param parent The classloader to use as the parent.
+     *               This should only be set when the current class is not using the system class loader
+     * @return The compiler instance
+     * @see MolangCompiler#OPTIMIZE_FLAG
+     * @see MolangCompiler#WRITE_CLASSES_FLAG
+     * @see MolangCompiler#DEFAULT_FLAGS
+     */
+    static MolangCompiler create(int flags, ClassLoader parent) {
+        return new MolangCompilerImpl(flags, parent);
+    }
 }
