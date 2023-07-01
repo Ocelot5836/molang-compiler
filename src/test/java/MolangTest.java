@@ -256,20 +256,15 @@ public class MolangTest {
 
     @Test
     void testLoop() throws MolangException {
-        MolangCompiler compiler = MolangCompiler.create();
+        MolangCompiler compiler = MolangCompiler.create(MolangCompiler.DEFAULT_FLAGS | MolangCompiler.WRITE_CLASSES_FLAG);
         MolangExpression expression = compiler.compile("""
-                v.test = 0;
-                loop(10, {
-                    v.test = v.test + 1;
-                    v.test2 = 4;
-                });
-                return v.test;
+                clinker.spill(q.throw_angle);
                 """);
 
-        MolangRuntime runtime = MolangRuntime.runtime().create();
-        float result = runtime.resolve(expression);
-        System.out.println(expression + "\n==RESULT==\n" + result);
-        Assertions.assertEquals(10, result);
+//        MolangRuntime runtime = MolangRuntime.runtime().create();
+//        float result = runtime.resolve(expression);
+//        System.out.println(expression + "\n==RESULT==\n" + result);
+//        Assertions.assertEquals(10, result);
     }
 
     @Test

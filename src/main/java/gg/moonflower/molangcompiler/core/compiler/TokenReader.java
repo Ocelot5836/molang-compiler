@@ -5,9 +5,9 @@ import org.jetbrains.annotations.ApiStatus;
 @ApiStatus.Internal
 public class TokenReader extends StringReader {
 
-    private final MolangTokenizer.Token[] tokens;
+    private final MolangLexer.Token[] tokens;
 
-    public TokenReader(MolangTokenizer.Token[] tokens) {
+    public TokenReader(MolangLexer.Token[] tokens) {
         super("");
         this.tokens = tokens;
     }
@@ -15,7 +15,7 @@ public class TokenReader extends StringReader {
     @Override
     public String getString() {
         StringBuilder builder = new StringBuilder();
-        for (MolangTokenizer.Token token : this.tokens) {
+        for (MolangLexer.Token token : this.tokens) {
             builder.append(token.value());
         }
         return builder.toString();
@@ -34,11 +34,11 @@ public class TokenReader extends StringReader {
         return offset;
     }
 
-    public MolangTokenizer.Token peekAfter(int amount) {
+    public MolangLexer.Token peekAfter(int amount) {
         return this.tokens[this.cursor + amount];
     }
 
-    public MolangTokenizer.Token peek() {
+    public MolangLexer.Token peek() {
         return this.tokens[this.cursor];
     }
 }
