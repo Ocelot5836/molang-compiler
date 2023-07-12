@@ -55,4 +55,20 @@ public interface MolangObject {
      * @since 3.0.0
      */
     Collection<String> getKeys();
+
+    /**
+     * @return The version of this object that will be passed to all copies of the parent environment
+     * @since 3.0.0
+     */
+    default MolangObject getCopy() {
+        return this;
+    }
+
+    /**
+     * @return Whether this object is allowed to be mutated
+     * @since 3.0.0
+     */
+    default boolean isMutable() {
+        return true;
+    }
 }

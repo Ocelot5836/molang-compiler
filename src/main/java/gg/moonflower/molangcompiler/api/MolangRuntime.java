@@ -1,5 +1,6 @@
 package gg.moonflower.molangcompiler.api;
 
+import gg.moonflower.molangcompiler.api.exception.MolangException;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import gg.moonflower.molangcompiler.api.object.ImmutableMolangObject;
 import gg.moonflower.molangcompiler.api.object.MolangObject;
@@ -17,19 +18,27 @@ public class MolangRuntime implements MolangEnvironment {
 
     private float thisValue;
     private final Map<String, MolangObject> objects;
-    private final Set<String> aliases;
+    private final Map<String, String> aliases;
     private final List<Float> parameters;
 
     private MolangRuntime(MolangObject query, MolangObject global, MolangObject variable, Map<String, MolangObject> libraries) {
         this.thisValue = 0.0F;
         this.objects = new HashMap<>();
-        this.aliases = new HashSet<>();
+        this.aliases = new HashMap<>();
         this.objects.putAll(libraries);
         this.loadLibrary("context", query, "c"); // This is static accesses
         this.loadLibrary("query", query, "q"); // This is static accesses
         this.loadLibrary("global", global); // This is parameter access
         this.loadLibrary("variable", variable, "v"); // This can be accessed by Java code
         this.parameters = new ArrayList<>(8);
+    }
+
+    private String sanitize(String name) {
+        name = name.toLowerCase(Locale.ROOT);
+        while (this.aliases.containsKey(name)) {
+            name = this.aliases.get(name).toLowerCase(Locale.ROOT);
+        }
+        return name;
     }
 
     /**
@@ -39,9 +48,7 @@ public class MolangRuntime implements MolangEnvironment {
         StringBuilder builder = new StringBuilder("==Start MoLang Runtime Dump==\n\n");
         builder.append("==Start Objects==\n");
         for (Map.Entry<String, MolangObject> entry : this.objects.entrySet()) {
-            if (!this.aliases.contains(entry.getKey())) {
-                builder.append(entry.getKey()).append('=').append(entry.getValue()).append('\n');
-            }
+            builder.append(entry.getKey()).append('=').append(entry.getValue()).append('\n');
         }
         builder.deleteCharAt(builder.length() - 2);
         builder.append("==End Objects==\n\n");
@@ -58,8 +65,7 @@ public class MolangRuntime implements MolangEnvironment {
     public void loadLibrary(String name, MolangObject object, String... aliases) {
         this.objects.put(name.toLowerCase(Locale.ROOT), object);
         for (String alias : aliases) {
-            this.objects.put(alias.toLowerCase(Locale.ROOT), object);
-            this.aliases.add(alias);
+            this.aliases.put(alias, name);
         }
     }
 
@@ -69,9 +75,9 @@ public class MolangRuntime implements MolangEnvironment {
             throw new IllegalArgumentException("Invalid MoLang library: " + name);
         }
 
-        this.aliases.add(first);
-        if (aliases.length > 0) {
-            this.aliases.addAll(Arrays.asList(aliases));
+        this.aliases.put(first, name);
+        for (String alias : aliases) {
+            this.aliases.put(alias, name);
         }
     }
 
@@ -92,7 +98,7 @@ public class MolangRuntime implements MolangEnvironment {
 
     @Override
     public MolangObject get(String name) throws MolangRuntimeException {
-        name = name.toLowerCase(Locale.ROOT);
+        name = this.sanitize(name);
         MolangObject object = this.objects.get(name);
         if (object != null) {
             return object;
@@ -114,8 +120,26 @@ public class MolangRuntime implements MolangEnvironment {
     }
 
     @Override
+    public Collection<String> getObjects() {
+        return this.objects.keySet();
+    }
+
+    @Override
     public void setThisValue(float thisValue) {
         this.thisValue = thisValue;
+    }
+
+    @Override
+    public boolean canEdit() {
+        return true;
+    }
+
+    @Override
+    public MolangEnvironmentBuilder<MolangRuntime> edit() {
+        MolangVariableStorage query = this.getStorage("query");
+        MolangVariableStorage global = this.getStorage("global");
+        MolangVariableStorage variable = this.getStorage("variable");
+        return new EditBuilder(this, query, global, variable);
     }
 
     private MolangVariableStorage getStorage(String name) {
@@ -130,19 +154,6 @@ public class MolangRuntime implements MolangEnvironment {
             throw new IllegalStateException("Expected " + name + " to be " + MolangVariableStorage.class.getName() + ", was " + object.getClass().getName());
         }
         return variableStorage;
-    }
-
-    @Override
-    public boolean canEdit() {
-        return true;
-    }
-
-    @Override
-    public MolangEnvironmentBuilder<MolangRuntime> edit() {
-        MolangVariableStorage query = this.getStorage("query");
-        MolangVariableStorage global = this.getStorage("global");
-        MolangVariableStorage variable = this.getStorage("variable");
-        return new EditBuilder(this, query, global, variable);
     }
 
     /**
@@ -285,6 +296,51 @@ public class MolangRuntime implements MolangEnvironment {
         }
 
         @Override
+        public MolangEnvironmentBuilder<MolangRuntime> copy(MolangEnvironment environment) {
+            try {
+                for (String name : environment.getObjects()) {
+                    name = name.toLowerCase(Locale.ROOT);
+                    MolangObject copy = environment.get(name).getCopy();
+
+                    switch (name) {
+                        case "query" -> {
+                            for (String field : copy.getKeys()) {
+                                this.query.set(field, copy.get(field));
+                            }
+                            continue;
+                        }
+                        case "global" -> {
+                            for (String field : copy.getKeys()) {
+                                this.global.set(field, copy.get(field));
+                            }
+                            continue;
+                        }
+                        case "variable" -> {
+                            for (String field : copy.getKeys()) {
+                                this.variable.set(field, copy.get(field));
+                            }
+                            continue;
+                        }
+                    }
+
+                    if (this.libraries.containsKey(name)) {
+                        MolangObject runtimeObject = environment.get(name);
+                        if (runtimeObject.isMutable()) {
+                            for (String field : copy.getKeys()) {
+                                runtimeObject.set(field, copy.get(field));
+                            }
+                            continue;
+                        }
+                    }
+                    this.libraries.put(name, copy);
+                }
+            } catch (MolangException e) {
+                throw new RuntimeException("Failed to copy environment data", e);
+            }
+            return this;
+        }
+
+        @Override
         public MolangRuntime create() {
             return new MolangRuntime(new ImmutableMolangObject(this.query), new ImmutableMolangObject(this.global), this.variable, this.libraries);
         }
@@ -402,6 +458,29 @@ public class MolangRuntime implements MolangEnvironment {
         @Override
         public MolangEnvironmentBuilder<MolangRuntime> clearVariable() {
             this.variable.clear();
+            return this;
+        }
+
+        @Override
+        public MolangEnvironmentBuilder<MolangRuntime> copy(MolangEnvironment environment) {
+            try {
+                for (String name : environment.getObjects()) {
+                    MolangObject copy = environment.get(name).getCopy();
+
+                    if (this.runtime.has(name)) {
+                        MolangObject runtimeObject = this.runtime.get(name);
+                        if (runtimeObject.isMutable()) {
+                            for (String field : copy.getKeys()) {
+                                runtimeObject.set(field, copy.get(field));
+                            }
+                            continue;
+                        }
+                    }
+                    this.runtime.objects.put(name, copy);
+                }
+            } catch (MolangException e) {
+                throw new RuntimeException("Failed to copy environment data", e);
+            }
             return this;
         }
 

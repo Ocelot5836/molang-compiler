@@ -4,6 +4,9 @@ import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import gg.moonflower.molangcompiler.api.object.MolangObject;
 import gg.moonflower.molangcompiler.core.ImmutableMolangEnvironment;
 
+import java.util.Collection;
+import java.util.Locale;
+
 /**
  * A MoLang execution environment.
  *
@@ -63,6 +66,17 @@ public interface MolangEnvironment {
     float getThis();
 
     /**
+     * Checks if the specified MoLang object exists.
+     *
+     * @param name The name to check for, case-insensitive
+     * @return Whether this environment has that object
+     * @since 3.0.0
+     */
+    default boolean has(String name) {
+        return this.getObjects().contains(name.toLowerCase(Locale.ROOT));
+    }
+
+    /**
      * Retrieves a {@link MolangObject} by the specified domain name.
      *
      * @param name The name to fetch by, case-insensitive
@@ -97,6 +111,12 @@ public interface MolangEnvironment {
     int getParameters();
 
     /**
+     * @return A collection of all valid MoLang objects
+     * @since 3.0.0
+     */
+    Collection<String> getObjects();
+
+    /**
      * Sets the value of "this".
      *
      * @param thisValue The new value
@@ -118,6 +138,16 @@ public interface MolangEnvironment {
      * @since 3.0.0
      */
     MolangEnvironmentBuilder<? extends MolangEnvironment> edit() throws IllegalStateException;
+
+    /**
+     * Creates a copy of this environment that can be mutated independently.
+     *
+     * @return The new environment
+     * @since 3.0.0
+     */
+    default MolangEnvironment copy() {
+        return MolangRuntime.runtime().copy(this).create(this.getThis());
+    }
 
     /**
      * <p>Resolves the float value of the specified expression in this environment.</p>

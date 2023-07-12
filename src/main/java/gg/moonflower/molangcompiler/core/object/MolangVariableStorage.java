@@ -66,6 +66,11 @@ public class MolangVariableStorage implements MolangObject {
     }
 
     @Override
+    public MolangObject getCopy() {
+        return new MolangVariableStorage(this);
+    }
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder("MoLang Object\n");
         for (Map.Entry<String, MolangExpression> entry : this.storage.entrySet()) {

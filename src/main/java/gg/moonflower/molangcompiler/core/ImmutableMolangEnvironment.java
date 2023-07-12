@@ -6,6 +6,8 @@ import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import gg.moonflower.molangcompiler.api.object.MolangObject;
 import org.jetbrains.annotations.ApiStatus;
 
+import java.util.Collection;
+
 /**
  * @author Ocelot
  */
@@ -50,6 +52,11 @@ public record ImmutableMolangEnvironment(MolangEnvironment environment) implemen
     @Override
     public int getParameters() {
         return this.environment.getParameters();
+    }
+
+    @Override
+    public Collection<String> getObjects() {
+        return this.environment.getObjects();
     }
 
     @Override

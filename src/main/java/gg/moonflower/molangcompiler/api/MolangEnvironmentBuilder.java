@@ -190,6 +190,12 @@ public interface MolangEnvironmentBuilder<V extends MolangEnvironment> {
     MolangEnvironmentBuilder<V> clearVariable();
 
     /**
+     * Attempts to copy the environment state from the specified environment.
+     * @param environment The environment to copy from
+     */
+    MolangEnvironmentBuilder<V> copy(MolangEnvironment environment);
+
+    /**
      * Adds all variables for the specified provider.
      *
      * @param provider The provider to add variables for

@@ -66,6 +66,11 @@ public abstract class MolangLibrary implements MolangObject {
     }
 
     @Override
+    public boolean isMutable() {
+        return false;
+    }
+
+    @Override
     public String toString() {
         StringBuilder builder = new StringBuilder(this.getName()).append('\n');
         for (Map.Entry<String, MolangExpression> entry : this.values.entrySet()) {
