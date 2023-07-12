@@ -21,6 +21,9 @@ import java.util.stream.Collectors;
  */
 public record MathNode(MathOperation function, Node... arguments) implements Node {
 
+    private static final float RADIANS_TO_DEGREES = (float) (180 / Math.PI);
+    private static final float DEGREES_TO_RADIANS = (float) (Math.PI / 180);
+
     @Override
     public String toString() {
         if (this.function.getParameters() == 0) {
@@ -57,14 +60,14 @@ public record MathNode(MathOperation function, Node... arguments) implements Nod
 
         return switch (this.function) {
             case ABS -> Math.abs(values[0]);
-            case ACOS -> (float) Math.acos(values[0]);
-            case ASIN -> (float) Math.asin(values[0]);
-            case ATAN -> (float) Math.atan(values[0]);
-            case ATAN2 -> (float) Math.atan2(values[0], values[1]);
+            case ACOS -> RADIANS_TO_DEGREES * (float) Math.acos(values[0]);
+            case ASIN -> RADIANS_TO_DEGREES * (float) Math.asin(values[0]);
+            case ATAN -> RADIANS_TO_DEGREES * (float) Math.atan(values[0]);
+            case ATAN2 -> RADIANS_TO_DEGREES * (float) Math.atan2(values[0], values[1]);
             case CEIL -> (float) Math.ceil(values[0]);
             case CLAMP -> MolangUtil.clamp(values[0], values[1], values[2]);
-            case COS -> (float) Math.cos(values[0]);
-            case SIN -> (float) Math.sin(values[0]);
+            case COS -> (float) Math.cos(DEGREES_TO_RADIANS * values[0]);
+            case SIN -> (float) Math.sin(DEGREES_TO_RADIANS * values[0]);
             case EXP -> (float) Math.exp(values[0]);
             case FLOOR -> (float) Math.floor(values[0]);
             case HERMITE_BLEND -> MolangUtil.hermiteBlend(values[0]);
@@ -100,21 +103,50 @@ public record MathNode(MathOperation function, Node... arguments) implements Nod
                 this.arguments[1].writeBytecode(method, env, breakLabel, continueLabel);
                 method.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Math", this.function.getName(), "(FF)F", false);
             }
+            // Convert to degrees
+            case ACOS, ASIN, ATAN -> {
+                this.arguments[0].writeBytecode(method, env, breakLabel, continueLabel);
+                method.visitInsn(Opcodes.F2D);
+                method.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Math", this.function.getName(), "(D)D", false);
+                method.visitInsn(Opcodes.D2F);
+                BytecodeCompiler.writeFloatConst(method, RADIANS_TO_DEGREES);
+                method.visitInsn(Opcodes.FMUL);
+            }
             // Single-argument Double
-            case ACOS, ASIN, ATAN, CEIL, COS, SIN, EXP, FLOOR, LN, SQRT -> {
+            case CEIL, EXP, FLOOR, LN, SQRT -> {
                 this.arguments[0].writeBytecode(method, env, breakLabel, continueLabel);
                 method.visitInsn(Opcodes.F2D);
                 method.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Math", this.function.getName(), "(D)D", false);
                 method.visitInsn(Opcodes.D2F);
             }
+            // Convert to radians
+            case COS, SIN -> {
+                this.arguments[0].writeBytecode(method, env, breakLabel, continueLabel);
+                BytecodeCompiler.writeFloatConst(method, DEGREES_TO_RADIANS);
+                method.visitInsn(Opcodes.FMUL);
+                method.visitInsn(Opcodes.F2D);
+                method.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Math", this.function.getName(), "(D)D", false);
+                method.visitInsn(Opcodes.D2F);
+            }
             // Double-argument Double
-            case ATAN2, POW -> {
+            case POW -> {
                 this.arguments[0].writeBytecode(method, env, breakLabel, continueLabel);
                 method.visitInsn(Opcodes.F2D);
                 this.arguments[1].writeBytecode(method, env, breakLabel, continueLabel);
                 method.visitInsn(Opcodes.F2D);
                 method.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Math", this.function.getName(), "(DD)D", false);
                 method.visitInsn(Opcodes.D2F);
+            }
+            // Convert to degrees
+            case ATAN2 -> {
+                this.arguments[0].writeBytecode(method, env, breakLabel, continueLabel);
+                method.visitInsn(Opcodes.F2D);
+                this.arguments[1].writeBytecode(method, env, breakLabel, continueLabel);
+                method.visitInsn(Opcodes.F2D);
+                method.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Math", this.function.getName(), "(DD)D", false);
+                method.visitInsn(Opcodes.D2F);
+                BytecodeCompiler.writeFloatConst(method, RADIANS_TO_DEGREES);
+                method.visitInsn(Opcodes.FMUL);
             }
             // Single-argument Float->Int
             case ROUND -> {

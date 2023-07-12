@@ -226,7 +226,7 @@ public class MolangTest {
 
     @Test
     void testContainer() throws MolangException {
-        MolangCompiler compiler = MolangCompiler.create();
+        MolangCompiler compiler = MolangCompiler.create(MolangCompiler.WRITE_CLASSES_FLAG);
         MolangExpression expression = compiler.compile("v.screen_aspect_ratio > v.aspect_ratio ? q.screen.width : q.screen.height * v.aspect_ratio");
 
         MolangRuntime runtime = MolangRuntime.runtime()
