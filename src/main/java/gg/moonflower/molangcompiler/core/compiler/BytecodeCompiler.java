@@ -14,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * @author Buddy, Ocelot
@@ -26,6 +28,8 @@ public class BytecodeCompiler extends ClassLoader {
     public static final int THIS_INDEX = 0;
     public static final int RUNTIME_INDEX = 1;
     public static final int VARIABLE_START = 2;
+
+    private static final Pattern DASH = Pattern.compile("-");
 
     private final MolangBytecodeEnvironment environment;
     private final boolean writeClasses;
@@ -50,7 +54,7 @@ public class BytecodeCompiler extends ClassLoader {
             ClassNode classNode = new ClassNode(Opcodes.ASM5);
             classNode.version = Opcodes.V1_8;
             classNode.superName = "java/lang/Object";
-            classNode.name = "Expression_" + System.nanoTime();
+            classNode.name = "Expression_" + DASH.matcher(UUID.randomUUID().toString()).replaceAll("");
             classNode.access = Opcodes.ACC_PUBLIC;
             classNode.interfaces.add(MolangExpression.class.getName().replaceAll("\\.", "/"));
 
