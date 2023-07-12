@@ -277,4 +277,26 @@ public class MolangTest {
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(0.0F, result);
     }
+
+    @Test
+    void testSign() throws MolangException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression expression = compiler.compile("math.sign(-4)");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = runtime.resolve(expression);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(-1.0F, result);
+    }
+
+    @Test
+    void testTriangleWave() throws MolangException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression expression = compiler.compile("math.triangle_wave(23544/2, 23544)");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = runtime.resolve(expression);
+        System.out.println(expression + "\n==RESULT==\n" + result);
+        Assertions.assertEquals(-1.0F, result);
+    }
 }

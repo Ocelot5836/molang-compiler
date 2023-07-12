@@ -62,6 +62,10 @@ public class MolangUtil {
         return (float) (low + Math.random() * (high - low));
     }
 
+    public static float triangleWave(float x, float wavelength) {
+        return (Math.abs(x % wavelength - wavelength * 0.5F) - wavelength * 0.25F) / (wavelength * 0.25F);
+    }
+
     public static MolangExpression getFunction(MolangObject object, String name, String fullKey) throws MolangException {
         if (object.has(fullKey)) {
             return object.get(fullKey);

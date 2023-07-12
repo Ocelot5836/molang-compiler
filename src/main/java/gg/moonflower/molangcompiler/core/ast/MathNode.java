@@ -80,6 +80,8 @@ public record MathNode(MathOperation function, Node... arguments) implements Nod
             case ROUND -> Math.round(values[0]);
             case SQRT -> (float) Math.sqrt(values[0]);
             case TRUNC -> (int) values[0];
+            case SIGN -> Math.signum(values[0]);
+            case TRIANGLE_WAVE -> MolangUtil.triangleWave(values[0], values[1]);
             default -> throw new MolangException("Unexpected value: " + this.function);
         };
     }
@@ -194,6 +196,15 @@ public record MathNode(MathOperation function, Node... arguments) implements Nod
                 method.visitMethodInsn(Opcodes.INVOKESTATIC, "gg/moonflower/molangcompiler/core/MolangUtil", "random", "(FF)F", false);
                 method.visitInsn(Opcodes.F2I);
                 method.visitInsn(Opcodes.I2F);
+            }
+            case SIGN -> {
+                this.arguments[0].writeBytecode(method, env, breakLabel, continueLabel);
+                method.visitMethodInsn(Opcodes.INVOKESTATIC, "java/lang/Math", "signum", "(F)F", false);
+            }
+            case TRIANGLE_WAVE -> {
+                this.arguments[0].writeBytecode(method, env, breakLabel, continueLabel);
+                this.arguments[1].writeBytecode(method, env, breakLabel, continueLabel);
+                method.visitMethodInsn(Opcodes.INVOKESTATIC, "gg/moonflower/molangcompiler/core/MolangUtil", "triangleWave", "(FF)F", false);
             }
         }
     }

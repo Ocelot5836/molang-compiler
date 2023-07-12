@@ -33,7 +33,9 @@ public enum MathOperation {
     RANDOM_INTEGER(2, false),
     ROUND(1),
     SQRT(1),
-    TRUNC(1);
+    TRUNC(1),
+    SIGN(1),
+    TRIANGLE_WAVE(2);
 
     private final String name;
     private final int parameters;
