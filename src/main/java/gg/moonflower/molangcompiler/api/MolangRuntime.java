@@ -305,19 +305,19 @@ public class MolangRuntime implements MolangEnvironment {
                     switch (name) {
                         case "query" -> {
                             for (String field : copy.getKeys()) {
-                                this.query.set(field, copy.get(field));
+                                this.query.set(field, copy.get(field).getCopy());
                             }
                             continue;
                         }
                         case "global" -> {
                             for (String field : copy.getKeys()) {
-                                this.global.set(field, copy.get(field));
+                                this.global.set(field, copy.get(field).getCopy());
                             }
                             continue;
                         }
                         case "variable" -> {
                             for (String field : copy.getKeys()) {
-                                this.variable.set(field, copy.get(field));
+                                this.variable.set(field, copy.get(field).getCopy());
                             }
                             continue;
                         }
@@ -327,7 +327,7 @@ public class MolangRuntime implements MolangEnvironment {
                         MolangObject runtimeObject = environment.get(name);
                         if (runtimeObject.isMutable()) {
                             for (String field : copy.getKeys()) {
-                                runtimeObject.set(field, copy.get(field));
+                                runtimeObject.set(field, copy.get(field).getCopy());
                             }
                             continue;
                         }
@@ -471,7 +471,7 @@ public class MolangRuntime implements MolangEnvironment {
                         MolangObject runtimeObject = this.runtime.get(name);
                         if (runtimeObject.isMutable()) {
                             for (String field : copy.getKeys()) {
-                                runtimeObject.set(field, copy.get(field));
+                                runtimeObject.set(field, copy.get(field).getCopy());
                             }
                             continue;
                         }

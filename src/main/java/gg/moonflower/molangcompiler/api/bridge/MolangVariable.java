@@ -24,6 +24,12 @@ public interface MolangVariable {
     void setValue(float value);
 
     /**
+     * @return A new copy of this variable
+     * @since 3.0.0
+     */
+    MolangVariable copy();
+
+    /**
      * Makes read-only copy of this variable.
      *
      * @return A new variable that reflects the value of the provided, but cannot be changed
@@ -38,6 +44,11 @@ public interface MolangVariable {
 
             @Override
             public void setValue(float value) {
+            }
+
+            @Override
+            public MolangVariable copy() {
+                return this;
             }
 
             @Override
@@ -69,6 +80,11 @@ public interface MolangVariable {
             @Override
             public void setValue(float value) {
                 setter.accept(value);
+            }
+
+            @Override
+            public MolangVariable copy() {
+                return this;
             }
 
             @Override
@@ -104,6 +120,11 @@ public interface MolangVariable {
             @Override
             public void setValue(float v) {
                 value[0] = v;
+            }
+
+            @Override
+            public MolangVariable copy() {
+                return create(initialValue);
             }
 
             @Override

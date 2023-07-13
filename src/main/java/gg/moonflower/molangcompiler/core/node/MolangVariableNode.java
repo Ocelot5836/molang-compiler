@@ -30,4 +30,14 @@ public record MolangVariableNode(MolangVariable value) implements MolangExpressi
     public void setValue(float value) {
         this.value.setValue(value);
     }
+
+    @Override
+    public MolangExpression getCopy() {
+        return new MolangVariableNode(this.copy());
+    }
+
+    @Override
+    public MolangVariable copy() {
+        return this.value.copy();
+    }
 }

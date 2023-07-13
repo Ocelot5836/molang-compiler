@@ -55,6 +55,16 @@ public interface MolangExpression {
     }
 
     /**
+     * Creates a copy of this expression if there is an internal state.
+     *
+     * @return A copy of this expression that has a unique internal state
+     * @since 3.0.0
+     */
+    default MolangExpression getCopy() {
+        return this;
+    }
+
+    /**
      * Creates a {@link MolangExpression} of the specified value.
      *
      * @param value The value to represent as an expression
