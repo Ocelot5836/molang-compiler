@@ -8,6 +8,10 @@ version '3.0.1'
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
+if (System.getenv('BUILD_NUMBER') != null) {
+    version += "." + System.getenv('BUILD_NUMBER')
+}
+
 repositories {
     mavenCentral()
 }
