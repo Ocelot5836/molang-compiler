@@ -32,12 +32,12 @@ public class BytecodeCompiler extends ClassLoader {
 
     private static final Pattern DASH = Pattern.compile("-");
 
-    private final MolangBytecodeEnvironment environment;
+    private final ThreadLocal<MolangBytecodeEnvironment> environment;
     private final boolean writeClasses;
 
     public BytecodeCompiler(int flags, ClassLoader parent) {
         super(parent);
-        this.environment = new MolangBytecodeEnvironment(flags);
+        this.environment = ThreadLocal.withInitial(() -> new MolangBytecodeEnvironment(flags));
         this.writeClasses = (flags & MolangCompiler.WRITE_CLASSES_FLAG) > 0;
     }
 
@@ -46,10 +46,11 @@ public class BytecodeCompiler extends ClassLoader {
     }
 
     public MolangExpression build(Node node) throws MolangSyntaxException {
-        this.environment.reset();
+        MolangBytecodeEnvironment environment = this.environment.get();
+        environment.reset();
         try {
-            if (this.environment.optimize() && node.isConstant()) {
-                return MolangExpression.of(node.evaluate(this.environment));
+            if (environment.optimize() && node.isConstant()) {
+                return MolangExpression.of(node.evaluate(environment));
             }
 
             ClassNode classNode = new ClassNode(Opcodes.ASM5);
@@ -73,7 +74,7 @@ public class BytecodeCompiler extends ClassLoader {
             method.name = "get";
             method.desc = "(Lgg/moonflower/molangcompiler/api/MolangEnvironment;)F";
             method.exceptions = List.of("gg/moonflower/molangcompiler/api/exception/MolangRuntimeException");
-            node.writeBytecode(method, this.environment, null, null);
+            node.writeBytecode(method, environment, null, null);
             classNode.methods.add(method);
 
             String compiledSource = node.toString();
