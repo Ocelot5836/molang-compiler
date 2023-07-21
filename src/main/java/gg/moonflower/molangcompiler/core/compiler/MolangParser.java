@@ -191,6 +191,12 @@ public final class MolangParser {
                     reader.skip();
                     result = new BinaryOperationNode(BinaryOperation.NULL_COALESCING, result, parseNode(reader));
                 }
+                case EQUAL -> {
+                    reader.skip();
+                    expect(reader, MolangLexer.TokenType.EQUAL);
+                    reader.skip();
+                    result = new BinaryOperationNode(BinaryOperation.EQUALS, result, parseNode(reader));
+                }
                 case SPECIAL -> {
                     switch (token.value()) {
                         // obj.name&&...

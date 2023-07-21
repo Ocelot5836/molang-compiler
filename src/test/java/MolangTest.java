@@ -310,4 +310,17 @@ public class MolangTest {
         Assertions.assertEquals(expression1, expression2);
         Assertions.assertEquals(expression1.hashCode(), expression2.hashCode());
     }
+
+    @Test
+    void testAState() throws MolangSyntaxException {
+        MolangCompiler compiler = MolangCompiler.create();
+        compiler.compile("query.is_gliding == 1.0 ? 1.0 : 0.0");
+        compiler.compile("query.is_gliding");
+    }
+
+    @Test
+    void testBState() throws MolangSyntaxException {
+        MolangCompiler compiler = MolangCompiler.create();
+        compiler.compile("test.a == 4");
+    }
 }
