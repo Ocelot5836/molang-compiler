@@ -325,4 +325,26 @@ public class MolangTest {
         MolangCompiler compiler = MolangCompiler.create();
         compiler.compile("test.a ? 4 : 0");
     }
+
+    @Test
+    void testJavaCondition() throws MolangException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression eq = compiler.compile("query.climb_vertical == 0.0");
+        MolangExpression ne = compiler.compile("query.climb_vertical != 0.0");
+        MolangExpression gt = compiler.compile("query.climb_vertical > 0.0");
+        MolangExpression gteq = compiler.compile("query.climb_vertical >= 0.0");
+        MolangExpression lt = compiler.compile("query.climb_vertical < 0.0");
+        MolangExpression lteq = compiler.compile("query.climb_vertical <= 0.0");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        for (int i = -4; i < 6; i++) {
+            runtime.edit().setQuery("climb_vertical", i);
+            Assertions.assertEquals(i == 0 ? 1.0F : 0.0F, runtime.resolve(eq));
+            Assertions.assertEquals(i != 0 ? 1.0F : 0.0F, runtime.resolve(ne));
+            Assertions.assertEquals(i > 0 ? 1.0F : 0.0F, runtime.resolve(gt));
+            Assertions.assertEquals(i >= 0 ? 1.0F : 0.0F, runtime.resolve(gteq));
+            Assertions.assertEquals(i < 0 ? 1.0F : 0.0F, runtime.resolve(lt));
+            Assertions.assertEquals(i <= 0 ? 1.0F : 0.0F, runtime.resolve(lteq));
+        }
+    }
 }

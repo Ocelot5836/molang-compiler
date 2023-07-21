@@ -161,8 +161,8 @@ public record BinaryOperationNode(BinaryOperation operator, Node left, Node righ
                 switch (this.operator) {
                     case ADD -> method.visitInsn(Opcodes.FADD);
                     case SUBTRACT -> method.visitInsn(Opcodes.FSUB);
-                    case EQUALS -> writeComparision(method, Opcodes.IFEQ);
-                    case NOT_EQUALS -> writeComparision(method, Opcodes.IFNE);
+                    case EQUALS -> writeComparision(method, Opcodes.IFNE);
+                    case NOT_EQUALS -> writeComparision(method, Opcodes.IFEQ);
                     case LESS_EQUALS -> writeComparision(method, Opcodes.IFGT);
                     case LESS -> writeComparision(method, Opcodes.IFGE);
                     case GREATER_EQUALS -> writeComparision(method, Opcodes.IFLT);
