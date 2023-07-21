@@ -4,6 +4,7 @@ import gg.moonflower.molangcompiler.api.MolangExpression;
 import gg.moonflower.molangcompiler.api.MolangRuntime;
 import gg.moonflower.molangcompiler.api.bridge.MolangVariable;
 import gg.moonflower.molangcompiler.api.exception.MolangException;
+import gg.moonflower.molangcompiler.api.exception.MolangSyntaxException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -298,5 +299,15 @@ public class MolangTest {
         float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(-1.0F, result);
+    }
+
+    @Test
+    void testEqualsHashCode() throws MolangSyntaxException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression expression1 = compiler.compile("q.test");
+        MolangExpression expression2 = compiler.compile("q.test");
+
+        Assertions.assertEquals(expression1, expression2);
+        Assertions.assertEquals(expression1.hashCode(), expression2.hashCode());
     }
 }

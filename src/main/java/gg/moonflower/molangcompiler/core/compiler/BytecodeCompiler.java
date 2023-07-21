@@ -75,13 +75,33 @@ public class BytecodeCompiler extends ClassLoader {
             node.writeBytecode(method, this.environment, null, null);
             classNode.methods.add(method);
 
+            String compiledSource = node.toString();
+
+            MethodNode equals = new MethodNode();
+            equals.access = Opcodes.ACC_PUBLIC;
+            equals.name = "equals";
+            equals.desc = "(Ljava/lang/Object;)Z";
+            equals.visitLdcInsn(compiledSource);
+            equals.visitVarInsn(Opcodes.ALOAD, 1);
+            equals.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;", false);
+            equals.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+            equals.visitInsn(Opcodes.IRETURN);
+            classNode.methods.add(equals);
+
+            MethodNode hashCode = new MethodNode();
+            hashCode.access = Opcodes.ACC_PUBLIC;
+            hashCode.name = "hashCode";
+            hashCode.desc = "()I";
+            BytecodeCompiler.writeIntConst(hashCode, compiledSource.hashCode());
+            hashCode.visitInsn(Opcodes.IRETURN);
+            classNode.methods.add(hashCode);
+
             MethodNode toString = new MethodNode();
             toString.access = Opcodes.ACC_PUBLIC;
             toString.name = "toString";
             toString.desc = "()Ljava/lang/String;";
-            toString.visitLdcInsn(node.toString());
+            toString.visitLdcInsn(compiledSource);
             toString.visitInsn(Opcodes.ARETURN);
-            toString.visitInsn(Opcodes.RETURN);
             classNode.methods.add(toString);
 
             ClassWriter cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS);
@@ -101,7 +121,7 @@ public class BytecodeCompiler extends ClassLoader {
             throw new MolangSyntaxException("Failed to convert expression '" + node + "' to bytecode", t);
         }
     }
-
+    
     public static void writeFloatConst(MethodNode method, float value) {
         if (value == 0.0F) {
             method.visitInsn(Opcodes.FCONST_0);
