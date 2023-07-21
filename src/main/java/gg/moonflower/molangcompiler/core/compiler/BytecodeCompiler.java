@@ -6,6 +6,7 @@ import gg.moonflower.molangcompiler.api.exception.MolangSyntaxException;
 import gg.moonflower.molangcompiler.core.ast.Node;
 import org.jetbrains.annotations.ApiStatus;
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -78,14 +79,31 @@ public class BytecodeCompiler extends ClassLoader {
             String compiledSource = node.toString();
 
             MethodNode equals = new MethodNode();
+            Label equalsFail = new Label();
+            Label equalsReturn = new Label();
             equals.access = Opcodes.ACC_PUBLIC;
             equals.name = "equals";
             equals.desc = "(Ljava/lang/Object;)Z";
+
+            equals.visitVarInsn(Opcodes.ALOAD, 1);
+            equals.visitTypeInsn(Opcodes.INSTANCEOF, "gg/moonflower/molangcompiler/api/MolangExpression");
+            equals.visitJumpInsn(Opcodes.IFEQ, equalsFail); // if !(obj instanceof MolangExpression) goto equalsFail
+
             equals.visitLdcInsn(compiledSource);
             equals.visitVarInsn(Opcodes.ALOAD, 1);
             equals.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Object", "toString", "()Ljava/lang/String;", false);
             equals.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/String", "equals", "(Ljava/lang/Object;)Z", false);
+            equals.visitJumpInsn(Opcodes.IFEQ, equalsFail); // if !source.equals(obj.toString()) goto equalsFail
+
+            BytecodeCompiler.writeIntConst(equals, 1);
+            equals.visitJumpInsn(Opcodes.GOTO, equalsReturn);
+
+            equals.visitLabel(equalsFail);
+            BytecodeCompiler.writeIntConst(equals, 0);
+
+            equals.visitLabel(equalsReturn);
             equals.visitInsn(Opcodes.IRETURN);
+
             classNode.methods.add(equals);
 
             MethodNode hashCode = new MethodNode();
@@ -121,7 +139,7 @@ public class BytecodeCompiler extends ClassLoader {
             throw new MolangSyntaxException("Failed to convert expression '" + node + "' to bytecode", t);
         }
     }
-    
+
     public static void writeFloatConst(MethodNode method, float value) {
         if (value == 0.0F) {
             method.visitInsn(Opcodes.FCONST_0);

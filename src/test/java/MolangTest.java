@@ -309,6 +309,8 @@ public class MolangTest {
 
         Assertions.assertEquals(expression1, expression2);
         Assertions.assertEquals(expression1.hashCode(), expression2.hashCode());
+        Assertions.assertNotEquals("q.test", expression1);
+        Assertions.assertNotEquals("q.test", expression2);
     }
 
     @Test
@@ -321,6 +323,6 @@ public class MolangTest {
     @Test
     void testBState() throws MolangSyntaxException {
         MolangCompiler compiler = MolangCompiler.create();
-        compiler.compile("test.a == 4");
+        compiler.compile("test.a ? 4 : 0");
     }
 }
