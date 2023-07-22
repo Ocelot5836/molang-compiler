@@ -182,9 +182,9 @@ public class BarLibrary extends MolangLibrary {
         consumer.accept("secret", MolangExpression.of(42));
     }
 
-    /**
-     * @return The name of this library
-     */
+    // This name is used for printing and identification.
+    // The actual namespace of the library is defined when adding it to a MolangEnvironment.
+    @Override
     protected String getName() {
         return "libname";
     }
