@@ -29,22 +29,15 @@ test {
     useJUnitPlatform()
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier = 'sources'
-    from sourceSets.main.allSource
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    archiveClassifier = 'javadoc'
-    from javadoc.destinationDir
+java {
+    withSourcesJar()
+    withJavadocJar()
 }
 
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            artifact sourcesJar
-            artifact javadocJar
-            artifact jar
+        myJava(MavenPublication) {
+            from components.java
         }
     }
 
