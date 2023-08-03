@@ -227,7 +227,7 @@ public class MolangTest {
 
     @Test
     void testContainer() throws MolangException {
-        MolangCompiler compiler = MolangCompiler.create(MolangCompiler.WRITE_CLASSES_FLAG);
+        MolangCompiler compiler = MolangCompiler.create();
         MolangExpression expression = compiler.compile("v.screen_aspect_ratio > v.aspect_ratio ? q.screen.width : q.screen.height * v.aspect_ratio");
 
         MolangRuntime runtime = MolangRuntime.runtime()
@@ -253,19 +253,6 @@ public class MolangTest {
         float result = runtime.resolve(expression);
         System.out.println(expression + "\n==RESULT==\n" + result);
         Assertions.assertEquals(1, test.getValue());
-    }
-
-    @Test
-    void testLoop() throws MolangException {
-        MolangCompiler compiler = MolangCompiler.create(MolangCompiler.DEFAULT_FLAGS | MolangCompiler.WRITE_CLASSES_FLAG);
-        MolangExpression expression = compiler.compile("""
-                clinker.spill(q.throw_angle);
-                """);
-
-//        MolangRuntime runtime = MolangRuntime.runtime().create();
-//        float result = runtime.resolve(expression);
-//        System.out.println(expression + "\n==RESULT==\n" + result);
-//        Assertions.assertEquals(10, result);
     }
 
     @Test
@@ -346,5 +333,18 @@ public class MolangTest {
             Assertions.assertEquals(i < 0 ? 1.0F : 0.0F, runtime.resolve(lt));
             Assertions.assertEquals(i <= 0 ? 1.0F : 0.0F, runtime.resolve(lteq));
         }
+    }
+
+    @Test
+    void testTrueFalse() throws MolangException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression trueExpression = compiler.compile("true");
+        MolangExpression falseExpression = compiler.compile("false");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float trueResult = runtime.resolve(trueExpression);
+        float falseResult = runtime.resolve(falseExpression);
+        Assertions.assertEquals(1.0F, trueResult);
+        Assertions.assertEquals(0.0F, falseResult);
     }
 }

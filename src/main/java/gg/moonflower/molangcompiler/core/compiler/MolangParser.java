@@ -103,6 +103,14 @@ public final class MolangParser {
                 reader.skip();
                 yield new ThisNode();
             }
+            case TRUE -> {
+                reader.skip();
+                yield new ConstNode(1.0F);
+            }
+            case FALSE -> {
+                reader.skip();
+                yield new ConstNode(0.0F);
+            }
             case NUMERAL -> {
                 try {
                     // 3
@@ -119,7 +127,7 @@ public final class MolangParser {
                         reader.skip();
 
                         if (decimal > 0) {
-                            value += decimal / Math.pow(10, decimalString.length());
+                            value += (float) (decimal / Math.pow(10, decimalString.length()));
                         }
                     }
 

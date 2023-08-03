@@ -70,6 +70,8 @@ public final class MolangLexer {
         RETURN("return"),
         LOOP("loop"),
         THIS("this"),
+        TRUE("true"),
+        FALSE("false"),
         NUMERAL("\\d+"),
         ALPHANUMERIC("[A-Za-z_][A-Za-z0-9_]*"),
         NULL_COALESCING("\\?\\?"),
