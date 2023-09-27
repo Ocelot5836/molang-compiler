@@ -2,7 +2,7 @@
 
 # Molang Compiler
 
-High Speed MoLang compiler and executor designed with per-frame execution in mind.
+High Speed MoLang compiler and executor designed with per-frame execution in mind. Check the [MoLang Documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/molangintroduction) for more information on how to write MoLang expressions.
 
 # How to add to your workspace
 
@@ -113,7 +113,8 @@ public class Example {
     private final MolangExpression speed;
     private final MolangExpression time;
 
-    // MolangEnvironment#resolve(MolangExpression) allows the caller to handle errors created by the compiled MoLang
+    // MolangEnvironment#resolve(MolangExpression) allows the caller to handle errors created while resolving
+    // The most common reason for an error is a variable being used that isn't defined in the environment
     public float getSpeed(MolangEnvironment environment) throws MolangRuntimeException {
         return environment.resolve(this.speed);
     }
@@ -132,7 +133,6 @@ public class Example {
 
             // Expressions can be compiled from a valid MoLang string
             // Note that compilation is relatively expensive(~15ms sometimes) so it should be done once and cached
-            // https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/molangintroduction
             MolangExpression speed = compiler.compile(speedInput);
             MolangExpression time = compiler.compile(timeInput);
 
