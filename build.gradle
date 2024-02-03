@@ -17,12 +17,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly 'org.jetbrains:annotations:23.0.0'
+    compileOnly 'org.jetbrains:annotations:24.1.0'
 
-    implementation 'org.ow2.asm:asm-tree:9.5'
+    implementation 'org.ow2.asm:asm-tree:9.6'
 
-    testImplementation 'com.google.guava:guava:31.1-jre'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.0'
+    testImplementation 'com.google.guava:guava:33.0.0-jre'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.1'
 }
 
 test {
