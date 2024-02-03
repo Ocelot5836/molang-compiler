@@ -71,6 +71,8 @@ public final class MolangLexer {
         LOOP("loop"),
         CONTINUE("continue"),
         BREAK("break"),
+        IF("if"),
+        ELSE("else"),
         THIS("this"),
         TRUE("true"),
         FALSE("false"),

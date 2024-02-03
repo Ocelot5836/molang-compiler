@@ -107,6 +107,26 @@ public final class MolangParser {
                 reader.skip();
                 yield new BreakNode();
             }
+            case IF -> {
+                reader.skip();
+                expect(reader, MolangLexer.TokenType.LEFT_PARENTHESIS);
+                reader.skip();
+
+                // if(condition)
+                Node condition = parseExpression(reader);
+
+                expect(reader, MolangLexer.TokenType.RIGHT_PARENTHESIS);
+                reader.skip();
+
+                Node branch = parseExpression(reader);
+                if (reader.canRead(2) && reader.peek().type().isTerminating() && reader.peekAfter(1).type() == MolangLexer.TokenType.ELSE) {
+                    reader.skip(2);
+                    yield new TernaryOperationNode(condition, branch, parseExpression(reader));
+                }
+
+                // value ? left
+                yield new BinaryConditionalNode(condition, branch);
+            }
             case THIS -> {
                 reader.skip();
                 yield new ThisNode();
