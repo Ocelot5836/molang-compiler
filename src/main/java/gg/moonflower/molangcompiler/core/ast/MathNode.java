@@ -4,6 +4,7 @@ import gg.moonflower.molangcompiler.api.exception.MolangException;
 import gg.moonflower.molangcompiler.core.MolangUtil;
 import gg.moonflower.molangcompiler.core.compiler.BytecodeCompiler;
 import gg.moonflower.molangcompiler.core.compiler.MolangBytecodeEnvironment;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * @param arguments The parameters to pass into the function
  * @author Ocelot, Buddy
  */
+@ApiStatus.Internal
 public record MathNode(MathOperation function, Node... arguments) implements Node {
 
     private static final float RADIANS_TO_DEGREES = (float) (180 / Math.PI);

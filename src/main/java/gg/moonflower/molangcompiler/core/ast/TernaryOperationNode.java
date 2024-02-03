@@ -2,6 +2,7 @@ package gg.moonflower.molangcompiler.core.ast;
 
 import gg.moonflower.molangcompiler.api.exception.MolangException;
 import gg.moonflower.molangcompiler.core.compiler.MolangBytecodeEnvironment;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
@@ -15,6 +16,7 @@ import org.objectweb.asm.tree.MethodNode;
  * @param right The value to use when false
  * @author Buddy
  */
+@ApiStatus.Internal
 public record TernaryOperationNode(Node value, Node left, Node right) implements Node {
 
     @Override

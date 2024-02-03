@@ -1,10 +1,13 @@
 package gg.moonflower.molangcompiler.core.ast;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.Objects;
 
 /**
  * @author Buddy
  */
+@ApiStatus.Internal
 public enum BinaryOperation {
     ADD("+"),
     SUBTRACT("-"),

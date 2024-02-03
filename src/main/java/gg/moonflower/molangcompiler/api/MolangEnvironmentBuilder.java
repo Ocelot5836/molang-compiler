@@ -68,7 +68,7 @@ public interface MolangEnvironmentBuilder<V extends MolangEnvironment> {
      * @param function The function to execute
      */
     default MolangEnvironmentBuilder<V> setQuery(String name, int params, MolangJavaFunction function) {
-        return this.setQuery(params < 0 ? name : (name + "$" + params), new MolangFunctionNode(params, function));
+        return this.setQuery(params < 0 ? name : (name + "$" + params), MolangExpression.function(params, function));
     }
 
     /**
@@ -107,7 +107,7 @@ public interface MolangEnvironmentBuilder<V extends MolangEnvironment> {
      * @param function The function to execute
      */
     default MolangEnvironmentBuilder<V> setGlobal(String name, int params, MolangJavaFunction function) {
-        return this.setGlobal(params < 0 ? name : (name + "$" + params), new MolangFunctionNode(params, function));
+        return this.setGlobal(params < 0 ? name : (name + "$" + params), MolangExpression.function(params, function));
     }
 
     /**

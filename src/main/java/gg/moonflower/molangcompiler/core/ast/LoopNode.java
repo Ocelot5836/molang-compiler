@@ -3,6 +3,7 @@ package gg.moonflower.molangcompiler.core.ast;
 import gg.moonflower.molangcompiler.api.exception.MolangException;
 import gg.moonflower.molangcompiler.core.compiler.BytecodeCompiler;
 import gg.moonflower.molangcompiler.core.compiler.MolangBytecodeEnvironment;
+import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
@@ -15,6 +16,7 @@ import org.objectweb.asm.tree.MethodNode;
  * @param body       The body of the loop
  * @author Buddy
  */
+@ApiStatus.Internal
 public record LoopNode(Node iterations, Node body) implements Node {
 
     @Override

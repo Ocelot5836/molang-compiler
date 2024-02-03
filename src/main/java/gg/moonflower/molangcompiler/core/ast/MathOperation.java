@@ -1,10 +1,13 @@
 package gg.moonflower.molangcompiler.core.ast;
 
+import org.jetbrains.annotations.ApiStatus;
+
 import java.util.Locale;
 
 /**
  * @author Ocelot
  */
+@ApiStatus.Internal
 public enum MathOperation {
     ABS(1),
     ACOS(1),
