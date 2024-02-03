@@ -81,7 +81,7 @@ public final class MolangParser {
                 if (value instanceof OptionalValueNode setNode) {
                     value = setNode.withReturnValue();
                 }
-                yield scope ? value : new ReturnNode(value);
+                yield new ReturnNode(value);
             }
             case LOOP -> {
                 reader.skip();
@@ -98,6 +98,14 @@ public final class MolangParser {
 
                 // Ignore the top level scope since the loop is already a "scope"
                 yield new LoopNode(iterations, body instanceof ScopeNode scopeNode ? scopeNode.node() : body);
+            }
+            case CONTINUE -> {
+                reader.skip();
+                yield new ContinueNode();
+            }
+            case BREAK -> {
+                reader.skip();
+                yield new BreakNode();
             }
             case THIS -> {
                 reader.skip();

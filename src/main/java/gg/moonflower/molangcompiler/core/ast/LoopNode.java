@@ -35,6 +35,7 @@ public record LoopNode(Node iterations, Node body) implements Node {
     @Override
     public void writeBytecode(MethodNode method, MolangBytecodeEnvironment environment, @Nullable Label breakLabel, @Nullable Label continueLabel) throws MolangException {
         Label begin = new Label();
+        Label next = new Label();
         Label end = new Label();
 
         // iterations
@@ -44,11 +45,12 @@ public record LoopNode(Node iterations, Node body) implements Node {
         BytecodeCompiler.writeIntConst(method, 0); // int i = 0;
         method.visitLabel(begin);
 
-        this.body.writeBytecode(method, environment, end, begin);
+        this.body.writeBytecode(method, environment, end, next);
         if (this.body.hasValue()) { // Must return void
             method.visitInsn(Opcodes.POP);
         }
 
+        method.visitLabel(next);
         method.visitInsn(Opcodes.ICONST_1);
         method.visitInsn(Opcodes.IADD); // i++
         method.visitInsn(Opcodes.DUP2);

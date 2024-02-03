@@ -98,10 +98,10 @@ public class MolangTest {
                         temp.a = 4;
                         temp.b = 2;
                         temp.c = {
-                        return 4;
+                        4;
                         };
                         return {
-                        return {return temp.a * temp.b;};
+                        {temp.a * temp.b;};
                         };
                 """);
 
@@ -346,5 +346,43 @@ public class MolangTest {
         float falseResult = runtime.resolve(falseExpression);
         Assertions.assertEquals(1.0F, trueResult);
         Assertions.assertEquals(0.0F, falseResult);
+    }
+
+    @Test
+    void testLoop() throws MolangException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression loop = compiler.compile("""
+                temp.i = 0;
+                loop(10, {
+                    temp.i++;
+                    if(temp.i > 5) {
+                        temp.i+=3;
+                        break;
+                    } else {
+                        temp.i+=2;
+                        continue;
+                    }
+                });
+                temp.i;
+                """);
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = runtime.resolve(loop);
+        Assertions.assertEquals(10, result);
+    }
+
+    @Test
+    void testIf() throws MolangException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression loop = compiler.compile("""
+                if(true) {
+                    return 4;
+                }
+                return 1;
+                """);
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = runtime.resolve(loop);
+        Assertions.assertEquals(4, result);
     }
 }

@@ -69,6 +69,8 @@ public final class MolangLexer {
     public enum TokenType {
         RETURN("return"),
         LOOP("loop"),
+        CONTINUE("continue"),
+        BREAK("break"),
         THIS("this"),
         TRUE("true"),
         FALSE("false"),
