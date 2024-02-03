@@ -30,6 +30,17 @@ public interface MolangExpression {
     float get(MolangEnvironment environment) throws MolangRuntimeException;
 
     /**
+     * Resolves the constant float value of this expression if {@link #isConstant()} returns <code>true</code>.
+     *
+     * @return The constant value backing this expression
+     * @throws UnsupportedOperationException If this expression is not considered constant and cannot be resolved without an environment
+     * @since 3.1.0
+     */
+    default float getConstant() throws UnsupportedOperationException {
+        throw new UnsupportedOperationException("Expression is not constant");
+    }
+
+    /**
      * Resolves the float value of this expression.
      *
      * @param environment The environment to execute in
@@ -52,6 +63,16 @@ public interface MolangExpression {
     @Deprecated
     default float safeResolve(MolangEnvironment environment) {
         return environment.safeResolve(this);
+    }
+
+    /**
+     * If this node is constant, {@link #getConstant()} can be safely called
+     *
+     * @return Whether this expression is considered constant and can be turned into a float primitive
+     * @since 3.1.0
+     */
+    default boolean isConstant() {
+        return false;
     }
 
     /**
