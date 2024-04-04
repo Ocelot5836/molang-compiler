@@ -2,7 +2,9 @@
 
 # Molang Compiler
 
-High Speed MoLang compiler and executor designed with per-frame execution in mind. Check the [MoLang Documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/molangintroduction) for more information on how to write MoLang expressions.
+High Speed MoLang compiler and executor designed with per-frame execution in mind. Check
+the [MoLang Documentation](https://learn.microsoft.com/en-us/minecraft/creator/reference/content/molangreference/examples/molangconcepts/molangintroduction)
+for more information on how to write MoLang expressions.
 
 # How to add to your workspace
 
@@ -203,3 +205,7 @@ public class BarLibrary extends MolangLibrary {
     }
 }
 ```
+
+# Credit
+
+Buddy for writing the Java bytecode generation and class loader. https://twitter.com/BuddyYuz
