@@ -4,7 +4,6 @@ import gg.moonflower.molangcompiler.api.bridge.MolangJavaFunction;
 import gg.moonflower.molangcompiler.api.bridge.MolangVariable;
 import gg.moonflower.molangcompiler.api.bridge.MolangVariableProvider;
 import gg.moonflower.molangcompiler.api.object.MolangObject;
-import gg.moonflower.molangcompiler.core.node.MolangFunctionNode;
 
 import java.util.function.Supplier;
 

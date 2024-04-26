@@ -5,7 +5,6 @@ import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -56,10 +55,6 @@ public final class MolangLexer {
     }
 
     public record Token(TokenType type, String value) {
-        public String lowercaseValue() {
-            return this.value.toLowerCase(Locale.ROOT);
-        }
-
         @Override
         public String toString() {
             return this.type + "[" + this.value + "]";

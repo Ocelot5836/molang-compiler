@@ -5,8 +5,8 @@ import gg.moonflower.molangcompiler.api.MolangExpression;
 import gg.moonflower.molangcompiler.api.exception.MolangSyntaxException;
 import gg.moonflower.molangcompiler.core.ast.Node;
 import gg.moonflower.molangcompiler.core.compiler.BytecodeCompiler;
-import gg.moonflower.molangcompiler.core.compiler.MolangParser;
 import gg.moonflower.molangcompiler.core.compiler.MolangLexer;
+import gg.moonflower.molangcompiler.core.compiler.MolangParser;
 import org.jetbrains.annotations.ApiStatus;
 
 /**

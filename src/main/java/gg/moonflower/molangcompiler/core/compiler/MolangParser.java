@@ -321,8 +321,8 @@ public final class MolangParser {
         expectLength(reader, 2);
 
         // object.name
-        String object = reader.peek().lowercaseValue();
-        if ("t".equals(object)) {
+        String object = reader.peek().value();
+        if ("t".equalsIgnoreCase(object)) {
             object = "temp";
         }
 
@@ -331,14 +331,14 @@ public final class MolangParser {
         reader.skip();
 
         expect(reader, MolangLexer.TokenType.ALPHANUMERIC);
-        StringBuilder nameBuilder = new StringBuilder(reader.peek().lowercaseValue());
+        StringBuilder nameBuilder = new StringBuilder(reader.peek().value());
         reader.skip();
         while (reader.canRead()) {
             MolangLexer.Token token = reader.peek();
             if (!token.type().validVariableName()) {
                 break;
             }
-            nameBuilder.append(token.lowercaseValue());
+            nameBuilder.append(token.value());
             reader.skip();
         }
 

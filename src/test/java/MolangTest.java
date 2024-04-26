@@ -385,4 +385,16 @@ public class MolangTest {
         float result = runtime.resolve(loop);
         Assertions.assertEquals(4, result);
     }
+
+    @Test
+    void testCamelCase() throws MolangException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression loop = compiler.compile("q.testCamel");
+
+        MolangRuntime runtime = MolangRuntime.runtime()
+                .setQuery("testCamel", 4)
+                .create();
+        float result = runtime.resolve(loop);
+        Assertions.assertEquals(4, result);
+    }
 }
