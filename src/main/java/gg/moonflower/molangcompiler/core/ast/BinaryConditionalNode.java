@@ -54,6 +54,7 @@ public record BinaryConditionalNode(Node value, Node branch) implements Node {
         method.visitInsn(Opcodes.FCMPL);
         method.visitJumpInsn(Opcodes.IFEQ, label_end);
         this.branch.writeBytecode(method, environment, breakLabel, continueLabel);
+        method.visitInsn(Opcodes.FRETURN);
         method.visitLabel(label_end);
     }
 }
