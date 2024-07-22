@@ -107,6 +107,11 @@ public final class MolangParser {
                 reader.skip();
                 yield new BreakNode();
             }
+            case STRING -> {
+                reader.skip();
+                String value = token.value().substring(1, token.value().length() - 1);
+                yield new ConstNode(value.hashCode());
+            }
             case IF -> {
                 reader.skip();
                 expect(reader, MolangLexer.TokenType.LEFT_PARENTHESIS);
@@ -198,6 +203,19 @@ public final class MolangParser {
                 expect(reader, MolangLexer.TokenType.RIGHT_BRACE);
                 reader.skip();
                 yield new ScopeNode(node);
+            }
+            case SPECIAL -> {
+                switch (token.value()) {
+                    case "!" -> {
+                        reader.skip();
+                        yield new NegateNode(parseNode(reader));
+                    }
+                    case "-" -> {
+                        reader.skip();
+                        yield new BinaryOperationNode(BinaryOperation.MULTIPLY, new ConstNode(-1.0F), parseNode(reader));
+                    }
+                    default -> throw error("Unexpected token", reader);
+                }
             }
             default -> throw error("Unexpected token", reader);
         };
