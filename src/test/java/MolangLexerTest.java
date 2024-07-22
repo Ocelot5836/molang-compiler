@@ -38,4 +38,12 @@ public class MolangLexerTest {
         System.out.println(Arrays.toString(tokens));
         Assertions.assertEquals(10, tokens.length);
     }
+
+    @Test
+    public void testStrings() throws MolangSyntaxException {
+        String input = "'hello world'";
+        MolangLexer.Token[] tokens = MolangLexer.createTokens(input);
+        System.out.println(Arrays.toString(tokens));
+        Assertions.assertEquals(1, tokens.length);
+    }
 }

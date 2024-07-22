@@ -85,6 +85,7 @@ public final class MolangLexer {
         DOT("\\."),
         COMMA("\\,"),
         EQUAL("="),
+        STRING("\"[^\"]*\"|'[^']*'"),
         SEMICOLON(";");
 
         private final Pattern pattern;

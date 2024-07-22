@@ -397,4 +397,34 @@ public class MolangTest {
         float result = runtime.resolve(loop);
         Assertions.assertEquals(4, result);
     }
+
+    @Test
+    void testNegation() throws MolangException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression negate = compiler.compile("!(1 > 2)");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = runtime.resolve(negate);
+        Assertions.assertEquals(1, result);
+    }
+
+    @Test
+    void testDoubleEquals() throws MolangException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression expression = compiler.compile("1 == 1");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = runtime.resolve(expression);
+        Assertions.assertEquals(1.0F, result);
+    }
+
+    @Test
+    void testString() throws MolangException {
+        MolangCompiler compiler = MolangCompiler.create();
+        MolangExpression expression = compiler.compile("'hello world'");
+
+        MolangRuntime runtime = MolangRuntime.runtime().create();
+        float result = runtime.resolve(expression);
+        Assertions.assertEquals("hello world".hashCode(), result);
+    }
 }
