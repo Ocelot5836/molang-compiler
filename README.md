@@ -8,13 +8,13 @@ for more information on how to write MoLang expressions.
 
 # How to add to your workspace
 
-There are two main ways to use this in your application. If you are writing a Minecraft Mod with Forge or Fabric,
-install [Pollen](https://github.com/MoonflowerTeam/pollen) which already has the library shadowed. If you don't want
+There are two main ways to use this in your application. If you are writing a Minecraft Mod with NeoForge or Fabric,
+install [Veil](https://github.com/FoundryMC/Veil) which already has the library shadowed. If you don't want
 to add another library, you can just manually shadow this library into your mod.
 
 ```gradle
 plugins {
-    id 'com.github.johnrengelman.shadow' version "7.1.2"
+    id 'com.github.johnrengelman.shadow' version "8.1.1"
 }
 
 configurations {
@@ -39,21 +39,6 @@ shadowJar {
 }
 ```
 
-This is only required in a modded workspace
-
-```gradle
-reobf {
-    shadowJar {}
-}
-
-artifacts {
-    archives jar
-    archives shadowJar
-}
-
-build.dependsOn reobfShadowJar
-```
-
 # Usage
 
 When using this library with a regular java program, you can use GlobalMolangCompiler to retrieve new instances of the
@@ -71,16 +56,16 @@ public class Main {
 }
 ```
 
-When in an environment like Forge or Fabric a custom molang compiler instance must be created as a child of the mod
-class loader. If using Pollen, this step is already handled.
+When in an environment like NeoForge or Fabric a custom molang compiler instance must be created as a child of the mod
+class loader. If using Veil, this step is already handled.
 
 ```java
 
 @Mod("modid")
-public class ForgeMod {
+public class NeoForgeMod {
 
-    public ForgeMod() {
-        MolangCompiler compiler = MolangCompiler.create(MolangCompiler.DEFAULT_FLAGS, ForgeMod.class.getClassLoader());
+    public NeoForgeMod() {
+        MolangCompiler compiler = MolangCompiler.create(MolangCompiler.DEFAULT_FLAGS, NeoForgeMod.class.getClassLoader());
     }
 }
 ```
@@ -130,7 +115,7 @@ public class Example {
         try {
             // Note: this cannot be used in a modded environment.
             // The compiler used should be a global instance
-            // created like the ForgeMod example
+            // created like the NeoForgeMod example
             MolangCompiler compiler = GlobalMolangCompiler.get();
 
             // Expressions can be compiled from a valid MoLang string
