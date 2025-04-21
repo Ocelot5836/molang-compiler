@@ -1,7 +1,7 @@
 package gg.moonflower.molangcompiler.api;
 
 import gg.moonflower.molangcompiler.api.exception.MolangSyntaxException;
-import gg.moonflower.molangcompiler.core.MolangCompilerImpl;
+import gg.moonflower.molangcompiler.impl.MolangCompilerImpl;
 
 /**
  * <p>Compiles a {@link MolangExpression} from a string input.</p>

@@ -3,7 +3,7 @@ package gg.moonflower.molangcompiler.api;
 import gg.moonflower.molangcompiler.api.bridge.MolangJavaFunction;
 import gg.moonflower.molangcompiler.api.bridge.MolangVariable;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
-import gg.moonflower.molangcompiler.core.node.*;
+import gg.moonflower.molangcompiler.impl.node.*;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.function.BooleanSupplier;
@@ -16,6 +16,7 @@ import java.util.function.Supplier;
  * @see MolangEnvironment
  * @since 1.0.0
  */
+@ApiStatus.NonExtendable
 public interface MolangExpression {
 
     MolangExpression ZERO = of(0);
@@ -27,7 +28,7 @@ public interface MolangExpression {
      * @return The resulting value
      * @throws MolangRuntimeException If any error occurs when resolving the value
      */
-    @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     float get(MolangEnvironment environment) throws MolangRuntimeException;
 
     /**
@@ -83,8 +84,21 @@ public interface MolangExpression {
      *
      * @return A copy of this expression that has a unique internal state
      * @since 3.0.0
+     * @deprecated Use {@link MolangExpression#createCopy()}
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "4.0.0")
     default MolangExpression getCopy() {
+        return this.createCopy();
+    }
+
+    /**
+     * Creates a copy of this expression if there is an internal state.
+     *
+     * @return A copy of this expression that has a unique internal state
+     * @since 3.2.0
+     */
+    default MolangExpression createCopy() {
         return this;
     }
 

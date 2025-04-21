@@ -2,7 +2,7 @@ package gg.moonflower.molangcompiler.api;
 
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import gg.moonflower.molangcompiler.api.object.MolangObject;
-import gg.moonflower.molangcompiler.core.ImmutableMolangEnvironment;
+import gg.moonflower.molangcompiler.impl.ImmutableMolangEnvironment;
 
 import java.util.Collection;
 import java.util.Locale;
@@ -84,6 +84,50 @@ public interface MolangEnvironment {
      * @throws MolangRuntimeException If the object does not exist
      */
     MolangObject get(String name) throws MolangRuntimeException;
+
+    /**
+     * Retrieves the "context" object.
+     *
+     * @return The context object
+     * @throws MolangRuntimeException If the object does not exist
+     * @since 3.2.0
+     */
+    default MolangObject getContext() throws MolangRuntimeException {
+        return this.get("context");
+    }
+
+    /**
+     * Retrieves the "query" object.
+     *
+     * @return The query object
+     * @throws MolangRuntimeException If the object does not exist
+     * @since 3.2.0
+     */
+    default MolangObject getQuery() throws MolangRuntimeException {
+        return this.get("query");
+    }
+
+    /**
+     * Retrieves the "global" object.
+     *
+     * @return The global object
+     * @throws MolangRuntimeException If the object does not exist
+     * @since 3.2.0
+     */
+    default MolangObject getGlobal() throws MolangRuntimeException {
+        return this.get("global");
+    }
+
+    /**
+     * Retrieves the "variable" object.
+     *
+     * @return The variable object
+     * @throws MolangRuntimeException If the object does not exist
+     * @since 3.2.0
+     */
+    default MolangObject getVariable() throws MolangRuntimeException {
+        return this.get("variable");
+    }
 
     /**
      * Retrieves an expression by the specified parameter index.

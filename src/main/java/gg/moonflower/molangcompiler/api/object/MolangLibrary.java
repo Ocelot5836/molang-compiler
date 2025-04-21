@@ -2,7 +2,7 @@ package gg.moonflower.molangcompiler.api.object;
 
 import gg.moonflower.molangcompiler.api.MolangExpression;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
-import gg.moonflower.molangcompiler.core.node.MolangFunctionNode;
+import gg.moonflower.molangcompiler.impl.node.MolangFunctionNode;
 
 import java.util.Collection;
 import java.util.HashMap;

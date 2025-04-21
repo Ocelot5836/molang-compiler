@@ -124,7 +124,7 @@ public interface MolangVariable {
 
             @Override
             public MolangVariable copy() {
-                return create(initialValue);
+                return create(value[0]);
             }
 
             @Override

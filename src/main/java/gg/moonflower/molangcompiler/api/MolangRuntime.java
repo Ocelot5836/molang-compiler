@@ -4,7 +4,7 @@ import gg.moonflower.molangcompiler.api.exception.MolangException;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
 import gg.moonflower.molangcompiler.api.object.ImmutableMolangObject;
 import gg.moonflower.molangcompiler.api.object.MolangObject;
-import gg.moonflower.molangcompiler.core.object.MolangVariableStorage;
+import gg.moonflower.molangcompiler.impl.object.MolangVariableStorage;
 
 import java.util.*;
 
@@ -21,7 +21,11 @@ public class MolangRuntime implements MolangEnvironment {
     private final Map<String, String> aliases;
     private final List<Float> parameters;
 
-    private MolangRuntime(MolangObject query, MolangObject global, MolangObject variable, Map<String, MolangObject> libraries) {
+    private final ImmutableMolangObject query;
+    private final ImmutableMolangObject global;
+    private final MolangObject variable;
+
+    private MolangRuntime(ImmutableMolangObject query, ImmutableMolangObject global, MolangObject variable, Map<String, MolangObject> libraries) {
         this.thisValue = 0.0F;
         this.objects = new HashMap<>();
         this.aliases = new HashMap<>();
@@ -29,8 +33,11 @@ public class MolangRuntime implements MolangEnvironment {
         this.loadLibrary("context", query, "c"); // This is static accesses
         this.loadLibrary("query", query, "q"); // This is static accesses
         this.loadLibrary("global", global); // This is parameter access
-        this.loadLibrary("variable", variable, "v"); // This can be accessed by Java code
+        this.loadLibrary("variable", variable, "v"); // Java code can access this
         this.parameters = new ArrayList<>(8);
+        this.query = query;
+        this.global = global;
+        this.variable = variable;
     }
 
     private String sanitize(String name) {
@@ -107,6 +114,26 @@ public class MolangRuntime implements MolangEnvironment {
     }
 
     @Override
+    public MolangObject getContext() {
+        return this.query;
+    }
+
+    @Override
+    public MolangObject getQuery() {
+        return this.query;
+    }
+
+    @Override
+    public MolangObject getGlobal() {
+        return this.global;
+    }
+
+    @Override
+    public MolangObject getVariable() {
+        return this.variable;
+    }
+
+    @Override
     public float getParameter(int parameter) throws MolangRuntimeException {
         if (parameter < 0 || parameter >= this.parameters.size()) {
             throw new MolangRuntimeException("No parameter loaded in slot " + parameter);
@@ -136,24 +163,10 @@ public class MolangRuntime implements MolangEnvironment {
 
     @Override
     public MolangEnvironmentBuilder<MolangRuntime> edit() {
-        MolangVariableStorage query = this.getStorage("query");
-        MolangVariableStorage global = this.getStorage("global");
-        MolangVariableStorage variable = this.getStorage("variable");
-        return new EditBuilder(this, query, global, variable);
-    }
-
-    private MolangVariableStorage getStorage(String name) {
-        MolangObject object = this.objects.get(name);
-        if (object == null) {
-            throw new IllegalStateException("Missing " + name);
-        }
-        if (object instanceof ImmutableMolangObject immutableObject) {
-            object = immutableObject.parent();
-        }
-        if (!(object instanceof MolangVariableStorage variableStorage)) {
-            throw new IllegalStateException("Expected " + name + " to be " + MolangVariableStorage.class.getName() + ", was " + object.getClass().getName());
-        }
-        return variableStorage;
+        return new EditBuilder(this,
+                (MolangVariableStorage) this.query.parent(),
+                (MolangVariableStorage) this.global.parent(),
+                (MolangVariableStorage) this.variable);
     }
 
     /**
@@ -300,24 +313,24 @@ public class MolangRuntime implements MolangEnvironment {
             try {
                 for (String name : environment.getObjects()) {
                     name = name.toLowerCase(Locale.ROOT);
-                    MolangObject copy = environment.get(name).getCopy();
+                    MolangObject copy = environment.get(name).createCopy();
 
                     switch (name) {
                         case "query" -> {
                             for (String field : copy.getKeys()) {
-                                this.query.set(field, copy.get(field).getCopy());
+                                this.query.set(field, copy.get(field).createCopy());
                             }
                             continue;
                         }
                         case "global" -> {
                             for (String field : copy.getKeys()) {
-                                this.global.set(field, copy.get(field).getCopy());
+                                this.global.set(field, copy.get(field).createCopy());
                             }
                             continue;
                         }
                         case "variable" -> {
                             for (String field : copy.getKeys()) {
-                                this.variable.set(field, copy.get(field).getCopy());
+                                this.variable.set(field, copy.get(field).createCopy());
                             }
                             continue;
                         }
@@ -327,7 +340,7 @@ public class MolangRuntime implements MolangEnvironment {
                         MolangObject runtimeObject = environment.get(name);
                         if (runtimeObject.isMutable()) {
                             for (String field : copy.getKeys()) {
-                                runtimeObject.set(field, copy.get(field).getCopy());
+                                runtimeObject.set(field, copy.get(field).createCopy());
                             }
                             continue;
                         }
@@ -465,13 +478,13 @@ public class MolangRuntime implements MolangEnvironment {
         public MolangEnvironmentBuilder<MolangRuntime> copy(MolangEnvironment environment) {
             try {
                 for (String name : environment.getObjects()) {
-                    MolangObject copy = environment.get(name).getCopy();
+                    MolangObject copy = environment.get(name).createCopy();
 
                     if (this.runtime.has(name)) {
                         MolangObject runtimeObject = this.runtime.get(name);
                         if (runtimeObject.isMutable()) {
                             for (String field : copy.getKeys()) {
-                                runtimeObject.set(field, copy.get(field).getCopy());
+                                runtimeObject.set(field, copy.get(field).createCopy());
                             }
                             continue;
                         }

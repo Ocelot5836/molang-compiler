@@ -1,5 +1,5 @@
 import gg.moonflower.molangcompiler.api.exception.MolangSyntaxException;
-import gg.moonflower.molangcompiler.core.compiler.MolangLexer;
+import gg.moonflower.molangcompiler.impl.compiler.MolangLexer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

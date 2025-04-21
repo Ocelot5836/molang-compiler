@@ -2,6 +2,7 @@ package gg.moonflower.molangcompiler.api.object;
 
 import gg.moonflower.molangcompiler.api.MolangExpression;
 import gg.moonflower.molangcompiler.api.exception.MolangRuntimeException;
+import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collection;
 
@@ -59,9 +60,20 @@ public interface MolangObject {
     /**
      * @return The version of this object that will be passed to all copies of the parent environment
      * @since 3.0.0
+     * @deprecated Use {@link MolangObject#createCopy()}
      */
+    @Deprecated
+    @ApiStatus.ScheduledForRemoval(inVersion = "4.0.0")
     default MolangObject getCopy() {
         return this;
+    }
+
+    /**
+     * @return The version of this object that will be passed to all copies of the parent environment
+     * @since 3.2.0
+     */
+    default MolangObject createCopy() {
+        return this.getCopy();
     }
 
     /**
